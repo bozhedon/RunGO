@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:outlineProvider="bounds"
+        android:clipToPadding="false">
+
+    <android.support.constraint.ConstraintLayout
+            android:id="@+id/cat_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+        <ImageView
+                android:layout_width="50dp"
+                android:layout_height="60dp" app:srcCompat="@drawable/tail" android:id="@+id/cat_tail_image_view"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" android:layout_marginBottom="20dp"/>
+        <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp" tools:srcCompat="@drawable/body"
+                android:id="@+id/cat_body_image_view"
+                android:layout_marginEnd="-30dp"
+                app:layout_constraintTop_toTopOf="@+id/cat_head_image_view" android:layout_marginTop="80dp"
+                app:layout_constraintStart_toStartOf="@+id/cat_head_image_view"
+                app:layout_constraintEnd_toEndOf="@+id/cat_head_image_view"/>
+        <ImageView
+                android:layout_width="150dp"
+                android:layout_height="30dp" tools:srcCompat="@drawable/hand_left_mirror"
+                android:id="@+id/cat_hand_left_mirror_image_view"
+                android:scaleType="centerInside"
+                app:layout_constraintTop_toTopOf="@+id/cat_head_image_view"
+                android:rotation="-30"
+                android:layout_marginTop="80dp"
+                app:layout_constraintEnd_toEndOf="parent"/>
+        <ImageView
+                android:layout_width="150dp"
+                android:layout_height="30dp" tools:srcCompat="@drawable/hand_right_mirror"
+                android:id="@+id/cat_hand_right_mirror_image_view" app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="80dp"
+                app:layout_constraintTop_toTopOf="@+id/cat_head_image_view" android:rotation="30"/>
+        <ImageView
+                android:layout_width="40dp"
+                android:layout_height="60dp" tools:srcCompat="@drawable/leg_l"
+                android:id="@+id/cat_leg_right_mirror_image_view"
+                android:layout_marginTop="70dp"
+                app:layout_constraintTop_toTopOf="@+id/cat_body_image_view"
+                app:layout_constraintEnd_toEndOf="@+id/cat_body_image_view"
+                android:layout_marginEnd="11dp"/>
+        <ImageView
+                android:layout_width="40dp"
+                android:layout_height="60dp" tools:srcCompat="@drawable/leg_r"
+                android:id="@+id/cat_leg_left_mirror_image_view"
+                app:layout_constraintStart_toStartOf="@+id/cat_body_image_view"
+                android:layout_marginTop="70dp" app:layout_constraintTop_toTopOf="@+id/cat_body_image_view"
+                android:layout_marginStart="11dp"/>
+        <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp" app:srcCompat="@drawable/ear_l"
+                android:id="@+id/cat_ear_left_mirror_image_view"
+                app:layout_constraintStart_toStartOf="@+id/cat_head_image_view"/>
+        <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp" app:srcCompat="@drawable/ear_r"
+                android:id="@+id/cat_ear_right_mirror_image_view"
+                app:layout_constraintEnd_toEndOf="@+id/cat_head_image_view"/>
+        <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp" tools:srcCompat="@drawable/head"
+                android:id="@+id/cat_head_image_view"
+                app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+    </android.support.constraint.ConstraintLayout>
+</FrameLayout>
