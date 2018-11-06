@@ -37,6 +37,11 @@
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps">
         </activity>
+        <service
+            android:name="MyService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
