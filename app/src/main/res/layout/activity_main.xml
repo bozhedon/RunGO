@@ -2,8 +2,44 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+
+    <com.ogaclejapan.arclayout.ArcLayout
+        android:id="@+id/arc_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:arc_axisRadius="@dimen/layout_child_offset_large"
+        app:arc_origin="center"
+        app:arc_radius="@dimen/layout_radius_large">
+
+        <Button
+            style="@style/Item.Small"
+            android:background="@drawable/light_blue_oval_selector"
+            android:text="A" />
+
+        <Button
+            style="@style/Item.Small"
+            android:background="@drawable/cyan_oval_selector"
+            android:text="B" />
+
+        <Button
+            style="@style/Item.Small"
+            android:background="@drawable/teal_oval_selector"
+            android:text="C" />
+
+        <Button
+            style="@style/Item.Small"
+            android:background="@drawable/green_oval_selector"
+            android:text="D" />
+
+        <Button
+            style="@style/Item.Small"
+            android:background="@drawable/light_green_oval_selector"
+            android:text="E" />
+
+    </com.ogaclejapan.arclayout.ArcLayout>
 
 </android.support.constraint.ConstraintLayout>
