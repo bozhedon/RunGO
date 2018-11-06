@@ -5,40 +5,57 @@
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background_main"
     tools:context=".MainActivity">
+
+
+    <FrameLayout
+        android:id="@+id/fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="160dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.ogaclejapan.arclayout.ArcLayout
         android:id="@+id/arc_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:arc_axisRadius="@dimen/layout_child_offset_large"
-        app:arc_origin="center"
+        app:arc_origin="bottom"
         app:arc_radius="@dimen/layout_radius_large">
 
         <Button
+            android:id="@+id/home"
             style="@style/Item.Small"
-            android:background="@drawable/light_blue_oval_selector"
-            android:text="A" />
+            android:background="@drawable/button_home" />
 
         <Button
+            android:id="@+id/custom"
             style="@style/Item.Small"
-            android:background="@drawable/cyan_oval_selector"
-            android:text="B" />
+            android:background="@drawable/button_custom" />
 
         <Button
-            style="@style/Item.Small"
-            android:background="@drawable/teal_oval_selector"
-            android:text="C" />
+            android:id="@+id/start"
+            style="@style/Item.Large"
+            android:background="@drawable/button_start" />
 
         <Button
+            android:id="@+id/challenge"
             style="@style/Item.Small"
-            android:background="@drawable/green_oval_selector"
-            android:text="D" />
+            android:background="@drawable/button_challenge" />
 
         <Button
+            android:id="@+id/profile"
             style="@style/Item.Small"
-            android:background="@drawable/light_green_oval_selector"
-            android:text="E" />
+            android:background="@drawable/button_profile" />
 
     </com.ogaclejapan.arclayout.ArcLayout>
 
