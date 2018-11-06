@@ -18,7 +18,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="160dp"
+        android:layout_marginBottom="200dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,7 +30,10 @@
         android:layout_height="match_parent"
         app:arc_axisRadius="@dimen/layout_child_offset_large"
         app:arc_origin="bottom"
-        app:arc_radius="@dimen/layout_radius_large">
+        app:arc_radius="@dimen/layout_radius_large"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <Button
             android:id="@+id/home"
