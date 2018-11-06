@@ -10,60 +10,58 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-        final android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        final Button button_home = findViewById(R.id.home);
-        final Button button_custom = findViewById(R.id.custom);
-        final Button button_start = findViewById(R.id.start);
-        final Button button_challenge = findViewById(R.id.challenge);
-        final Button button_profile = findViewById(R.id.profile);
+        Button button_home = findViewById(R.id.home);
+        Button button_custom = findViewById(R.id.custom);
+        Button button_start = findViewById(R.id.start);
+        Button button_challenge = findViewById(R.id.challenge);
+        Button button_profile = findViewById(R.id.profile);
 
-        button_home.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
 
+        button_home.setOnClickListener(this);
+        button_custom.setOnClickListener(this);
+        button_start.setOnClickListener(this);
+        button_challenge.setOnClickListener(this);
+        button_profile.setOnClickListener(this);
+    }
+    @Override
+    public void onClick(View view) {
+        Fragment fragment = null;
+        switch (view.getId()) {
+            case R.id.home:
+                for (Fragment fragments:getSupportFragmentManager().getFragments()) {
+                getSupportFragmentManager().beginTransaction().remove(fragments).commit();
             }
-        });
-        button_custom.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Fragment fragment=null;
-                fragment= new Customization();
-                fragmentTransaction.replace(R.id.fragment,fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            }
-        });
-        button_start.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+                break;
+            case R.id.custom:
+                fragment = new Customization();
+                replaceFragment(fragment);
+                break;
+            case R.id.start:
                 Intent myIntent = new Intent(MainActivity.this, StartActivity.class);
-                //myIntent.putExtra("key", value); //Optional parameters
                 MainActivity.this.startActivity(myIntent);
-            }
-        });
-        button_challenge.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Fragment fragment=null;
-                fragment= new Challenge();
-                fragmentTransaction.replace(R.id.fragment,fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            }
-        });
-        button_profile.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Fragment fragment=null;
-                fragment= new Profile();
-                fragmentTransaction.replace(R.id.fragment,fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            }
-        });
+                break;
+            case R.id.challenge:
+                fragment = new Challenge();
+                replaceFragment(fragment);
+                break;
+            case R.id.profile:
+                fragment = new Profile();
+                replaceFragment(fragment);
+                break;
+        }
+    }
+    public void replaceFragment(Fragment someFragment) {
+        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.fragment_container, someFragment);
+        transaction.commit();
     }
 }
