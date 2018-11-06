@@ -11,55 +11,62 @@
 
     <FrameLayout
         android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="200dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/start"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.ogaclejapan.arclayout.ArcLayout
-        android:id="@+id/arc_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:arc_axisRadius="@dimen/layout_child_offset_large"
-        app:arc_origin="bottom"
-        app:arc_radius="@dimen/layout_radius_large"
+    <Button
+        android:id="@+id/home"
+        style="@style/Item.Small"
+        android:layout_marginStart="32dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/button_home"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/custom"
+        style="@style/Item.Small"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/button_custom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/start" />
+
+    <Button
+        android:id="@+id/start"
+        style="@style/Item.Large"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/button_start"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <Button
-            android:id="@+id/home"
-            style="@style/Item.Small"
-            android:background="@drawable/button_home" />
+    <Button
+        android:id="@+id/challenge"
+        style="@style/Item.Small"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/button_challenge"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/start" />
 
-        <Button
-            android:id="@+id/custom"
-            style="@style/Item.Small"
-            android:background="@drawable/button_custom" />
-
-        <Button
-            android:id="@+id/start"
-            style="@style/Item.Large"
-            android:background="@drawable/button_start" />
-
-        <Button
-            android:id="@+id/challenge"
-            style="@style/Item.Small"
-            android:background="@drawable/button_challenge" />
-
-        <Button
-            android:id="@+id/profile"
-            style="@style/Item.Small"
-            android:background="@drawable/button_profile" />
-
-    </com.ogaclejapan.arclayout.ArcLayout>
+    <Button
+        android:id="@+id/profile"
+        style="@style/Item.Small"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/button_profile"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

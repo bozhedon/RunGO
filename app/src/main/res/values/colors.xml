@@ -30,4 +30,8 @@
     <color name="path_black">#403B36</color>
     <color name="path_green">#5FB336</color>
     <color name="path_purple">#49098A</color>
+
+    <color name="feed_bg">#d3d6db</color>
+    <color name="feed_item_bg">#ffffff</color>
+    <color name="feed_item_border">#c2c3c8</color>
 </resources>
