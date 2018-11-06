@@ -69,7 +69,8 @@ public class StartActivity extends AppCompatActivity implements LocationListener
 
         data = new Data(onGpsServiceUpdate);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
+        CatView catView = findViewById(R.id.cat_view);
+        catView.run();
         start = findViewById(R.id.Start);
         stop = findViewById(R.id.Stop);
         map_btn = findViewById(R.id.map_btn);
@@ -177,7 +178,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
     public void onStartClick(View v) {
         if (!data.isRunning()) {
             data.setRunning(true);
-            start.setText("Pause");
+            start.setBackground(this.getResources().getDrawable(R.drawable.pause));
             stop.setEnabled(false);
             time.setBase(SystemClock.elapsedRealtime() - data.getTime());
             time.start();
@@ -185,7 +186,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
             startService(new Intent(getBaseContext(), MyService.class));
         } else {
             data.setRunning(false);
-            start.setText("GO!");
+            start.setBackground(this.getResources().getDrawable(R.drawable.play));
             stop.setEnabled(true);
             stopService(new Intent(getBaseContext(), MyService.class));
         }
@@ -193,7 +194,6 @@ public class StartActivity extends AppCompatActivity implements LocationListener
 
     public void onMapClick(View v) {
         if(!map_active){
-            map_btn.setText("CAT");
             map_active=true;
             mapFragment.getView().setVisibility(View.VISIBLE);
             startLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -209,7 +209,6 @@ public class StartActivity extends AppCompatActivity implements LocationListener
             }
         }
         else if(map_active) {
-            map_btn.setText("MAP");
             map_active=false;
             mapFragment.getView().setVisibility(View.INVISIBLE);
         }
