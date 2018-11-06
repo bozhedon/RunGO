@@ -4,4 +4,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="running">Идёт пробежка</string>
+    <string name="notification">Макс. скорость : %1$s, Пройдено : %2$s.</string>
+    <string name="noti_id" translatable="false">StepsV2id</string>
 </resources>
