@@ -59,6 +59,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
     private SupportMapFragment mapFragment;
     private String currentTime;
     private GoogleMap map;
+    private CatView catView;
 
 
 
@@ -69,8 +70,8 @@ public class StartActivity extends AppCompatActivity implements LocationListener
 
         data = new Data(onGpsServiceUpdate);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        CatView catView = findViewById(R.id.cat_view);
-        catView.run();
+        catView = findViewById(R.id.cat_view);
+        catView.stop();
         start = findViewById(R.id.Start);
         stop = findViewById(R.id.Stop);
         map_btn = findViewById(R.id.map_btn);
@@ -178,6 +179,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
     public void onStartClick(View v) {
         if (!data.isRunning()) {
             data.setRunning(true);
+            catView.run();
             start.setBackground(this.getResources().getDrawable(R.drawable.pause));
             stop.setEnabled(false);
             time.setBase(SystemClock.elapsedRealtime() - data.getTime());
@@ -186,6 +188,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
             startService(new Intent(getBaseContext(), MyService.class));
         } else {
             data.setRunning(false);
+            catView.stop();
             start.setBackground(this.getResources().getDrawable(R.drawable.play));
             stop.setEnabled(true);
             stopService(new Intent(getBaseContext(), MyService.class));
@@ -215,12 +218,12 @@ public class StartActivity extends AppCompatActivity implements LocationListener
     }
 
     public void onStopClick(View v) {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("distance", data.getDistance());
-        intent.putExtra("average", data.getAverageSpeed());
-        intent.putExtra("time", currentTime);
+        //Intent intent = new Intent(this, MainActivity.class);
+        //intent.putExtra("distance", data.getDistance());
+        //intent.putExtra("average", data.getAverageSpeed());
+        //intent.putExtra("time", currentTime);
         resetData();
-        startActivity(intent);
+        //startActivity(intent);
         finish();
     }
 
