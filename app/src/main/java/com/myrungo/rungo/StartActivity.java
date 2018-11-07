@@ -182,6 +182,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
             catView.run();
             start.setBackground(this.getResources().getDrawable(R.drawable.pause));
             stop.setEnabled(false);
+            stop.setBackground(this.getResources().getDrawable(R.drawable.stop_inactive));
             time.setBase(SystemClock.elapsedRealtime() - data.getTime());
             time.start();
             data.setFirstTime(true);
@@ -191,6 +192,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
             catView.stop();
             start.setBackground(this.getResources().getDrawable(R.drawable.play));
             stop.setEnabled(true);
+            stop.setBackground(this.getResources().getDrawable(R.drawable.stop));
             stopService(new Intent(getBaseContext(), MyService.class));
         }
     }
