@@ -9,7 +9,7 @@ package com.myrungo.rungo;
         import android.view.ViewGroup;
 
 
-public class Challenge extends Fragment {
+public class ChallengeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
