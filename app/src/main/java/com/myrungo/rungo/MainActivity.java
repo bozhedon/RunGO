@@ -2,6 +2,7 @@ package com.myrungo.rungo;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
@@ -45,10 +46,20 @@ public class MainActivity extends AppCompatActivity{
         }
     };
 
+    FloatingActionButton fab;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        fab = findViewById(R.id.fab_start);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, StartActivity.class);
+                startActivity(intent);
+            }
+        });
         Fragment fragment = new HomeFragment();
         replaceFragment(fragment);
         BottomNavigationViewEx bottomNavigationViewEx = findViewById(R.id.bnve);
@@ -69,5 +80,4 @@ public class MainActivity extends AppCompatActivity{
         bnve.enableAnimation(false);
         bnve.setTextVisibility(false);
     }
-
 }

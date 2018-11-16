@@ -16,7 +16,6 @@ public class HomeFragment extends Fragment {
 
         catView = view.findViewById(R.id.cat);
         catView.setSkin(CatView.Skins.BAD);
-        catView.run();
         return view;
     }
 }
