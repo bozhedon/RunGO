@@ -15,7 +15,6 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         catView = view.findViewById(R.id.cat);
         catView.setSkin(CatView.Skins.BAD);
-        catView.run();
         return view;
     }
 }
