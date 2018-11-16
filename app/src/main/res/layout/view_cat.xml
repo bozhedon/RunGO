@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cat_layout"
@@ -13,22 +12,22 @@
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="65dp"
-        tools:srcCompat="@drawable/tall_common"
         app:layout_constraintDimensionRatio="758:649"
+        app:layout_constraintEnd_toEndOf="@+id/cat_body_image_view"
         app:layout_constraintTop_toBottomOf="@+id/cat_hand_left_image_view"
-        app:layout_constraintEnd_toEndOf="@+id/cat_body_image_view"/>
+        tools:srcCompat="@drawable/tall_common" />
 
     <ImageView
         android:id="@+id/cat_hand_left_image_view"
         android:layout_width="50dp"
         android:layout_height="0dp"
-        android:layout_marginEnd="48dp"
         android:layout_marginTop="10dp"
+        android:layout_marginEnd="48dp"
         android:scaleX="-1"
-        tools:srcCompat="@drawable/bussiness_cat_hand"
         app:layout_constraintDimensionRatio="1083:1069"
+        app:layout_constraintEnd_toEndOf="@+id/cat_body_image_view"
         app:layout_constraintTop_toTopOf="@+id/cat_body_image_view"
-        app:layout_constraintEnd_toEndOf="@+id/cat_body_image_view"/>
+        tools:srcCompat="@drawable/bussiness_cat_hand" />
 
     <ImageView
         android:id="@+id/cat_hand_right_image_view"
@@ -36,20 +35,20 @@
         android:layout_height="0dp"
         android:layout_marginStart="48dp"
         android:layout_marginTop="10dp"
-        tools:srcCompat="@drawable/bussiness_cat_hand"
         app:layout_constraintDimensionRatio="1083:1069"
+        app:layout_constraintStart_toStartOf="@+id/cat_body_image_view"
         app:layout_constraintTop_toTopOf="@+id/cat_body_image_view"
-        app:layout_constraintStart_toStartOf="@+id/cat_body_image_view"/>
+        tools:srcCompat="@drawable/bussiness_cat_hand" />
 
     <ImageView
         android:id="@+id/cat_leg_left_image_view"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginTop="10dp"
-        tools:srcCompat="@drawable/bussiness_cat_leg"
         app:layout_constraintDimensionRatio="676:923"
         app:layout_constraintEnd_toEndOf="@+id/cat_body_image_view"
-        app:layout_constraintTop_toBottomOf="@+id/cat_hand_right_image_view"/>
+        app:layout_constraintTop_toBottomOf="@+id/cat_hand_right_image_view"
+        tools:srcCompat="@drawable/bussiness_cat_leg" />
 
     <ImageView
         android:id="@+id/cat_leg_right_image_view"
@@ -57,42 +56,42 @@
         android:layout_height="50dp"
         android:layout_marginTop="10dp"
         android:scaleX="-1"
-        tools:srcCompat="@drawable/bussiness_cat_leg"
         app:layout_constraintDimensionRatio="676:923"
         app:layout_constraintStart_toStartOf="@+id/cat_body_image_view"
-        app:layout_constraintTop_toBottomOf="@+id/cat_hand_right_image_view"/>
+        app:layout_constraintTop_toBottomOf="@+id/cat_hand_right_image_view"
+        tools:srcCompat="@drawable/bussiness_cat_leg" />
 
     <ImageView
         android:id="@+id/cat_body_image_view"
         android:layout_width="0dp"
         android:layout_height="100dp"
         android:layout_marginTop="53dp"
-        tools:srcCompat="@drawable/bussiness_cat_body"
         app:layout_constraintDimensionRatio="1729:2211"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@drawable/bussiness_cat_body" />
 
     <ImageView
         android:id="@+id/cat_head_image_view"
         android:layout_width="100dp"
         android:layout_height="0dp"
-        tools:srcCompat="@drawable/head_sad"
         app:layout_constraintDimensionRatio="2316:1798"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/cat_body_image_view"
         app:layout_constraintStart_toStartOf="@+id/cat_body_image_view"
-        app:layout_constraintEnd_toEndOf="@+id/cat_body_image_view"/>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@drawable/head_sad" />
 
     <ImageView
         android:id="@+id/cat_eye_left"
         android:layout_width="20dp"
         android:layout_height="21dp"
-        android:layout_marginTop="29dp"
         android:layout_marginStart="21dp"
-        tools:srcCompat="@drawable/eye_sad"
-        app:layout_constraintTop_toTopOf="@+id/cat_head_image_view"
+        android:layout_marginTop="29dp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="@+id/cat_head_image_view"
-        android:visibility="gone"/>
+        app:layout_constraintTop_toTopOf="@+id/cat_head_image_view"
+        tools:srcCompat="@drawable/eye_sad" />
 
     <ImageView
         android:id="@+id/cat_eye_right"
@@ -100,9 +99,9 @@
         android:layout_height="21dp"
         android:layout_marginTop="29dp"
         android:layout_marginEnd="21dp"
-        tools:srcCompat="@drawable/eye_sad"
-        app:layout_constraintTop_toTopOf="@+id/cat_head_image_view"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/cat_head_image_view"
-        android:visibility="gone"/>
+        app:layout_constraintTop_toTopOf="@+id/cat_head_image_view"
+        tools:srcCompat="@drawable/eye_sad" />
 
 </android.support.constraint.ConstraintLayout>
