@@ -9,10 +9,10 @@
 
     <ImageView
         android:id="@+id/cat_tail_image_view"
-        android:layout_width="66dp"
+        android:layout_width="33dp"
         android:layout_height="0dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="130dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="65dp"
         tools:srcCompat="@drawable/tall_common"
         app:layout_constraintDimensionRatio="758:649"
         app:layout_constraintTop_toBottomOf="@+id/cat_hand_left_image_view"
@@ -20,10 +20,10 @@
 
     <ImageView
         android:id="@+id/cat_hand_left_image_view"
-        android:layout_width="100dp"
+        android:layout_width="50dp"
         android:layout_height="0dp"
-        android:layout_marginEnd="96dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginTop="10dp"
         android:scaleX="-1"
         tools:srcCompat="@drawable/bussiness_cat_hand"
         app:layout_constraintDimensionRatio="1083:1069"
@@ -32,10 +32,10 @@
 
     <ImageView
         android:id="@+id/cat_hand_right_image_view"
-        android:layout_width="100dp"
+        android:layout_width="50dp"
         android:layout_height="0dp"
-        android:layout_marginStart="96dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="10dp"
         tools:srcCompat="@drawable/bussiness_cat_hand"
         app:layout_constraintDimensionRatio="1083:1069"
         app:layout_constraintTop_toTopOf="@+id/cat_body_image_view"
@@ -44,8 +44,8 @@
     <ImageView
         android:id="@+id/cat_leg_left_image_view"
         android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="20dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
         tools:srcCompat="@drawable/bussiness_cat_leg"
         app:layout_constraintDimensionRatio="676:923"
         app:layout_constraintEnd_toEndOf="@+id/cat_body_image_view"
@@ -54,8 +54,8 @@
     <ImageView
         android:id="@+id/cat_leg_right_image_view"
         android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="20dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
         android:scaleX="-1"
         tools:srcCompat="@drawable/bussiness_cat_leg"
         app:layout_constraintDimensionRatio="676:923"
@@ -65,8 +65,8 @@
     <ImageView
         android:id="@+id/cat_body_image_view"
         android:layout_width="0dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="106dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="53dp"
         tools:srcCompat="@drawable/bussiness_cat_body"
         app:layout_constraintDimensionRatio="1729:2211"
         app:layout_constraintTop_toTopOf="parent"
@@ -75,7 +75,7 @@
 
     <ImageView
         android:id="@+id/cat_head_image_view"
-        android:layout_width="200dp"
+        android:layout_width="100dp"
         android:layout_height="0dp"
         tools:srcCompat="@drawable/head_sad"
         app:layout_constraintDimensionRatio="2316:1798"
@@ -85,10 +85,10 @@
 
     <ImageView
         android:id="@+id/cat_eye_left"
-        android:layout_width="40dp"
-        android:layout_height="42dp"
-        android:layout_marginTop="58dp"
-        android:layout_marginStart="42dp"
+        android:layout_width="20dp"
+        android:layout_height="21dp"
+        android:layout_marginTop="29dp"
+        android:layout_marginStart="21dp"
         tools:srcCompat="@drawable/eye_sad"
         app:layout_constraintTop_toTopOf="@+id/cat_head_image_view"
         app:layout_constraintStart_toStartOf="@+id/cat_head_image_view"
@@ -96,10 +96,10 @@
 
     <ImageView
         android:id="@+id/cat_eye_right"
-        android:layout_width="40dp"
-        android:layout_height="42dp"
-        android:layout_marginTop="58dp"
-        android:layout_marginEnd="42dp"
+        android:layout_width="20dp"
+        android:layout_height="21dp"
+        android:layout_marginTop="29dp"
+        android:layout_marginEnd="21dp"
         tools:srcCompat="@drawable/eye_sad"
         app:layout_constraintTop_toTopOf="@+id/cat_head_image_view"
         app:layout_constraintEnd_toEndOf="@+id/cat_head_image_view"
