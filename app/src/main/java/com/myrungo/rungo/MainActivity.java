@@ -80,4 +80,5 @@ public class MainActivity extends AppCompatActivity{
         bnve.enableAnimation(false);
         bnve.setTextVisibility(false);
     }
+
 }
