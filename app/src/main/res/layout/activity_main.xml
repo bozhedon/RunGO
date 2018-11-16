@@ -11,12 +11,13 @@
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/fragment_container"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="-16dp"
+        android:layout_marginBottom="-10dp"
         app:elevation="9dp"
+        android:src="@drawable/round_play_arrow_24px"
+        app:maxImageSize="90dp"
         app:fabCustomSize="90dp" />
 
     <FrameLayout
@@ -26,15 +27,19 @@
         android:background="@drawable/bg_parent_rounded_corner"
         android:layout_above="@+id/bnve">
     </FrameLayout>
+
     <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
         android:id="@+id/bnve"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginBottom="1dp"
         android:background="@color/bottomviewcolor"
+        app:itemIconTint="@color/bottom_navigation_item_color"
         app:menu="@menu/bottom_menu">
+
     </com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx>
 
 </RelativeLayout>

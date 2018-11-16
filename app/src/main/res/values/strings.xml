@@ -7,4 +7,5 @@
     <string name="running">Идёт пробежка</string>
     <string name="notification">Макс. скорость : %1$s, Пройдено : %2$s.</string>
     <string name="noti_id" translatable="false">StepsV2id</string>
+    <string name="custom_frag_title">Выбери одежду</string>
 </resources>
