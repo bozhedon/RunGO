@@ -4,11 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseNetworkException;
+import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
@@ -16,16 +19,27 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.auth.SignInMethodQueryResult;
 import com.myrungo.rungo.R;
 import com.myrungo.rungo.base.BasePresenter;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 final class LoginPresenter<V extends LoginContract.View>
         extends BasePresenter<V>
         implements LoginContract.Presenter<V> {
+
+    private final String TAG = this.getClass().getName();
+
+    @Nullable
+    private String verificationId;
+
+    @Nullable
+    private PhoneAuthProvider.ForceResendingToken resendToken;
 
     @Nullable
     private FirebaseAuth firebaseAuth;
@@ -62,65 +76,61 @@ final class LoginPresenter<V extends LoginContract.View>
             return;
         }
 
+        if (email.isEmpty()) {
+            //TODO
+            //if sign up with phone number, sign in with appropriate info
+            return;
+        }
+
         silentlySignIn(email);
     }
 
     private void silentlySignIn(@NonNull final String email) {
         getFirebaseAuth()
                 .fetchSignInMethodsForEmail(email)
-                .addOnCompleteListener(((Activity) getView()), new OnCompleteListener<SignInMethodQueryResult>() {
+                .addOnSuccessListener(new OnSuccessListener<SignInMethodQueryResult>() {
                     @Override
-                    final public void onComplete(@NonNull final Task<SignInMethodQueryResult> task) {
+                    final public void onSuccess(@NonNull final SignInMethodQueryResult result) {
                         if (getCurrentUser() == null) {
                             return;
                         }
 
-                        final boolean emailVerified = getCurrentUser().isEmailVerified();
+                        @Nullable final List<String> signInMethods = result.getSignInMethods();
 
-                        @NonNull final Context context = ((Activity) getView()).getApplicationContext();
-
-                        if (task.isSuccessful()) {
-                            @Nullable final SignInMethodQueryResult result = task.getResult();
-
-                            if (result == null) {
-                                getView().hideProgressDialog();
-                                return;
-                            }
-
-                            @Nullable final List<String> signInMethods = result.getSignInMethods();
-
-                            if (signInMethods == null) {
-                                getView().hideProgressDialog();
-                                return;
-                            }
-
-                            final boolean userExistsInDB = !signInMethods.isEmpty();
-
-                            if (userExistsInDB) {
-                                if (emailVerified) {
-                                    getView().goToMain();
-                                } else {
-                                    emailIsNotVerified(context);
-                                }
-                            }
-
+                        if (signInMethods == null) {
+                            getView().hideProgressDialog();
                             return;
                         }
 
+                        final boolean userExistsInDB = !signInMethods.isEmpty();
+
+                        if (userExistsInDB) {
+                            if (!getCurrentUser().isEmailVerified()) {
+                                emailIsNotVerified();
+                            } else {
+                                getView().goToMain();
+                            }
+                        } else {
+                            getView().hideProgressDialog();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    final public void onFailure(@NonNull final Exception exception) {
                         @NonNull String message;
 
-                        @Nullable final Exception exception = task.getException();
-
                         if (exception instanceof FirebaseNetworkException) {
-                            //todo решить, давать ли пользователю войти в аккаунт
-                            //(его может не быть в БД или email не верифицирован)
-                            //или показывать сообщение об ошибке
-                            @NonNull final String networkError = context.getString(R.string.a_network_error_has_occurred);
-                            @NonNull final String signInFailed = context.getString(R.string.sign_in_failed);
+                            //todo user may be is not verified
+                            //then go to main screen or show error?
+                            @NonNull final String networkError = getContext().getString(R.string.a_network_error_has_occurred);
+                            @NonNull final String signInFailed = getContext().getString(R.string.sign_in_failed);
                             message = networkError + ". " + signInFailed;
                         } else {
-                            message = context.getString(R.string.unknown_error_has_occured);
+                            message = getContext().getString(R.string.unknown_error_has_occured);
                         }
+
+                        Log.d(TAG, exception.getMessage(), exception);
 
                         getView().hideProgressDialog();
 
@@ -136,16 +146,54 @@ final class LoginPresenter<V extends LoginContract.View>
         firebaseAuth = FirebaseAuth.getInstance();
     }
 
+    private void signInWithPhoneAuthCredential(@NonNull final PhoneAuthCredential credential) {
+        getView().showProgressDialog();
+
+        getFirebaseAuth().signInWithCredential(credential)
+                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                    @Override
+                    final public void onSuccess(@NonNull final AuthResult result) {
+                        if (getCurrentUser() == null) {
+                            getView().hideProgressDialog();
+                            return;
+                        }
+
+                        getView().goToMain();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    final public void onFailure(@NonNull final Exception exception) {
+                        if (exception instanceof FirebaseAuthInvalidCredentialsException) {
+                            getView().showMessage(getContext().getString(R.string.invalid_code));
+                        } else {
+                            //..
+                        }
+
+                        Log.d(TAG, exception.getMessage(), exception);
+
+                        getView().hideProgressDialog();
+                    }
+                });
+    }
+
+    private void verifyPhoneNumberWithCode(@NonNull final String verificationId, @NonNull final String code) {
+        @NonNull final PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
+
+        signInWithPhoneAuthCredential(credential);
+    }
+
     @Override
     final public void signInWithPhoneNumber(@NonNull final String phoneNumber) {
         getView().showProgressDialog();
 
         if (!getView().isPhoneNumberValid()) {
             getView().hideProgressDialog();
+            getView().disableSignInWithPhoneNumberButton();
             return;
         }
 
-        int c = 1;
+        //..
     }
 
     @Override
@@ -154,47 +202,20 @@ final class LoginPresenter<V extends LoginContract.View>
 
         if (!getView().isEmailAndPasswordValid()) {
             getView().hideProgressDialog();
-            getView().disableSignInButton();
+            getView().disableSignInWithEmailButton();
             return;
         }
 
         //email and password are valid
 
-        getView().disableSignInButton();
+        getView().disableSignInWithEmailButton();
 
         getFirebaseAuth()
                 .signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener((Activity) getView(), new OnCompleteListener<AuthResult>() {
+                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
-                    final public void onComplete(@NonNull final Task<AuthResult> task) {
-                        @NonNull final Context context = ((Activity) getView()).getApplicationContext();
-
-                        if (!task.isSuccessful()) {
-                            @Nullable final Exception taskException = task.getException();
-
-                            @NonNull String message;
-
-                            if (taskException instanceof FirebaseAuthInvalidUserException) {
-                                message = context.getString(R.string.there_is_no_such_user);
-                            } else if (taskException instanceof FirebaseNetworkException) {
-                                message = context.getString(R.string.a_network_error_has_occurred);
-                                getView().enableSignInButton();
-                            } else if (taskException instanceof FirebaseAuthInvalidCredentialsException) {
-                                message = context.getString(R.string.the_email_address_is_badly_formatted);
-                                getView().enableSignInButton();
-                            } else {
-                                message = context.getString(R.string.sign_in_failed);
-                                getView().enableSignInButton();
-                            }
-
-                            getView().hideProgressDialog();
-                            getView().showMessage(message);
-                            return;
-                        }
-
-                        //task is succesful
-
-                        getView().enableSignInButton();
+                    public void onSuccess(@NonNull final AuthResult authResult) {
+                        getView().enableSignInWithEmailButton();
 
                         if (getCurrentUser() == null) {
                             getView().hideProgressDialog();
@@ -204,19 +225,40 @@ final class LoginPresenter<V extends LoginContract.View>
                         //currentUser != null
 
                         if (getCurrentUser().isEmailVerified()) {
-                            //TODO сохранять в БД
-
-                            getView().hideProgressDialog();
+                            //TODO save to DB
                             getView().goToMain();
-                            return;
+                        } else {
+                            emailIsNotVerified();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    final public void onFailure(@NonNull final Exception exception) {
+                        @NonNull String message;
+
+                        if (exception instanceof FirebaseAuthInvalidUserException) {
+                            message = getContext().getString(R.string.there_is_no_such_user);
+                        } else if (exception instanceof FirebaseNetworkException) {
+                            message = getContext().getString(R.string.a_network_error_has_occurred);
+                            getView().enableSignInWithEmailButton();
+                        } else if (exception instanceof FirebaseAuthInvalidCredentialsException) {
+                            message = getContext().getString(R.string.the_email_address_is_badly_formatted);
+                            getView().enableSignInWithEmailButton();
+                        } else {
+                            message = getContext().getString(R.string.sign_in_failed);
+                            getView().enableSignInWithEmailButton();
                         }
 
-                        emailIsNotVerified(context);
+                        Log.d(TAG, exception.getMessage(), exception);
+
+                        getView().hideProgressDialog();
+                        getView().showMessage(message);
                     }
                 });
     }
 
-    private void emailIsNotVerified(@NonNull final Context context) {
+    private void emailIsNotVerified() {
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
             final public void onClick(@NonNull final View v) {
@@ -224,14 +266,14 @@ final class LoginPresenter<V extends LoginContract.View>
             }
         };
 
-        String message = context.getString(R.string.email_is_not_verified) + ". " +
-                context.getString(R.string.send_email_verification_again);
+        String message = getContext().getString(R.string.email_is_not_verified) + ". " +
+                getContext().getString(R.string.send_email_verification_again);
 
         getView().hideProgressDialog();
 
         getView().showMessage(
                 message,
-                context.getString(android.R.string.yes),
+                getContext().getString(android.R.string.yes),
                 clickListener
         );
     }
@@ -242,80 +284,153 @@ final class LoginPresenter<V extends LoginContract.View>
 
         if (!getView().isEmailAndPasswordValid()) {
             getView().hideProgressDialog();
-            getView().disableSignInButton();
+            getView().disableSignInWithEmailButton();
             return;
         }
 
         //email and password are valid
 
         getFirebaseAuth().createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener((Activity) getView(), new OnCompleteListener<AuthResult>() {
+                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
-                    final public void onComplete(@NonNull final Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            sendEmailVerification();
-                            getView().hideProgressDialog();
-                            return;
-                        }
-
-                        //task is not successful
-
-                        @Nullable final Exception taskException = task.getException();
-                        @NonNull final Context context = ((Activity) getView()).getApplicationContext();
+                    final public void onSuccess(@NonNull final AuthResult result) {
+                        sendEmailVerification();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    final public void onFailure(@NonNull final Exception exception) {
                         @NonNull String message;
 
-                        if (taskException instanceof FirebaseAuthWeakPasswordException) {
-                            message = context.getString(R.string.password_must_be_at_least_6_characters);
-                        } else if (taskException instanceof FirebaseAuthUserCollisionException) {
-                            @NonNull final String tryToSignIn = context.getString(R.string.try_to_sign_in);
+                        if (exception instanceof FirebaseAuthWeakPasswordException) {
+                            message = getContext().getString(R.string.password_must_be_at_least_6_characters);
+                        } else if (exception instanceof FirebaseAuthUserCollisionException) {
+                            @NonNull final String tryToSignIn = getContext().getString(R.string.try_to_sign_in);
 
                             @NonNull final String suchUserAlreadyExists =
-                                    context.getString(R.string.such_user_already_exists);
+                                    getContext().getString(R.string.such_user_already_exists);
 
                             message = suchUserAlreadyExists + ". " + tryToSignIn;
-                        } else if (taskException instanceof FirebaseNetworkException) {
-                            message = context.getString(R.string.a_network_error_has_occurred);
-                        } else if (taskException instanceof FirebaseAuthInvalidCredentialsException) {
-                            message = context.getString(R.string.the_email_address_is_badly_formatted);
-                            getView().enableSignInButton();
+                        } else if (exception instanceof FirebaseNetworkException) {
+                            message = getContext().getString(R.string.a_network_error_has_occurred);
+                        } else if (exception instanceof FirebaseAuthInvalidCredentialsException) {
+                            message = getContext().getString(R.string.the_email_address_is_badly_formatted);
+                            getView().enableSignInWithEmailButton();
                         } else {
-                            message = context.getString(R.string.register_failed);
+                            message = getContext().getString(R.string.register_failed);
                         }
+
+                        Log.d(TAG, exception.getMessage(), exception);
 
                         getView().hideProgressDialog();
 
                         getView().showMessage(message);
+
                     }
                 });
     }
 
     @Override
     public void signUpWithPhoneNumber(@NonNull final String phoneNumber) {
-        int c = 1;
+        getView().showProgressDialog();
+
+        if (!getView().isPhoneNumberValid()) {
+            getView().hideProgressDialog();
+            getView().disableSignInWithPhoneNumberButton();
+            return;
+        }
+
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+                phoneNumber,    // Phone number to verify
+                60, // Timeout duration
+                TimeUnit.SECONDS,   // Unit of timeout
+                (Activity) getView(),   // Activity (for callback binding)
+                new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+
+                    @Override
+                    public void onVerificationCompleted(@NonNull final PhoneAuthCredential credential) {
+                        // This callback will be invoked in two situations:
+                        // 1 - Instant verification. In some cases the phone number can be instantly
+                        //     verified without needing to send or enter a verification code.
+                        // 2 - Auto-retrieval. On some devices Google Play services can automatically
+                        //     detect the incoming verification SMS and perform verification without
+                        //     user action.
+
+                        getView().hideProgressDialog();
+
+                        signInWithPhoneAuthCredential(credential);
+                    }
+
+                    @Override
+                    public void onVerificationFailed(@NonNull final FirebaseException exception) {
+                        // This callback is invoked in an invalid request for verification is made,
+                        // for instance if the the phone number format is not valid.
+
+                        if (exception instanceof FirebaseAuthInvalidCredentialsException) {
+                            // Invalid request
+                            getView().showPhoneNumberError(getContext().getString(R.string.invalid_phone_number));
+                        } else if (exception instanceof FirebaseNetworkException) {
+                            getView().showMessage(getContext().getString(R.string.a_network_error_has_occurred));
+                        } else if (exception instanceof FirebaseTooManyRequestsException) {
+                            // The SMS quota for the project has been exceeded
+                            getView().showMessage("The SMS quota for the project has been exceeded");
+                        } else {
+                            getView().showMessage(getContext().getString(R.string.send_sms_failed));
+                        }
+
+                        Log.d(this.getClass().getName(), exception.getMessage(), exception);
+
+                        getView().hideProgressDialog();
+                    }
+
+                    @Override
+                    public void onCodeSent(
+                            @NonNull final String verificationId,
+                            @NonNull final PhoneAuthProvider.ForceResendingToken token
+                    ) {
+                        //TODO save this parameters to DB or Shared Preferences
+                        LoginPresenter.this.verificationId = verificationId;
+                        resendToken = token;
+
+                        getView().hideProgressDialog();
+                    }
+                });
     }
 
     private void sendEmailVerification() {
         Objects.requireNonNull(getCurrentUser()).sendEmailVerification()
-                .addOnCompleteListener((Activity) getView(), new OnCompleteListener<Void>() {
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    final public void onComplete(@NonNull final Task<Void> task) {
-                        @NonNull final Context context = ((Activity) getView()).getApplicationContext();
+                    final public void onSuccess(@Nullable final Void aVoid) {
+                        if (getCurrentUser() != null) {
+                            String hasBeenSentTo =
+                                    getContext().getString(R.string.email_verification_has_been_sent_to);
 
-                        @NonNull String message = "";
+                            @NonNull final String message = hasBeenSentTo + " " + getCurrentUser().getEmail();
 
-                        if (task.isSuccessful()) {
-                            if (getCurrentUser() != null) {
-                                message = context.getString(R.string.email_verification_has_been_sent_to) + " " +
-                                        getCurrentUser().getEmail();
-                            }
-                        } else {
-                            message = context.getString(R.string.verification_failed);
+                            getView().hideProgressDialog();
+                            getView().showMessage(message);
+                            getView().enableSignInWithEmailButton();
                         }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    final public void onFailure(@NonNull final Exception exception) {
+                        final @NonNull String message = getContext().getString(R.string.send_verification_email_failed);
 
+                        Log.d(TAG, exception.getMessage(), exception);
+
+                        getView().hideProgressDialog();
                         getView().showMessage(message);
-                        getView().enableSignInButton();
+                        getView().enableSignInWithEmailButton();
                     }
                 });
+    }
+
+    @NonNull
+    private Context getContext() {
+        return ((Activity) getView()).getApplicationContext();
     }
 
 }

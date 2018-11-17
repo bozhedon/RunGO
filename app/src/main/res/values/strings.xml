@@ -25,7 +25,7 @@
     <string name="such_user_already_exists">Такой пользователь уже существует</string>
     <string name="register_failed">Не удалось зарегистрироваться</string>
     <string name="email_verification_has_been_sent_to">Письмо для подтверждения было отправлено на</string>
-    <string name="verification_failed">Не удалось отправить письмо для подтверждения</string>
+    <string name="send_verification_email_failed">Не удалось отправить письмо для подтверждения</string>
     <string name="a_network_error_has_occurred">Произошла ошибка сети</string>
     <string name="account_is_not_verified">Аккаунт не подтверждён</string>
     <string name="try_to_sign_in">Попробуйте зайти в свой аккаунт</string>
@@ -33,4 +33,8 @@
     <string name="sign_in_with_phone_number">Войти с помощью телефонного номера</string>
     <string name="sign_in_with_email">Войти с помощью e-mail</string>
     <string name="the_email_address_is_badly_formatted">Неверный формат e-mail адреса</string>
+    <string name="invalid_code">Неверный код</string>
+    <string name="invalid_phone_number">Неверный формат номера</string>
+    <string name="you_have_not_entered_phone_number">Вы не ввели номер телефона</string>
+    <string name="send_sms_failed">Не удалось отправить СМС</string>
 </resources>

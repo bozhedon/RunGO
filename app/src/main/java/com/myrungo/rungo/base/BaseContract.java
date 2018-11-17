@@ -1,6 +1,7 @@
 package com.myrungo.rungo.base;
 
 import android.support.annotation.NonNull;
+import android.view.View;
 import android.view.View.OnClickListener;
 
 public interface BaseContract {
@@ -19,6 +20,10 @@ public interface BaseContract {
                 @NonNull final OnClickListener clickListener
         );
 
+        void hideKeyboard(@NonNull final android.view.View view);
+
+        void hideKeyboard();
+
     }
 
     interface Presenter<V extends View> {
@@ -26,8 +31,6 @@ public interface BaseContract {
         void onBindView(final @NonNull V view);
 
         void onUnbindView();
-
-        void onStart();
 
     }
 

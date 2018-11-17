@@ -8,16 +8,21 @@ public interface LoginContract extends BaseContract {
 
     interface View extends BaseContract.View {
 
-        @SuppressWarnings("BooleanMethodIsAlwaysInverted")
         boolean isEmailAndPasswordValid();
 
         boolean isPhoneNumberValid();
 
         void goToMain();
 
-        void disableSignInButton();
+        void disableSignInWithEmailButton();
 
-        void enableSignInButton();
+        void enableSignInWithEmailButton();
+
+        void disableSignInWithPhoneNumberButton();
+
+        void enableSignInWithPhoneNumberButton();
+
+        void showPhoneNumberError(final @NonNull String message);
 
     }
 
@@ -30,6 +35,8 @@ public interface LoginContract extends BaseContract {
         void signInWithEmailAndPassword(final @NonNull String email, final @NonNull String password);
 
         void signInWithPhoneNumber(final @NonNull String phoneNumber);
+
+        void onStart();
 
     }
 

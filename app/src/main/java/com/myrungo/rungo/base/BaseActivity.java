@@ -1,5 +1,6 @@
 package com.myrungo.rungo.base;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 
 public abstract class BaseActivity
         extends AppCompatActivity
@@ -20,12 +22,6 @@ public abstract class BaseActivity
         setupContentView();
         setupClickListeners();
         setPresenter();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        getPresenter().onStart();
     }
 
     @Override
@@ -42,7 +38,7 @@ public abstract class BaseActivity
 
     @Override
     final public void showMessage(@NonNull final String message) {
-        Snackbar.make(getProgressBarLayout(), message, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(getCoordinatorLayout(), message, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -52,7 +48,7 @@ public abstract class BaseActivity
             @NonNull final View.OnClickListener clickListener
     ) {
         Snackbar
-                .make(getProgressBarLayout(), message, Snackbar.LENGTH_LONG)
+                .make(getCoordinatorLayout(), message, Snackbar.LENGTH_LONG)
                 .setAction(buttonString, clickListener)
                 .show();
     }
@@ -65,6 +61,24 @@ public abstract class BaseActivity
     @Override
     final public void showProgressDialog() {
         getProgressBarLayout().setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    final public void hideKeyboard(@NonNull final View view) {
+        @Nullable final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    @Override
+    final public void hideKeyboard() {
+        @Nullable final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(findViewById(android.R.id.content).getWindowToken(), 0);
+        }
     }
 
     @NonNull

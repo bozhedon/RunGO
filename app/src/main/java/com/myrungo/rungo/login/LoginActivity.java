@@ -29,15 +29,10 @@ public final class LoginActivity
     @Nullable
     private LoginContract.Presenter<LoginContract.View> presenter;
 
-    @SuppressLint("SetTextI18n")
     @Override
-    final protected void onCreate(@Nullable final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        //TODO mock
-        getEmailField().setText("example70@bk.ru");
-        getPasswordField().setText("password70");
-        //
+    final protected void onStart() {
+        super.onStart();
+        getPresenter().onStart();
     }
 
     @Override
@@ -66,6 +61,8 @@ public final class LoginActivity
         @NonNull final String password = passwordFieldText.toString().trim();
         @NonNull final String phoneNumber = phoneNumberFieldText.toString().trim();
 
+        hideKeyboard();
+
         if (i == R.id.signInWithEmailButton) {
             getPresenter().signInWithEmailAndPassword(email, password);
         } else if (i == R.id.signInWithPhoneNumberButton) {
@@ -78,13 +75,23 @@ public final class LoginActivity
     }
 
     @Override
-    public void disableSignInButton() {
+    public void disableSignInWithEmailButton() {
         getSignInWithEmailButton().setEnabled(false);
     }
 
     @Override
-    public void enableSignInButton() {
+    public void enableSignInWithEmailButton() {
         getSignInWithEmailButton().setEnabled(true);
+    }
+
+    @Override
+    public void disableSignInWithPhoneNumberButton() {
+        getSignInWithPhoneNumberButton().setEnabled(false);
+    }
+
+    @Override
+    public void enableSignInWithPhoneNumberButton() {
+        getSignInWithPhoneNumberButton().setEnabled(true);
     }
 
     @NonNull
@@ -161,7 +168,6 @@ public final class LoginActivity
             getPasswordField().setError(getString(R.string.password_must_be_at_least_6_characters));
         }
 
-
         final boolean isEmailCorrect = isEmailCorrect(email);
 
         if (!isEmailCorrect) {
@@ -175,7 +181,7 @@ public final class LoginActivity
     final public boolean isPhoneNumberValid() {
         @Nullable final Editable phoneNumberField = getPhoneNumberField().getText();
 
-        @NonNull final String notFilled = getString(R.string.not_filled);
+        @NonNull final String notFilled = getString(R.string.you_have_not_entered_phone_number);
 
         if (phoneNumberField == null) {
             getPhoneNumberInputLayout().setError(notFilled);
@@ -184,7 +190,13 @@ public final class LoginActivity
 
         @NonNull final String phoneNumber = phoneNumberField.toString().trim();
 
-        return isPhoneNumberCorrect(phoneNumber);
+        boolean phoneNumberCorrect = isPhoneNumberCorrect(phoneNumber);
+
+        if (!phoneNumberCorrect) {
+            getPhoneNumberInputLayout().setError(notFilled);
+        }
+
+        return phoneNumberCorrect;
     }
 
     @Override
@@ -223,7 +235,7 @@ public final class LoginActivity
                     getEmailInputLayout().setError(null);
                 }
 
-                enableSignInButton();
+                enableSignInWithEmailButton();
             }
 
         });
@@ -256,7 +268,40 @@ public final class LoginActivity
                     getPasswordInputLayout().setError(null);
                 }
 
-                enableSignInButton();
+                enableSignInWithEmailButton();
+            }
+
+        });
+
+        getPhoneNumberField().addTextChangedListener(new TextWatcher() {
+
+            @Override
+            final public void beforeTextChanged(
+                    @NonNull final CharSequence s,
+                    final int start,
+                    final int count,
+                    final int after
+            ) {
+            }
+
+            @Override
+            final public void onTextChanged(
+                    @NonNull final CharSequence s,
+                    final int start,
+                    final int before,
+                    final int count
+            ) {
+            }
+
+            @Override
+            final public void afterTextChanged(@NonNull final Editable s) {
+                if (s.length() == 0)
+                    getPhoneNumberInputLayout().setError(getString(R.string.you_have_not_entered_phone_number));
+                else {
+                    getPhoneNumberInputLayout().setError(null);
+                }
+
+                enableSignInWithPhoneNumberButton();
             }
 
         });
@@ -279,6 +324,11 @@ public final class LoginActivity
         }
 
         return layoutWithProgressBar;
+    }
+
+    @Override
+    public void showPhoneNumberError(final @NonNull String message) {
+        getPhoneNumberInputLayout().setError(message);
     }
 
     private boolean isEmailCorrect(@NonNull final String email) {

@@ -57,9 +57,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".login.SignInActivity" />
         <activity android:name=".login.LoginActivity" />
-        <activity android:name=".login.FirebaseUIActivity" />
     </application>
 
 </manifest>
