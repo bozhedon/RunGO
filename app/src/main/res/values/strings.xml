@@ -7,4 +7,30 @@
     <string name="running">Идёт пробежка</string>
     <string name="notification">Макс. скорость : %1$s, Пройдено : %2$s.</string>
     <string name="noti_id" translatable="false">StepsV2id</string>
+    <string name="sign_up_with">Зарегистрироваться с помощью</string>
+    <string name="e_mail">E-mail</string>
+    <string name="password">Пароль</string>
+    <string name="not_filled">Заполните</string>
+    <string name="sign_in">Войти</string>
+    <string name="sign_up">Зарегистрироваться</string>
+    <string name="gmail">Gmail</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="you_have_not_entered_password">Вы не ввели пароль</string>
+    <string name="you_have_not_entered_email">Вы не ввели e-mail</string>
+    <string name="email_is_not_verified">E-mail не подтверждён</string>
+    <string name="send_email_verification_again">Выслать письмо для подтверждения ещё раз?</string>
+    <string name="there_is_no_such_user">Такого аккаунта не существует</string>
+    <string name="sign_in_failed">Не получилось войти в аккаунт</string>
+    <string name="password_must_be_at_least_6_characters">Пароль должен состоять минимум из 6 символов</string>
+    <string name="such_user_already_exists">Такой пользователь уже существует</string>
+    <string name="register_failed">Не удалось зарегистрироваться</string>
+    <string name="email_verification_has_been_sent_to">Письмо для подтверждения было отправлено на</string>
+    <string name="verification_failed">Не удалось отправить письмо для подтверждения</string>
+    <string name="a_network_error_has_occurred">Произошла ошибка сети</string>
+    <string name="account_is_not_verified">Аккаунт не подтверждён</string>
+    <string name="try_to_sign_in">Попробуйте зайти в свой аккаунт</string>
+    <string name="unknown_error_has_occured">Произошла неизвестная ошибка</string>
+    <string name="sign_in_with_phone_number">Войти с помощью телефонного номера</string>
+    <string name="sign_in_with_email">Войти с помощью e-mail</string>
+    <string name="the_email_address_is_badly_formatted">Неверный формат e-mail адреса</string>
 </resources>
