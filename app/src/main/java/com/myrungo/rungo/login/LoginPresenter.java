@@ -1,436 +1,237 @@
 package com.myrungo.rungo.login;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.View;
 
+import com.firebase.ui.auth.FirebaseUiException;
+import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.FirebaseException;
-import com.google.firebase.FirebaseNetworkException;
-import com.google.firebase.FirebaseTooManyRequestsException;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseAuthInvalidUserException;
-import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.PhoneAuthCredential;
-import com.google.firebase.auth.PhoneAuthProvider;
-import com.google.firebase.auth.SignInMethodQueryResult;
+import com.google.firebase.auth.FirebaseUserMetadata;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.myrungo.rungo.R;
-import com.myrungo.rungo.base.BasePresenter;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
 
-final class LoginPresenter<V extends LoginContract.View>
-        extends BasePresenter<V>
-        implements LoginContract.Presenter<V> {
+import static android.app.Activity.RESULT_OK;
+import static com.firebase.ui.auth.ErrorCodes.ANONYMOUS_UPGRADE_MERGE_CONFLICT;
+import static com.firebase.ui.auth.ErrorCodes.DEVELOPER_ERROR;
+import static com.firebase.ui.auth.ErrorCodes.EMAIL_MISMATCH_ERROR;
+import static com.firebase.ui.auth.ErrorCodes.NO_NETWORK;
+import static com.firebase.ui.auth.ErrorCodes.PLAY_SERVICES_UPDATE_CANCELLED;
+import static com.firebase.ui.auth.ErrorCodes.PROVIDER_ERROR;
+import static com.firebase.ui.auth.ErrorCodes.UNKNOWN_ERROR;
+import static com.myrungo.rungo.login.LoginActivity.RC_SIGN_IN;
 
-    private final String TAG = this.getClass().getName();
-
-    @Nullable
-    private String verificationId;
-
-    @Nullable
-    private PhoneAuthProvider.ForceResendingToken resendToken;
-
-    @Nullable
-    private FirebaseAuth firebaseAuth;
+public final class LoginPresenter<V extends LoginContract.View> implements LoginContract.Presenter<V> {
 
     @NonNull
-    private FirebaseAuth getFirebaseAuth() {
-        if (firebaseAuth == null) {
-            firebaseAuth = FirebaseAuth.getInstance();
-        }
-
-        firebaseAuth.useAppLanguage();
-
-        return firebaseAuth;
-    }
-
+    public static final String usersCollection = "users";
+    @NonNull
+    public static final String emailKey = "email";
+    @NonNull
+    public static final String phoneNumberKey = "phoneNumber";
+    private final String TAG = this.getClass().getName();
     @Nullable
-    private FirebaseUser getCurrentUser() {
-        return getFirebaseAuth().getCurrentUser();
+    private FirebaseFirestore firestoreDB;
+    @Nullable
+    private V view = null;
+
+    @Override
+    public void onViewCreate() {
+        getView().showProgressIndicator();
+        getView().createSignInIntent();
     }
 
     @Override
-    final public void onStart() {
-        getView().showProgressDialog();
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        getView().hideRefreshIndicator();
 
-        if (getCurrentUser() == null) {
-            getView().hideProgressDialog();
-            return;
-        }
+        getView().showProgressIndicator();
 
-        @Nullable final String email = getCurrentUser().getEmail();
+        if (requestCode == RC_SIGN_IN) {
+            @Nullable final IdpResponse response = IdpResponse.fromResultIntent(data);
 
-        if (email == null) {
-            getView().hideProgressDialog();
-            return;
-        }
-
-        if (email.isEmpty()) {
-            //TODO
-            //if sign up with phone number, sign in with appropriate info
-            return;
-        }
-
-        silentlySignIn(email);
-    }
-
-    private void silentlySignIn(@NonNull final String email) {
-        getFirebaseAuth()
-                .fetchSignInMethodsForEmail(email)
-                .addOnSuccessListener(new OnSuccessListener<SignInMethodQueryResult>() {
-                    @Override
-                    final public void onSuccess(@NonNull final SignInMethodQueryResult result) {
-                        if (getCurrentUser() == null) {
-                            return;
-                        }
-
-                        @Nullable final List<String> signInMethods = result.getSignInMethods();
-
-                        if (signInMethods == null) {
-                            getView().hideProgressDialog();
-                            return;
-                        }
-
-                        final boolean userExistsInDB = !signInMethods.isEmpty();
-
-                        if (userExistsInDB) {
-                            if (!getCurrentUser().isEmailVerified()) {
-                                emailIsNotVerified();
-                            } else {
-                                getView().goToMain();
-                            }
-                        } else {
-                            getView().hideProgressDialog();
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    final public void onFailure(@NonNull final Exception exception) {
-                        @NonNull String message;
-
-                        if (exception instanceof FirebaseNetworkException) {
-                            //todo user may be is not verified
-                            //then go to main screen or show error?
-                            @NonNull final String networkError = getContext().getString(R.string.a_network_error_has_occurred);
-                            @NonNull final String signInFailed = getContext().getString(R.string.sign_in_failed);
-                            message = networkError + ". " + signInFailed;
-                        } else {
-                            message = getContext().getString(R.string.unknown_error_has_occured);
-                        }
-
-                        Log.d(TAG, exception.getMessage(), exception);
-
-                        getView().hideProgressDialog();
-
-                        getView().showMessage(message);
-                    }
-                });
-    }
-
-    @Override
-    final public void onBindView(@NonNull final V view) {
-        super.onBindView(view);
-
-        firebaseAuth = FirebaseAuth.getInstance();
-    }
-
-    private void signInWithPhoneAuthCredential(@NonNull final PhoneAuthCredential credential) {
-        getView().showProgressDialog();
-
-        getFirebaseAuth().signInWithCredential(credential)
-                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                    @Override
-                    final public void onSuccess(@NonNull final AuthResult result) {
-                        if (getCurrentUser() == null) {
-                            getView().hideProgressDialog();
-                            return;
-                        }
-
-                        getView().goToMain();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    final public void onFailure(@NonNull final Exception exception) {
-                        if (exception instanceof FirebaseAuthInvalidCredentialsException) {
-                            getView().showMessage(getContext().getString(R.string.invalid_code));
-                        } else {
-                            //..
-                        }
-
-                        Log.d(TAG, exception.getMessage(), exception);
-
-                        getView().hideProgressDialog();
-                    }
-                });
-    }
-
-    private void verifyPhoneNumberWithCode(@NonNull final String verificationId, @NonNull final String code) {
-        @NonNull final PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
-
-        signInWithPhoneAuthCredential(credential);
-    }
-
-    @Override
-    final public void signInWithPhoneNumber(@NonNull final String phoneNumber) {
-        getView().showProgressDialog();
-
-        if (!getView().isPhoneNumberValid()) {
-            getView().hideProgressDialog();
-            getView().disableSignInWithPhoneNumberButton();
-            return;
-        }
-
-        //..
-    }
-
-    @Override
-    final public void signInWithEmailAndPassword(@NonNull final String email, @NonNull final String password) {
-        getView().showProgressDialog();
-
-        if (!getView().isEmailAndPasswordValid()) {
-            getView().hideProgressDialog();
-            getView().disableSignInWithEmailButton();
-            return;
-        }
-
-        //email and password are valid
-
-        getView().disableSignInWithEmailButton();
-
-        getFirebaseAuth()
-                .signInWithEmailAndPassword(email, password)
-                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                    @Override
-                    public void onSuccess(@NonNull final AuthResult authResult) {
-                        getView().enableSignInWithEmailButton();
-
-                        if (getCurrentUser() == null) {
-                            getView().hideProgressDialog();
-                            return;
-                        }
-
-                        //currentUser != null
-
-                        if (getCurrentUser().isEmailVerified()) {
-                            //TODO save to DB
-                            getView().goToMain();
-                        } else {
-                            emailIsNotVerified();
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    final public void onFailure(@NonNull final Exception exception) {
-                        @NonNull String message;
-
-                        if (exception instanceof FirebaseAuthInvalidUserException) {
-                            message = getContext().getString(R.string.there_is_no_such_user);
-                        } else if (exception instanceof FirebaseNetworkException) {
-                            message = getContext().getString(R.string.a_network_error_has_occurred);
-                            getView().enableSignInWithEmailButton();
-                        } else if (exception instanceof FirebaseAuthInvalidCredentialsException) {
-                            message = getContext().getString(R.string.the_email_address_is_badly_formatted);
-                            getView().enableSignInWithEmailButton();
-                        } else {
-                            message = getContext().getString(R.string.sign_in_failed);
-                            getView().enableSignInWithEmailButton();
-                        }
-
-                        Log.d(TAG, exception.getMessage(), exception);
-
-                        getView().hideProgressDialog();
-                        getView().showMessage(message);
-                    }
-                });
-    }
-
-    private void emailIsNotVerified() {
-        View.OnClickListener clickListener = new View.OnClickListener() {
-            @Override
-            final public void onClick(@NonNull final View v) {
-                sendEmailVerification();
+            if (resultCode == RESULT_OK) {
+                onOkResult();
+            } else {
+                onNotOkResult(response);
             }
-        };
-
-        String message = getContext().getString(R.string.email_is_not_verified) + ". " +
-                getContext().getString(R.string.send_email_verification_again);
-
-        getView().hideProgressDialog();
-
-        getView().showMessage(
-                message,
-                getContext().getString(android.R.string.yes),
-                clickListener
-        );
-    }
-
-    @Override
-    final public void signUpWithEmail(@NonNull final String email, @NonNull final String password) {
-        getView().showProgressDialog();
-
-        if (!getView().isEmailAndPasswordValid()) {
+        } else {
             getView().hideProgressDialog();
-            getView().disableSignInWithEmailButton();
-            return;
         }
-
-        //email and password are valid
-
-        getFirebaseAuth().createUserWithEmailAndPassword(email, password)
-                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                    @Override
-                    final public void onSuccess(@NonNull final AuthResult result) {
-                        sendEmailVerification();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    final public void onFailure(@NonNull final Exception exception) {
-                        @NonNull String message;
-
-                        if (exception instanceof FirebaseAuthWeakPasswordException) {
-                            message = getContext().getString(R.string.password_must_be_at_least_6_characters);
-                        } else if (exception instanceof FirebaseAuthUserCollisionException) {
-                            @NonNull final String tryToSignIn = getContext().getString(R.string.try_to_sign_in);
-
-                            @NonNull final String suchUserAlreadyExists =
-                                    getContext().getString(R.string.such_user_already_exists);
-
-                            message = suchUserAlreadyExists + ". " + tryToSignIn;
-                        } else if (exception instanceof FirebaseNetworkException) {
-                            message = getContext().getString(R.string.a_network_error_has_occurred);
-                        } else if (exception instanceof FirebaseAuthInvalidCredentialsException) {
-                            message = getContext().getString(R.string.the_email_address_is_badly_formatted);
-                            getView().enableSignInWithEmailButton();
-                        } else {
-                            message = getContext().getString(R.string.register_failed);
-                        }
-
-                        Log.d(TAG, exception.getMessage(), exception);
-
-                        getView().hideProgressDialog();
-
-                        getView().showMessage(message);
-
-                    }
-                });
     }
 
-    @Override
-    public void signUpWithPhoneNumber(@NonNull final String phoneNumber) {
-        getView().showProgressDialog();
+    private void onOkResult() {
+        getView().hideErrorTextView();
 
-        if (!getView().isPhoneNumberValid()) {
+        @Nullable final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) {
             getView().hideProgressDialog();
-            getView().disableSignInWithPhoneNumberButton();
-            return;
+        } else {
+            saveToDB(user);
         }
-
-        PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                phoneNumber,    // Phone number to verify
-                60, // Timeout duration
-                TimeUnit.SECONDS,   // Unit of timeout
-                (Activity) getView(),   // Activity (for callback binding)
-                new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-
-                    @Override
-                    public void onVerificationCompleted(@NonNull final PhoneAuthCredential credential) {
-                        // This callback will be invoked in two situations:
-                        // 1 - Instant verification. In some cases the phone number can be instantly
-                        //     verified without needing to send or enter a verification code.
-                        // 2 - Auto-retrieval. On some devices Google Play services can automatically
-                        //     detect the incoming verification SMS and perform verification without
-                        //     user action.
-
-                        getView().hideProgressDialog();
-
-                        signInWithPhoneAuthCredential(credential);
-                    }
-
-                    @Override
-                    public void onVerificationFailed(@NonNull final FirebaseException exception) {
-                        // This callback is invoked in an invalid request for verification is made,
-                        // for instance if the the phone number format is not valid.
-
-                        if (exception instanceof FirebaseAuthInvalidCredentialsException) {
-                            // Invalid request
-                            getView().showPhoneNumberError(getContext().getString(R.string.invalid_phone_number));
-                        } else if (exception instanceof FirebaseNetworkException) {
-                            getView().showMessage(getContext().getString(R.string.a_network_error_has_occurred));
-                        } else if (exception instanceof FirebaseTooManyRequestsException) {
-                            // The SMS quota for the project has been exceeded
-                            getView().showMessage("The SMS quota for the project has been exceeded");
-                        } else {
-                            getView().showMessage(getContext().getString(R.string.send_sms_failed));
-                        }
-
-                        Log.d(this.getClass().getName(), exception.getMessage(), exception);
-
-                        getView().hideProgressDialog();
-                    }
-
-                    @Override
-                    public void onCodeSent(
-                            @NonNull final String verificationId,
-                            @NonNull final PhoneAuthProvider.ForceResendingToken token
-                    ) {
-                        //TODO save this parameters to DB or Shared Preferences
-                        LoginPresenter.this.verificationId = verificationId;
-                        resendToken = token;
-
-                        getView().hideProgressDialog();
-                    }
-                });
     }
 
-    private void sendEmailVerification() {
-        Objects.requireNonNull(getCurrentUser()).sendEmailVerification()
+    private void saveToDB(@NonNull final FirebaseUser user) {
+        getView().showProgressIndicator();
+
+        @Nullable final FirebaseUserMetadata metadata = user.getMetadata();
+
+        final long creationTimestamp = metadata == null ? System.currentTimeMillis() : metadata.getCreationTimestamp();
+
+        @NonNull final Map<String, Object> newUserInfo = new HashMap<>();
+
+        @NonNull final String email = user.getEmail() != null ? user.getEmail() : "";
+        @NonNull final String displayName = user.getDisplayName() != null ? user.getDisplayName() : "";
+        @NonNull final String phoneNumber = user.getPhoneNumber() != null ? user.getPhoneNumber() : "";
+        @NonNull final Uri photoUri = user.getPhotoUrl() != null ? user.getPhotoUrl() : Uri.EMPTY;
+        @NonNull final String uid = user.getUid();
+        final boolean isAnonymous = user.isAnonymous();
+
+        @NonNull final List<String> providers = user.getProviders() != null
+                ? user.getProviders() : Collections.<String>emptyList();
+
+        @NonNull final String provider = providers.isEmpty() ? "" : providers.get(0);
+
+        @NonNull final String photoUrl = photoUri.toString();
+
+        newUserInfo.put("reg_date", creationTimestamp);
+        newUserInfo.put("name", displayName);
+        newUserInfo.put(emailKey, email);
+        newUserInfo.put(phoneNumberKey, phoneNumber);
+        newUserInfo.put("photoUri", photoUrl);
+        newUserInfo.put("uid", uid);
+        newUserInfo.put("isAnonymous", isAnonymous);
+        newUserInfo.put("provider", provider);
+
+        getFirebaseFirestore()
+                .collection(usersCollection)
+                .document(uid)
+                .set(newUserInfo)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    final public void onSuccess(@Nullable final Void aVoid) {
-                        if (getCurrentUser() != null) {
-                            String hasBeenSentTo =
-                                    getContext().getString(R.string.email_verification_has_been_sent_to);
-
-                            @NonNull final String message = hasBeenSentTo + " " + getCurrentUser().getEmail();
-
-                            getView().hideProgressDialog();
-                            getView().showMessage(message);
-                            getView().enableSignInWithEmailButton();
-                        }
+                    public void onSuccess(@Nullable final Void v) {
+                        //user saved in DB
+                        getView().goToMainScreen();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     final public void onFailure(@NonNull final Exception exception) {
-                        final @NonNull String message = getContext().getString(R.string.send_verification_email_failed);
-
-                        Log.d(TAG, exception.getMessage(), exception);
-
                         getView().hideProgressDialog();
-                        getView().showMessage(message);
-                        getView().enableSignInWithEmailButton();
+
+                        getView().showMessage(exception.getMessage());
                     }
                 });
     }
 
+    @SuppressLint("SetTextI18n")
+    private void onNotOkResult(@Nullable final IdpResponse response) {
+        if (response == null) {
+            //the user canceled the sign-in flow using the back button
+            getView().hideProgressDialog();
+            return;
+        }
+
+        @Nullable final FirebaseUiException error = response.getError();
+
+        if (error == null) {
+            getView().hideProgressDialog();
+            return;
+        }
+
+        Log.d(TAG, error.getMessage(), error);
+
+        final int errorCode = error.getErrorCode();
+
+        @NonNull String part1;
+
+        Context context = ((Activity) getView()).getApplicationContext();
+
+        if (errorCode == NO_NETWORK) {
+
+            part1 = context.getString(R.string.no_internet_connection);
+
+        } else if (errorCode == PLAY_SERVICES_UPDATE_CANCELLED) {
+
+            part1 = context.getString(R.string.play_services_update_cancelled);
+
+        } else if (errorCode == DEVELOPER_ERROR) {
+
+            part1 = context.getString(R.string.developer_error);
+
+        } else if (errorCode == PROVIDER_ERROR) {
+
+            part1 = context.getString(R.string.provider_error);
+
+        } else if (errorCode == ANONYMOUS_UPGRADE_MERGE_CONFLICT) {
+
+            part1 = context.getString(R.string.user_account_merge_conflict);
+
+        } else if (errorCode == EMAIL_MISMATCH_ERROR) {
+
+            part1 = context.getString(R.string.you_are_attempting_to_sign_in_a_different_email_than_previously_provided);
+
+        } else if (errorCode == UNKNOWN_ERROR) {
+
+            part1 = context.getString(R.string.unknown_error_has_occured);
+
+        } else {
+
+            part1 = context.getString(R.string.unknown_error_has_occured);
+
+        }
+
+        @NonNull final String part2 = context.getString(R.string.swipe_from_up_to_down);
+
+        getView().setErrorText(part1 + ". " + part2);
+
+        getView().showErrorTextView();
+
+        getView().showMessage(part1);
+
+        getView().hideProgressDialog();
+    }
+
     @NonNull
-    private Context getContext() {
-        return ((Activity) getView()).getApplicationContext();
+    private FirebaseFirestore getFirebaseFirestore() {
+        if (firestoreDB == null) {
+            firestoreDB = FirebaseFirestore.getInstance();
+        }
+
+        return firestoreDB;
+    }
+
+    @NonNull
+    private V getView() {
+        if (view == null) {
+            throw new RuntimeException("view == null");
+        }
+
+        return view;
+    }
+
+    @Override
+    public void onBindView(@NonNull V view) {
+        this.view = view;
+    }
+
+    @Override
+    public void onUnbindView() {
+        view = null;
     }
 
 }

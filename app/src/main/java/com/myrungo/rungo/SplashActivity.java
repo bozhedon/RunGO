@@ -10,12 +10,20 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.SignInMethodQueryResult;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.myrungo.rungo.login.LoginActivity;
+import com.myrungo.rungo.login.LoginPresenter;
 
 import java.util.List;
+import java.util.Map;
 
 public final class SplashActivity extends AppCompatActivity {
+
+    @SuppressWarnings("unused")
+    @NonNull
+    private final String TAG = getClass().getName();
 
     @Override
     final protected void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -25,15 +33,27 @@ public final class SplashActivity extends AppCompatActivity {
     }
 
     @Nullable
+    private FirebaseFirestore firestoreDB;
+
+    @NonNull
+    private FirebaseFirestore getFirebaseFirestore() {
+        if (firestoreDB == null) {
+            firestoreDB = FirebaseFirestore.getInstance();
+        }
+
+        return firestoreDB;
+    }
+
+    @Nullable
     private FirebaseAuth firebaseAuth;
 
     @NonNull
     private FirebaseAuth getFirebaseAuth() {
         if (firebaseAuth == null) {
             firebaseAuth = FirebaseAuth.getInstance();
-        }
 
-        firebaseAuth.useAppLanguage();
+            firebaseAuth.useAppLanguage();
+        }
 
         return firebaseAuth;
     }
@@ -44,54 +64,35 @@ public final class SplashActivity extends AppCompatActivity {
     }
 
     private void routeToAppropriateScreen() {
-        if (getCurrentUser() == null) {
-            goToLoginScreen();
-            return;
+        if (getCurrentUser() != null) {
+            @Nullable final String phoneNumber = getCurrentUser().getPhoneNumber();
+
+            if (phoneNumber != null && !phoneNumber.isEmpty()) {
+                checkWithPhoneNumber(phoneNumber);
+                return;
+            }
+
+            @Nullable final String email = getCurrentUser().getEmail();
+
+            if (email != null && !email.isEmpty()) {
+                checkWithEmail(email);
+                return;
+            }
         }
 
-        @Nullable final String email = getCurrentUser().getEmail();
+        goToLoginScreen();
+    }
 
-        if (email == null) {
-            goToLoginScreen();
-            return;
-        }
-
-        if (email.isEmpty()) {
-            //TODO
-            //if sign up with phone number, sign in with appropriate info
-            goToLoginScreen();
-            return;
-        }
-
-        getFirebaseAuth()
-                .fetchSignInMethodsForEmail(email)
-                .addOnSuccessListener(new OnSuccessListener<SignInMethodQueryResult>() {
+    private void checkWithEmail(@NonNull final String email) {
+        getFirebaseFirestore()
+                .collection(LoginPresenter.usersCollection)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
-                    final public void onSuccess(@NonNull final SignInMethodQueryResult result) {
-                        if (getCurrentUser() == null) {
-                            goToLoginScreen();
-                            return;
-                        }
+                    final public void onSuccess(@NonNull final QuerySnapshot querySnapshot) {
+                        @NonNull final List<DocumentSnapshot> documents = querySnapshot.getDocuments();
 
-                        @Nullable final List<String> signInMethods = result.getSignInMethods();
-
-                        if (signInMethods == null) {
-                            goToLoginScreen();
-                            return;
-                        }
-
-                        final boolean userExistsInDB = !signInMethods.isEmpty();
-
-                        if (!userExistsInDB) {
-                            goToLoginScreen();
-                            return;
-                        }
-
-                        if (!getCurrentUser().isEmailVerified()) {
-                            goToLoginScreen();
-                        } else {
-                            goToMainScreen();
-                        }
+                        checkDocumentsForEmail(documents, email);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -100,6 +101,86 @@ public final class SplashActivity extends AppCompatActivity {
                         goToLoginScreen();
                     }
                 });
+    }
+
+    private void checkDocumentsForEmail(
+            @Nullable final List<DocumentSnapshot> documents,
+            @NonNull final String email
+    ) {
+        if (documents == null) {
+            goToLoginScreen();
+            return;
+        }
+
+        for (@NonNull final DocumentSnapshot document : documents) {
+            @Nullable final Map<String, Object> data = document.getData();
+
+            if (data != null) {
+                @Nullable final Object emailFromDB = data.get(LoginPresenter.emailKey);
+
+                if (emailFromDB != null) {
+                    final boolean canGoToMainScreen = emailFromDB.equals(email);
+
+                    if (canGoToMainScreen) {
+                        goToMainScreen();
+                        return;
+                    }
+                }
+            }
+        }
+
+        //DB has no such user's email
+        goToLoginScreen();
+    }
+
+    private void checkWithPhoneNumber(@NonNull final String phoneNumber) {
+        getFirebaseFirestore()
+                .collection(LoginPresenter.usersCollection)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    final public void onSuccess(@NonNull final QuerySnapshot querySnapshot) {
+                        @NonNull final List<DocumentSnapshot> documents = querySnapshot.getDocuments();
+
+                        checkDocumentsForPhoneNumber(documents, phoneNumber);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    final public void onFailure(@NonNull final Exception exception) {
+                        goToLoginScreen();
+                    }
+                });
+    }
+
+    private void checkDocumentsForPhoneNumber(
+            @Nullable final List<DocumentSnapshot> documents,
+            @NonNull final String phoneNumber
+    ) {
+        if (documents == null) {
+            goToLoginScreen();
+            return;
+        }
+
+        for (@NonNull final DocumentSnapshot document : documents) {
+            @Nullable final Map<String, Object> data = document.getData();
+
+            if (data != null) {
+                @Nullable final Object phoneNumberFromDB = data.get(LoginPresenter.phoneNumberKey);
+
+                if (phoneNumberFromDB != null) {
+                    final boolean canGoToMainScreen = phoneNumberFromDB.equals(phoneNumber);
+
+                    if (canGoToMainScreen) {
+                        goToMainScreen();
+                        return;
+                    }
+                }
+            }
+        }
+
+        //DB has no such user's phone number
+        goToLoginScreen();
     }
 
     private void goToLoginScreen() {

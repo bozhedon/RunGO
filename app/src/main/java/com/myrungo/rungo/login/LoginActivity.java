@@ -1,114 +1,48 @@
 package com.myrungo.rungo.login;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.TextInputLayout;
-import android.text.Editable;
-import android.text.TextUtils;
-import android.text.TextWatcher;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.TextView;
 
+import com.firebase.ui.auth.AuthUI;
 import com.myrungo.rungo.MainActivity;
 import com.myrungo.rungo.R;
-import com.myrungo.rungo.base.BaseActivity;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Arrays;
+import java.util.List;
 
 public final class LoginActivity
-        extends BaseActivity
-        implements View.OnClickListener, LoginContract.View {
+        extends AppCompatActivity
+        implements SwipeRefreshLayout.OnRefreshListener, LoginContract.View {
+
+    static final int RC_SIGN_IN = 123;
+
+    @NonNull
+    private final static List<AuthUI.IdpConfig> providers = Arrays.asList(
+            new AuthUI.IdpConfig.EmailBuilder().build(),
+            new AuthUI.IdpConfig.PhoneBuilder().build(),
+            new AuthUI.IdpConfig.GoogleBuilder().build()
+    );
 
     @Nullable
     private LoginContract.Presenter<LoginContract.View> presenter;
 
-    @Override
-    final protected void onStart() {
-        super.onStart();
-        getPresenter().onStart();
-    }
+    private void setupPresenter() {
+        presenter = new LoginPresenter<>();
 
-    @Override
-    final public void onClick(@NonNull final View v) {
-        final int i = v.getId();
-
-        @Nullable final Editable emailFieldText = getEmailField().getText();
-
-        if (emailFieldText == null) {
-            throw new RuntimeException("emailFieldText == null");
-        }
-
-        @Nullable final Editable passwordFieldText = getPasswordField().getText();
-
-        if (passwordFieldText == null) {
-            throw new RuntimeException("passwordFieldText == null");
-        }
-
-        @Nullable final Editable phoneNumberFieldText = getPhoneNumberField().getText();
-
-        if (phoneNumberFieldText == null) {
-            throw new RuntimeException("phoneNumberFieldText == null");
-        }
-
-        @NonNull final String email = emailFieldText.toString().trim();
-        @NonNull final String password = passwordFieldText.toString().trim();
-        @NonNull final String phoneNumber = phoneNumberFieldText.toString().trim();
-
-        hideKeyboard();
-
-        if (i == R.id.signInWithEmailButton) {
-            getPresenter().signInWithEmailAndPassword(email, password);
-        } else if (i == R.id.signInWithPhoneNumberButton) {
-            getPresenter().signInWithPhoneNumber(phoneNumber);
-        } else if (i == R.id.signUpWithEmailButton) {
-            getPresenter().signUpWithEmail(email, password);
-        } else if (i == R.id.signUpWithPhoneNumberButton) {
-            getPresenter().signUpWithPhoneNumber(phoneNumber);
-        }
-    }
-
-    @Override
-    public void disableSignInWithEmailButton() {
-        getSignInWithEmailButton().setEnabled(false);
-    }
-
-    @Override
-    public void enableSignInWithEmailButton() {
-        getSignInWithEmailButton().setEnabled(true);
-    }
-
-    @Override
-    public void disableSignInWithPhoneNumberButton() {
-        getSignInWithPhoneNumberButton().setEnabled(false);
-    }
-
-    @Override
-    public void enableSignInWithPhoneNumberButton() {
-        getSignInWithPhoneNumberButton().setEnabled(true);
+        presenter.onBindView(this);
     }
 
     @NonNull
-    @Override
-    final protected CoordinatorLayout getCoordinatorLayout() {
-        @Nullable final CoordinatorLayout activitySignUpCL = findViewById(R.id.activitySignUpCL);
-
-        if (activitySignUpCL == null) {
-            throw new RuntimeException("activitySignUpCL == null");
-        }
-
-        return activitySignUpCL;
-    }
-
-    @NonNull
-    @Override
-    final protected LoginContract.Presenter getPresenter() {
+    private LoginContract.Presenter<LoginContract.View> getPresenter() {
         if (presenter == null) {
             throw new RuntimeException("presenter == null");
         }
@@ -117,206 +51,93 @@ public final class LoginActivity
     }
 
     @Override
-    final protected void setupContentView() {
-        setContentView(R.layout.activity_login);
+    final protected void onCreate(@Nullable final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_firebase_ui);
+
+        getSwipeRefreshLayout().setOnRefreshListener(this);
+
+        setupPresenter();
+
+        getPresenter().onViewCreate();
+    }
+
+    //must be called ONLY from onCreate
+    @Override
+    public void createSignInIntent() {
+        @NonNull final Intent intent = AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setIsSmartLockEnabled(false, true)
+                .setAvailableProviders(providers)
+                .setLogo(R.drawable.icon_head_400x400)
+                .setTheme(R.style.AppTheme)
+                .build();
+
+        startActivityForResult(intent, RC_SIGN_IN);
     }
 
     @Override
-    final protected void setPresenter() {
-        presenter = new LoginPresenter<>();
+    final protected void onActivityResult(
+            final int requestCode,
+            final int resultCode,
+            @Nullable final Intent data
+    ) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-        presenter.onBindView(this);
+        getPresenter().onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
-    final public boolean isEmailAndPasswordValid() {
-        @Nullable final Editable emailFieldText = getEmailField().getText();
-
-        if (emailFieldText == null) {
-            getEmailInputLayout().setError(getString(R.string.you_have_not_entered_email));
-            return false;
-        }
-
-        @Nullable final Editable passwordFieldText = getPasswordField().getText();
-
-        if (passwordFieldText == null) {
-            getPasswordInputLayout().setError(getString(R.string.you_have_not_entered_password));
-            return false;
-        }
-
-        @NonNull final String email = emailFieldText.toString();
-
-        @NonNull final String password = passwordFieldText.toString();
-
-        final boolean emailIsEmpty = TextUtils.getTrimmedLength(email) == 0;
-
-        if (emailIsEmpty) {
-            getEmailField().setError(getString(R.string.you_have_not_entered_email));
-        }
-
-        int passwordLength = TextUtils.getTrimmedLength(password);
-
-        final boolean passwordIsEmpty = passwordLength == 0;
-
-        if (passwordIsEmpty) {
-            getPasswordField().setError(getString(R.string.you_have_not_entered_password));
-        }
-
-        final boolean passwordIsWeak = passwordLength < 6;
-
-        if (passwordIsWeak) {
-            getPasswordField().setError(getString(R.string.password_must_be_at_least_6_characters));
-        }
-
-        final boolean isEmailCorrect = isEmailCorrect(email);
-
-        if (!isEmailCorrect) {
-            getEmailField().setError(getString(R.string.the_email_address_is_badly_formatted));
-        }
-
-        return !emailIsEmpty && !passwordIsEmpty && !passwordIsWeak && isEmailCorrect;
+    public void hideRefreshIndicator() {
+        getSwipeRefreshLayout().setRefreshing(false);
     }
 
     @Override
-    final public boolean isPhoneNumberValid() {
-        @Nullable final Editable phoneNumberField = getPhoneNumberField().getText();
-
-        @NonNull final String notFilled = getString(R.string.you_have_not_entered_phone_number);
-
-        if (phoneNumberField == null) {
-            getPhoneNumberInputLayout().setError(notFilled);
-            return false;
-        }
-
-        @NonNull final String phoneNumber = phoneNumberField.toString().trim();
-
-        boolean phoneNumberCorrect = isPhoneNumberCorrect(phoneNumber);
-
-        if (!phoneNumberCorrect) {
-            getPhoneNumberInputLayout().setError(notFilled);
-        }
-
-        return phoneNumberCorrect;
-    }
-
-    @Override
-    final protected void setupClickListeners() {
-        getSignInWithEmailButton().setOnClickListener(this);
-        getSignInWithPhoneNumberButton().setOnClickListener(this);
-
-        getSignUpWithEmailButton().setOnClickListener(this);
-        getSignUpWithPhoneNumberButton().setOnClickListener(this);
-
-        getEmailField().addTextChangedListener(new TextWatcher() {
-
-            @Override
-            final public void beforeTextChanged(
-                    @NonNull final CharSequence s,
-                    final int start,
-                    final int count,
-                    final int after
-            ) {
-            }
-
-            @Override
-            final public void onTextChanged(
-                    @NonNull final CharSequence s,
-                    final int start,
-                    final int before,
-                    final int count
-            ) {
-            }
-
-            @Override
-            final public void afterTextChanged(@NonNull final Editable s) {
-                if (s.length() == 0)
-                    getEmailInputLayout().setError(getString(R.string.you_have_not_entered_email));
-                else {
-                    getEmailInputLayout().setError(null);
-                }
-
-                enableSignInWithEmailButton();
-            }
-
-        });
-
-        getPasswordField().addTextChangedListener(new TextWatcher() {
-
-            @Override
-            final public void beforeTextChanged(
-                    @NonNull final CharSequence s,
-                    final int start,
-                    final int count,
-                    final int after
-            ) {
-            }
-
-            @Override
-            final public void onTextChanged(
-                    @NonNull final CharSequence s,
-                    final int start,
-                    final int before,
-                    final int count
-            ) {
-            }
-
-            @Override
-            final public void afterTextChanged(@NonNull final Editable s) {
-                if (s.length() == 0)
-                    getPasswordInputLayout().setError(getString(R.string.you_have_not_entered_password));
-                else {
-                    getPasswordInputLayout().setError(null);
-                }
-
-                enableSignInWithEmailButton();
-            }
-
-        });
-
-        getPhoneNumberField().addTextChangedListener(new TextWatcher() {
-
-            @Override
-            final public void beforeTextChanged(
-                    @NonNull final CharSequence s,
-                    final int start,
-                    final int count,
-                    final int after
-            ) {
-            }
-
-            @Override
-            final public void onTextChanged(
-                    @NonNull final CharSequence s,
-                    final int start,
-                    final int before,
-                    final int count
-            ) {
-            }
-
-            @Override
-            final public void afterTextChanged(@NonNull final Editable s) {
-                if (s.length() == 0)
-                    getPhoneNumberInputLayout().setError(getString(R.string.you_have_not_entered_phone_number));
-                else {
-                    getPhoneNumberInputLayout().setError(null);
-                }
-
-                enableSignInWithPhoneNumberButton();
-            }
-
-        });
-    }
-
-    @Override
-    final public void goToMain() {
+    public void goToMainScreen() {
         @NonNull final Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }
 
-    @NonNull
     @Override
-    final protected ViewGroup getProgressBarLayout() {
+    public void setErrorText(@Nullable final String message) {
+        getErrorTextView().setText(message);
+    }
+
+    @Override
+    public void hideProgressDialog() {
+        getProgressBarLayout().setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showProgressIndicator() {
+        getProgressBarLayout().setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showMessage(@Nullable final String message) {
+        if (message != null) {
+            Snackbar.make(getCoordinatorLayout(), message, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onRefresh() {
+        createSignInIntent();
+    }
+
+    @Override
+    public void showErrorTextView() {
+        getErrorTextView().setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideErrorTextView() {
+        getErrorTextView().setVisibility(View.GONE);
+    }
+
+    @NonNull
+    private ViewGroup getProgressBarLayout() {
         @Nullable final ViewGroup layoutWithProgressBar = findViewById(R.id.layoutWithProgressBar);
 
         if (layoutWithProgressBar == null) {
@@ -326,156 +147,37 @@ public final class LoginActivity
         return layoutWithProgressBar;
     }
 
-    @Override
-    public void showPhoneNumberError(final @NonNull String message) {
-        getPhoneNumberInputLayout().setError(message);
-    }
+    @NonNull
+    private CoordinatorLayout getCoordinatorLayout() {
+        @Nullable final CoordinatorLayout activityFirebaseUICL = findViewById(R.id.activityFirebaseUICL);
 
-    private boolean isEmailCorrect(@NonNull final String email) {
-        //stupid check
-
-        if (!email.contains("@")) {
-            return false;
+        if (activityFirebaseUICL == null) {
+            throw new RuntimeException("activityFirebaseUICL == null");
         }
 
-        final int indexOfAt = email.indexOf('@');
-
-        @NonNull final String name = email.substring(0, indexOfAt);
-
-        if (name.isEmpty()) {
-            return false;
-        }
-
-        @NonNull final String emailProvider = email.substring(indexOfAt + 1, email.length());
-
-        if (emailProvider.isEmpty()) {
-            return false;
-        }
-
-        if (emailProvider.contains("@")) {
-            return false;
-        }
-
-        return emailProvider.contains(".");
-    }
-
-    private boolean isPhoneNumberCorrect(@NonNull final String phoneNumber) {
-        String russianPhoneRegExp = "^((\\+7|8)+([0-9]){10})$";
-
-        Pattern pattern = Pattern.compile(russianPhoneRegExp);
-        Matcher matcher = pattern.matcher(phoneNumber);
-
-        return matcher.matches();
+        return activityFirebaseUICL;
     }
 
     @NonNull
-    private Button getSignUpWithEmailButton() {
-        @Nullable final Button signUpWithEmailButton = findViewById(R.id.signUpWithEmailButton);
+    private SwipeRefreshLayout getSwipeRefreshLayout() {
+        @Nullable final SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
 
-        if (signUpWithEmailButton == null) {
-            throw new RuntimeException("signUpWithEmailButton == null");
+        if (swipeRefreshLayout == null) {
+            throw new RuntimeException("swipeRefreshLayout == null");
         }
 
-        return signUpWithEmailButton;
+        return swipeRefreshLayout;
     }
 
     @NonNull
-    private Button getSignUpWithPhoneNumberButton() {
-        @Nullable final Button signUpWithPhoneNumberButton = findViewById(R.id.signUpWithPhoneNumberButton);
+    private TextView getErrorTextView() {
+        @Nullable final TextView errorTextView = findViewById(R.id.errorText);
 
-        if (signUpWithPhoneNumberButton == null) {
-            throw new RuntimeException("signUpWithPhoneNumberButton == null");
+        if (errorTextView == null) {
+            throw new RuntimeException("errorTextView == null");
         }
 
-        return signUpWithPhoneNumberButton;
-    }
-
-    @NonNull
-    private Button getSignInWithPhoneNumberButton() {
-        @Nullable final Button signInWithPhoneNumberButton = findViewById(R.id.signInWithPhoneNumberButton);
-
-        if (signInWithPhoneNumberButton == null) {
-            throw new RuntimeException("signInWithPhoneNumberButton == null");
-        }
-
-        return signInWithPhoneNumberButton;
-    }
-
-    @NonNull
-    private Button getSignInWithEmailButton() {
-        @Nullable final Button signInWithEmailButton = findViewById(R.id.signInWithEmailButton);
-
-        if (signInWithEmailButton == null) {
-            throw new RuntimeException("signInWithEmailButton == null");
-        }
-
-        return signInWithEmailButton;
-    }
-
-    @NonNull
-    private EditText getEmailField() {
-        @Nullable final EditText emailField = findViewById(R.id.emailField);
-
-        if (emailField == null) {
-            throw new RuntimeException("emailField == null");
-        }
-
-        return emailField;
-    }
-
-    @NonNull
-    private EditText getPasswordField() {
-        @Nullable final EditText passwordField = findViewById(R.id.passwordField);
-
-        if (passwordField == null) {
-            throw new RuntimeException("passwordField == null");
-        }
-
-        return passwordField;
-    }
-
-    @NonNull
-    private EditText getPhoneNumberField() {
-        @Nullable final EditText phoneNumberField = findViewById(R.id.phoneNumberField);
-
-        if (phoneNumberField == null) {
-            throw new RuntimeException("phoneNumberField == null");
-        }
-
-        return phoneNumberField;
-    }
-
-    @NonNull
-    private TextInputLayout getEmailInputLayout() {
-        @Nullable final TextInputLayout emailInputLayout = findViewById(R.id.emailInputLayout);
-
-        if (emailInputLayout == null) {
-            throw new RuntimeException("emailInputLayout == null");
-        }
-
-        return emailInputLayout;
-    }
-
-    @NonNull
-    private TextInputLayout getPasswordInputLayout() {
-        @Nullable final TextInputLayout passwordInputLayout = findViewById(R.id.passwordInputLayout);
-
-        if (passwordInputLayout == null) {
-            throw new RuntimeException("passwordInputLayout == null");
-        }
-
-        return passwordInputLayout;
-    }
-
-    @NonNull
-    private TextInputLayout getPhoneNumberInputLayout() {
-        @Nullable final TextInputLayout phoneNumberInputLayout = findViewById(R.id.phoneNumberInputLayout);
-
-        if (phoneNumberInputLayout == null) {
-            throw new RuntimeException("phoneNumberInputLayout == null");
-        }
-
-        return phoneNumberInputLayout;
+        return errorTextView;
     }
 
 }

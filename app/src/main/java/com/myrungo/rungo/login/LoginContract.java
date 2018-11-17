@@ -1,42 +1,42 @@
 package com.myrungo.rungo.login;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import com.myrungo.rungo.base.BaseContract;
+interface LoginContract {
 
-public interface LoginContract extends BaseContract {
+    interface View {
 
-    interface View extends BaseContract.View {
+        void showProgressIndicator();
 
-        boolean isEmailAndPasswordValid();
+        void createSignInIntent();
 
-        boolean isPhoneNumberValid();
+        void hideRefreshIndicator();
 
-        void goToMain();
+        void hideProgressDialog();
 
-        void disableSignInWithEmailButton();
+        void hideErrorTextView();
 
-        void enableSignInWithEmailButton();
+        void showErrorTextView();
 
-        void disableSignInWithPhoneNumberButton();
+        void goToMainScreen();
 
-        void enableSignInWithPhoneNumberButton();
+        void showMessage(@Nullable final String message);
 
-        void showPhoneNumberError(final @NonNull String message);
+        void setErrorText(@Nullable final String message);
 
     }
 
-    interface Presenter<V extends View> extends BaseContract.Presenter<V> {
+    interface Presenter<V extends View> {
 
-        void signUpWithEmail(final @NonNull String email, final @NonNull String password);
+        void onBindView(@NonNull final V view);
 
-        void signUpWithPhoneNumber(final @NonNull String phoneNumber);
+        void onUnbindView();
 
-        void signInWithEmailAndPassword(final @NonNull String email, final @NonNull String password);
+        void onViewCreate();
 
-        void signInWithPhoneNumber(final @NonNull String phoneNumber);
-
-        void onStart();
+        void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data);
 
     }
 
