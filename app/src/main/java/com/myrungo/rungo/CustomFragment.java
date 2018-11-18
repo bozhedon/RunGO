@@ -1,6 +1,7 @@
 package com.myrungo.rungo;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import java.util.Objects;
 
 
 public class CustomFragment extends Fragment {
@@ -37,28 +40,59 @@ public class CustomFragment extends Fragment {
         karatecat.setClickable(true);
         officecat.setClickable(true);
         sportcat.setClickable(true);
+
+        final SharedPreferences prefs = Objects.requireNonNull(getContext())
+                .getSharedPreferences("APP_DATA", Context.MODE_PRIVATE);
+
+        String preferedSkin = prefs.getString("SKIN", CatView.Skins.COMMON.toString().toLowerCase());
+
+        switch (preferedSkin) {
+            case "bad":
+                catview.setSkin(CatView.Skins.BAD);
+                break;
+
+            case "karate":
+                catview.setSkin(CatView.Skins.KARATE);
+                break;
+
+            case "business":
+                catview.setSkin(CatView.Skins.BUSINESS);
+                break;
+
+            case "normal":
+                catview.setSkin(CatView.Skins.NORMAL);
+                break;
+
+            default:
+                catview.setSkin(CatView.Skins.COMMON);
+        }
+
         badcat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 catview.setSkin(CatView.Skins.BAD);
+                prefs.edit().putString("SKIN", CatView.Skins.BAD.toString().toLowerCase()).apply();
             }
         });
         karatecat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 catview.setSkin(CatView.Skins.KARATE);
+                prefs.edit().putString("SKIN", CatView.Skins.KARATE.toString().toLowerCase()).apply();
             }
         });
         officecat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 catview.setSkin(CatView.Skins.BUSINESS);
+                prefs.edit().putString("SKIN", CatView.Skins.BUSINESS.toString().toLowerCase()).apply();
             }
         });
         sportcat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 catview.setSkin(CatView.Skins.NORMAL);
+                prefs.edit().putString("SKIN", CatView.Skins.NORMAL.toString().toLowerCase()).apply();
             }
         });
         return view;
@@ -66,6 +100,13 @@ public class CustomFragment extends Fragment {
 
     @Override
     public void onPause() {
+        catview.pause();
         super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        catview.resume();
     }
 }

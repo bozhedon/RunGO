@@ -38,6 +38,7 @@ import com.google.gson.Gson;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class StartActivity extends AppCompatActivity implements LocationListener, GpsStatus.Listener, OnMapReadyCallback {
     private SharedPreferences sharedPreferences;
@@ -60,8 +61,6 @@ public class StartActivity extends AppCompatActivity implements LocationListener
     private String currentTime;
     private GoogleMap map;
     private CatView catView;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,6 +173,32 @@ public class StartActivity extends AppCompatActivity implements LocationListener
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         mapFragment.getView().setVisibility(View.INVISIBLE);
+
+        final SharedPreferences prefs = Objects.requireNonNull(this)
+                .getSharedPreferences("APP_DATA", Context.MODE_PRIVATE);
+
+        String preferedSkin = prefs.getString("SKIN", CatView.Skins.COMMON.toString().toLowerCase());
+
+        switch (preferedSkin) {
+            case "bad":
+                catView.setSkin(CatView.Skins.BAD);
+                break;
+
+            case "karate":
+                catView.setSkin(CatView.Skins.KARATE);
+                break;
+
+            case "business":
+                catView.setSkin(CatView.Skins.BUSINESS);
+                break;
+
+            case "normal":
+                catView.setSkin(CatView.Skins.NORMAL);
+                break;
+
+            default:
+                catView.setSkin(CatView.Skins.COMMON);
+        }
     }
 
     public void onStartClick(View v) {
@@ -232,6 +257,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
     @Override
     protected void onResume() {
         super.onResume();
+        catView.resume();
         firstfix = true;
         if (!data.isRunning()) {
             Gson gson = new Gson();
@@ -272,10 +298,9 @@ public class StartActivity extends AppCompatActivity implements LocationListener
 
     }
 
-
-
     @Override
     protected void onPause() {
+        catView.pause();
         super.onPause();
         mLocationManager.removeUpdates(this);
         mLocationManager.removeGpsStatusListener(this);
