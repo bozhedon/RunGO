@@ -13,9 +13,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-
         catView = view.findViewById(R.id.cat);
-        catView.setSkin(CatView.Skins.BAD);
         return view;
     }
 }

@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +19,27 @@ import android.widget.Toast;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 public class MainActivity extends AppCompatActivity{
+
+    public CatView.Skins getSkin() {
+        return skin;
+    }
+
+    public void setSkin(CatView.Skins skin) {
+        this.skin = skin;
+    }
+
+    public CatView.Heads getHead() {
+        return head;
+    }
+
+    public void setHead(CatView.Heads head) {
+        this.head = head;
+    }
+
+    private CatView.Skins skin;
+    private CatView.Heads head;
+
+
 
     private BottomNavigationViewEx.OnNavigationItemSelectedListener onNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -61,7 +84,10 @@ public class MainActivity extends AppCompatActivity{
             }
         });
         Fragment fragment = new HomeFragment();
-        replaceFragment(fragment);
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.add(R.id.fragment_container,fragment);
+        transaction.commit();
         BottomNavigationViewEx bottomNavigationViewEx = findViewById(R.id.bnve);
         bottomNavigationViewEx.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
         setupBottomNavigationView(bottomNavigationViewEx);
@@ -71,6 +97,7 @@ public class MainActivity extends AppCompatActivity{
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.fragment_container, someFragment);
+        transaction.addToBackStack(null);
         transaction.commit();
     }
     //bottom navigation view customization
