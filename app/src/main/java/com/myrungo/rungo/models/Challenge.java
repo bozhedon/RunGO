@@ -38,4 +38,5 @@ public final class Challenge {
     public String getImgURL() {
         return imgURL;
     }
+
 }

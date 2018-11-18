@@ -16,8 +16,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 import com.myrungo.rungo.base.BasePresenter;
 import com.myrungo.rungo.models.Challenge;
+import com.myrungo.rungo.models.DBUser;
 import com.myrungo.rungo.models.Training;
-import com.myrungo.rungo.models.User;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,7 +102,7 @@ public final class MainPresenter
 
     @NonNull
     @Override
-    final public List<User> getUsers() throws Exception {
+    final public List<DBUser> getUsers() throws Exception {
         @NonNull final Task<QuerySnapshot> task = getDB()
                 .collection(usersCollection)
                 .get();
@@ -121,14 +121,14 @@ public final class MainPresenter
             return Collections.emptyList();
         }
 
-        @NonNull final List<User> user = result.toObjects(User.class);
+        @NonNull final List<DBUser> user = result.toObjects(DBUser.class);
 
         return user;
     }
 
     @Nullable
     @Override
-    final public User getCurrentUserInfo() throws Exception {
+    final public DBUser getCurrentUserInfo() throws Exception {
         @NonNull final Task<QuerySnapshot> task = getDB()
                 .collection(usersCollection)
                 .get();
@@ -147,13 +147,13 @@ public final class MainPresenter
             return null;
         }
 
-        @NonNull final List<User> users = result.toObjects(User.class);
+        @NonNull final List<DBUser> users = result.toObjects(DBUser.class);
 
-        for (@Nullable final User user : users) {
+        for (@Nullable final DBUser user : users) {
             @Nullable final FirebaseUser currentUser = getCurrentUser();
 
             if (currentUser == null) {
-                throw new UnauthorizedUserExceptions("CurrentUser == null. User must sign in");
+                throw new UnauthorizedUserExceptions("CurrentUser == null. DBUser must sign in");
             }
 
             if (user == null) {
@@ -176,7 +176,7 @@ public final class MainPresenter
      * it will be renamed to regDate
      */
     @Override
-    final public void updateUserInfo(@NonNull final User newUserInfo) throws Exception {
+    final public void updateUserInfo(@NonNull final DBUser newUserInfo) throws Exception {
         @NonNull final ObjectMapper mapper = new ObjectMapper();
 
         //convert POJO to Map
@@ -221,7 +221,7 @@ public final class MainPresenter
 
     //I'm sure that user's creation must do by login screen
     @Override
-    final public void createNewUser(@NonNull final User newUser) throws Exception {
+    final public void createNewUser(@NonNull final DBUser newUser) throws Exception {
         if (newUser.getUid().trim().isEmpty()) {
             throw new RuntimeException("Uid must not be empty");
         }
@@ -361,9 +361,9 @@ public final class MainPresenter
                 continue;
             }
 
-            @Nullable final User user;
+            @Nullable final DBUser user;
             try {
-                user = document.toObject(User.class);
+                user = document.toObject(DBUser.class);
 
                 if (user == null) {
                     continue;

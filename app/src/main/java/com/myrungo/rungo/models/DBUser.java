@@ -3,32 +3,42 @@ package com.myrungo.rungo.models;
 import android.support.annotation.NonNull;
 
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
-public final class User {
+public final class DBUser {
 
     @NonNull
     private String email = "";
+
     private boolean isAnonymous;
+
     @NonNull
     private String name = "";
+
     @NonNull
     private String phoneNumber = "";
+
     @NonNull
     private String photoUri = "";
+
     @NonNull
     private String provider = "";
+
     @NonNull
     private String regDate = "";
+
     /**
      * Primary key
      */
     @NonNull
-    private String uid = "";
+    private String uid;
+
     private int age;
+
     @NonNull
     private String costume = "";
+
     private int height;
 
-    public User(@NonNull final String uid) {
+    public DBUser(@NonNull final String uid) {
         this.uid = uid.trim();
     }
 
@@ -123,4 +133,5 @@ public final class User {
     public void setAnonymous(final boolean anonymous) {
         isAnonymous = anonymous;
     }
+
 }

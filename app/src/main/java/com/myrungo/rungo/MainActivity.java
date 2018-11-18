@@ -17,10 +17,11 @@ import com.myrungo.rungo.base.BaseActivity;
 import com.myrungo.rungo.main.MainContract;
 import com.myrungo.rungo.main.MainPresenter;
 import com.myrungo.rungo.models.Challenge;
+import com.myrungo.rungo.models.DBUser;
 import com.myrungo.rungo.models.Training;
-import com.myrungo.rungo.models.User;
 
 import java.util.List;
+import java.util.Objects;
 
 public final class MainActivity
         extends BaseActivity<MainContract.View, MainContract.Presenter<MainContract.View>>
@@ -32,30 +33,45 @@ public final class MainActivity
     @Nullable
     private CatView.Heads head;
 
+    private boolean first = true;
+    private int position = 1;
+    private User user;
+    public static final String USER_TAG = "USER_TAG";
     @NonNull
     private BottomNavigationViewEx.OnNavigationItemSelectedListener onNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
         @Override
         final public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
             @NonNull Fragment fragment;
 
             switch (item.getItemId()) {
                 case R.id.home:
-                    fragment = new HomeFragment();
-                    replaceFragment(fragment);
+                    if (position != 1) {
+                        fragment = new HomeFragment();
+                        replaceFragment(fragment);
+                        position = 1;
+                    }
                     return true;
                 case R.id.custom:
-                    fragment = new CustomFragment();
-                    replaceFragment(fragment);
+                    if (position != 2) {
+                        fragment = new CustomFragment();
+                        replaceFragment(fragment);
+                        position = 2;
+                    }
                     return true;
                 case R.id.challenge:
-                    fragment = new ChallengeFragment();
-                    replaceFragment(fragment);
+                    if (position != 4) {
+                        fragment = new ChallengeFragment();
+                        replaceFragment(fragment);
+                        position = 4;
+                    }
                     return true;
                 case R.id.profile:
-                    fragment = new ProfileFragment();
-                    replaceFragment(fragment);
+                    if (position != 5) {
+                        fragment = new ProfileFragment();
+                        replaceFragment(fragment);
+                        position = 5;
+                    }
                     return true;
             }
 
@@ -108,12 +124,14 @@ public final class MainActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fab = findViewById(R.id.fab_start);
+        user = new User(CatView.Skins.BUSINESS, CatView.Heads.ANGRY);
 
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab = findViewById(R.id.fab_start);
+        Objects.requireNonNull(fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, StartActivity.class);
+                intent.putExtra(DBUser.class.getSimpleName(), user);
                 startActivity(intent);
             }
         });
@@ -121,6 +139,9 @@ public final class MainActivity
         @NonNull final Fragment fragment = new HomeFragment();
         @NonNull final FragmentManager manager = getSupportFragmentManager();
 
+        Bundle user_bundle = new Bundle();
+        user_bundle.putSerializable(USER_TAG, user);
+        fragment.setArguments(user_bundle);
         @NonNull final FragmentTransaction transaction = manager.beginTransaction();
         transaction.add(R.id.fragment_container, fragment);
         transaction.commit();
@@ -131,11 +152,18 @@ public final class MainActivity
     }
 
     final public void replaceFragment(@NonNull final Fragment someFragment) {
+        Bundle user_bundle = new Bundle();
+        user_bundle.putSerializable(USER_TAG, user);
+        someFragment.setArguments(user_bundle);
         @NonNull final FragmentManager fragmentManager = getSupportFragmentManager();
         @NonNull final FragmentTransaction transaction = fragmentManager.beginTransaction();
 
         transaction.replace(R.id.fragment_container, someFragment);
-        transaction.addToBackStack(null);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        if (first) {
+            transaction.addToBackStack(null);
+            first = false;
+        }
         transaction.commit();
     }
 
@@ -158,23 +186,23 @@ public final class MainActivity
 
     @NonNull
     @Override
-    final public List<User> getUsers() throws Exception {
+    final public List<DBUser> getUsers() throws Exception {
         return getPresenter().getUsers();
     }
 
     @Nullable
     @Override
-    final public User getCurrentUserInfo() throws Exception {
+    final public DBUser getCurrentUserInfo() throws Exception {
         return getPresenter().getCurrentUserInfo();
     }
 
     @Override
-    final public void updateUserInfo(@NonNull final User newUserInfo) throws Exception {
+    final public void updateUserInfo(@NonNull final DBUser newUserInfo) throws Exception {
         getPresenter().updateUserInfo(newUserInfo);
     }
 
     @Override
-    final public void createNewUser(@NonNull final User newUser) throws Exception {
+    final public void createNewUser(@NonNull final DBUser newUser) throws Exception {
         getPresenter().createNewUser(newUser);
     }
 

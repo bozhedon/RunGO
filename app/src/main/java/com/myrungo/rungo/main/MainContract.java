@@ -5,12 +5,12 @@ import android.support.annotation.Nullable;
 
 import com.myrungo.rungo.base.BaseContract;
 import com.myrungo.rungo.models.Challenge;
+import com.myrungo.rungo.models.DBUser;
 import com.myrungo.rungo.models.Training;
-import com.myrungo.rungo.models.User;
 
 import java.util.List;
 
-public  interface MainContract extends BaseContract {
+public interface MainContract extends BaseContract {
 
     @SuppressWarnings("unused")
     interface View extends BaseContract.View {
@@ -45,14 +45,14 @@ public  interface MainContract extends BaseContract {
          * Example available in getAllChallenges()
          */
         @NonNull
-        List<User> getUsers() throws Exception;
+        List<DBUser> getUsers() throws Exception;
 
         @Nullable
-        User getCurrentUserInfo() throws Exception;
+        DBUser getCurrentUserInfo() throws Exception;
 
-        void updateUserInfo(@NonNull final User newUserInfo) throws Exception;
+        void updateUserInfo(@NonNull final DBUser newUserInfo) throws Exception;
 
-        void createNewUser(@NonNull final User newUser) throws Exception;
+        void createNewUser(@NonNull final DBUser newUser) throws Exception;
 
         @NonNull
         List<Training> getUserTrainingsByUid(@NonNull final String uid) throws Exception;
@@ -69,14 +69,14 @@ public  interface MainContract extends BaseContract {
         List<Challenge> getAllChallenges() throws Exception;
 
         @NonNull
-        List<User> getUsers() throws Exception;
+        List<DBUser> getUsers() throws Exception;
 
         @Nullable
-        User getCurrentUserInfo() throws Exception;
+        DBUser getCurrentUserInfo() throws Exception;
 
-        void updateUserInfo(@NonNull final User newUserInfo) throws Exception;
+        void updateUserInfo(@NonNull final DBUser newUserInfo) throws Exception;
 
-        void createNewUser(@NonNull final User newUser) throws Exception;
+        void createNewUser(@NonNull final DBUser newUser) throws Exception;
 
         @NonNull
         List<Training> getUserTrainingsByUid(@NonNull final String uid) throws Exception;

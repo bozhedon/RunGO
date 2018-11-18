@@ -1,70 +1,204 @@
 package com.myrungo.rungo;
 
+import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.firebase.ui.auth.AuthUI.TAG;
 
 
-public class ChallengeFragment extends Fragment implements View.OnClickListener {
+public class ChallengeFragment extends Fragment {
 
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseFirestore profilered = FirebaseFirestore.getInstance();
+    private static final String TAG = ChallengeFragment.class.getSimpleName();
+
+    @Nullable final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private Map data, data2;
+    private ListView listView;
+    private List<ChallengeItem> challengeItems;
+    private ChallengeListAdapter challengeListAdapter;
+    ImageLoader imageLoader = AppController.getInstance().getImageLoader();
+
+    Dialog MyDialog;
+    Button accept,close;
+
+    @SuppressLint("NewApi")
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_challenge, container, false);
-        ImageView imageView = view.findViewById(R.id.imageView16);
-        ImageView imageView1 = view.findViewById(R.id.imageView15);
-        ImageView imageView2 = view.findViewById(R.id.imageView17);
-        ImageView imageView3 = view.findViewById(R.id.imageView18);
-        imageView.setOnClickListener(this);
-        imageView1.setOnClickListener(this);
-        imageView2.setOnClickListener(this);
-        imageView3.setOnClickListener(this);
+        listView = view.findViewById(R.id.list);
+        Log.d(TAG, user.getUid().toString()+"<=>");
+
+
+        challengeItems = new ArrayList<ChallengeItem>();
+
+        challengeListAdapter = new ChallengeListAdapter(getActivity(), challengeItems);
+        listView.setAdapter(challengeListAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                set_dialog(position);
+            }
+        });
+
+        db.collection("challenges")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                //Log.d(TAG,document.getId()+"="+document.getData()+"=>");
+                                data = document.getData();
+                                ChallengeItem item = new ChallengeItem();
+
+                                item.setDistance((Long) data.get("distance"));
+                                item.setHour((Long) data.get("hour"));
+                                item.setMinutes((Long) data.get("minutes"));
+                                item.setId((String) data.get("id"));
+                                String imageURL = ((String) data.get("imgURL"));
+                                if (imageURL==null){
+
+                                }
+                                else item.setImge(imageURL);
+                                challengeItems.add(item);
+                            }
+                            challengeListAdapter.notifyDataSetChanged();
+                        } else {
+                            Log.w(TAG, "Error getting documents.", task.getException());
+                        }
+
+                    }
+                });
+
+
+
+
+
+
         return view;
     }
 
-    public void onChallengeClick(View v) {
-        AlertDialog.Builder ad;
-        String title = "Выборать вызов?";
-        String message = "Выполни условния вызова";
-        String button1String = "Вернуться";
-        String button2String = "Начать";
+    private void set_challenge(int position)
+    {
+        final ChallengeItem challengeItem;
+        challengeItem = (ChallengeItem) listView.getAdapter().getItem(position);
+        String UID = user.getUid();
+        final DocumentReference sfDocRef = profilered.collection("users").document(UID);
+        profilered.runTransaction(new Transaction.Function<Void>() {
+            @Override
+            public Void apply(Transaction transaction) throws FirebaseFirestoreException {
+                DocumentSnapshot snapshot = transaction.get(sfDocRef);
+                String chal_id = challengeItem.getId();
+                transaction.update(sfDocRef, "active_challenge", chal_id);
 
-        ad = new AlertDialog.Builder(v.getContext());
-        ad.setTitle(title);  // заголовок
-        ad.setMessage(message); // с
-        ad.setPositiveButton(button1String, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int arg1) {
+                // Success
+                return null;
             }
-        });
-        ad.setNegativeButton(button2String, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int arg1) {
+        }).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Transaction success!");
             }
-        });
-        ad.setCancelable(true);
-        ad.show();
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Transaction failure.", e);
+                    }
+                });
     }
 
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.imageView16:
-                onChallengeClick(view);
-                break;
-            case R.id.imageView15:
-                onChallengeClick(view);
-                break;
-            case R.id.imageView17:
-                onChallengeClick(view);
-                break;
-            case R.id.imageView18:
-                onChallengeClick(view);
-                break;
+    private void set_dialog(final int position)
+    {
+        ChallengeItem challengeItem;
+        challengeItem = (ChallengeItem) listView.getAdapter().getItem(position);
+
+        MyDialog = new Dialog(getActivity());
+        MyDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        MyDialog.setContentView(R.layout.challenge_dialog);
+        NetworkImageView imageView = MyDialog.findViewById(R.id.profilePic);
+
+        imageView.setImageUrl(challengeItem.getImge(), imageLoader);
+        TextView textDistance = MyDialog.findViewById(R.id.textDistance);
+        TextView textHour = MyDialog.findViewById(R.id.textHour);
+
+        if (challengeItem.distance!=null){
+            textDistance.setText(challengeItem.distance.toString()+"км");
         }
+        if (challengeItem.hour!=null){
+            textHour.setText("0"+challengeItem.hour.toString()+":"+challengeItem.minutes.toString());
+        }
+
+
+        accept = MyDialog.findViewById(R.id.accept);
+        close = MyDialog.findViewById(R.id.close);
+
+        accept.setEnabled(true);
+        close.setEnabled(true);
+
+        accept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                set_challenge(position);
+                MyDialog.cancel();
+            }
+        });
+
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MyDialog.cancel();
+            }
+        });
+
+        MyDialog.show();
     }
+    private void accept_challenge(int position){
+
+    }
+
 }

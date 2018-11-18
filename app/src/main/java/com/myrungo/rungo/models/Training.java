@@ -4,8 +4,11 @@ package com.myrungo.rungo.models;
 public final class Training {
 
     private double averageSpeed = 0.0;
+
     private double distance = 0.0;
+
     private int startTime = 0;
+
     private double time = 0.0;
 
     public double getAverageSpeed() {

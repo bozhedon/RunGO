@@ -1,5 +1,6 @@
 package com.myrungo.rungo;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ public class CustomFragment extends Fragment {
     ImageView karatecat;
     ImageView officecat;
     ImageView sportcat;
+    private static final String USER_TAG = "USER_TAG";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -27,8 +29,15 @@ public class CustomFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        Bundle user_bundle = getArguments();
+        User user = (User) user_bundle.getSerializable(USER_TAG);
+
         View view = inflater.inflate(R.layout.fragment_customization, container, false);
+
         catview = view.findViewById(R.id.cat);
+        catview.setSkin(user.getSkin());
+        catview.setHead(user.getHead());
+
         badcat = view.findViewById(R.id.bad_cat_cloth);
         karatecat = view.findViewById(R.id.karate_cloth);
         officecat = view.findViewById(R.id.office_cloth);
@@ -63,7 +72,6 @@ public class CustomFragment extends Fragment {
         });
         return view;
     }
-
     @Override
     public void onPause() {
         super.onPause();
