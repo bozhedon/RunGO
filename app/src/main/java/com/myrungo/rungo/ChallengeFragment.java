@@ -1,11 +1,13 @@
 package com.myrungo.rungo;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -39,16 +41,19 @@ import static com.firebase.ui.auth.AuthUI.TAG;
 public class ChallengeFragment extends Fragment {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private static final String TAG = ChallengeFragment.class.getSimpleName();
     private Map data;
-    private Long distance,hour,minutes;
     private ListView listView;
     private List<ChallengeItem> challengeItems;
     private ChallengeListAdapter challengeListAdapter;
+    ImageLoader imageLoader = AppController.getInstance().getImageLoader();
 
     Dialog MyDialog;
     Button accept,close;
 
-
+    @SuppressLint("NewApi")
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -80,6 +85,11 @@ public class ChallengeFragment extends Fragment {
                                 item.setDistance((Long) data.get("distance"));
                                 item.setHour((Long) data.get("hour"));
                                 item.setMinutes((Long) data.get("minutes"));
+                                String imageURL = ((String) data.get("imgURL"));
+                                if (imageURL==null){
+
+                                }
+                                else item.setImge(imageURL);
                                 challengeItems.add(item);
                             }
                             challengeListAdapter.notifyDataSetChanged();
@@ -98,6 +108,15 @@ public class ChallengeFragment extends Fragment {
         return view;
     }
 
+    private void set_list(int position)
+    {
+        ChallengeItem challengeItem;
+        challengeItem = (ChallengeItem) listView.getAdapter().getItem(position);
+        TextView text_distance = getActivity().findViewById(R.id.text_distance);
+        TextView textTime = getActivity().findViewById(R.id.textTime);
+        text_distance.setText(challengeItem.distance.toString());
+        textTime.setText("0"+challengeItem.hour.toString()+":"+challengeItem.minutes.toString());
+    }
 
     private void set_dialog(int position)
     {
@@ -107,16 +126,17 @@ public class ChallengeFragment extends Fragment {
         MyDialog = new Dialog(getActivity());
         MyDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         MyDialog.setContentView(R.layout.challenge_dialog);
-        NetworkImageView profilePic = MyDialog.findViewById(R.id.profilePic);
+        NetworkImageView imageView = MyDialog.findViewById(R.id.profilePic);
 
-        TextView descr = MyDialog.findViewById(R.id.textDistance);
-        TextView name = MyDialog.findViewById(R.id.textHour);
+        imageView.setImageUrl(challengeItem.getImge(), imageLoader);
+        TextView textDistance = MyDialog.findViewById(R.id.textDistance);
+        TextView textHour = MyDialog.findViewById(R.id.textHour);
 
         if (challengeItem.distance!=null){
-            descr.setText(challengeItem.distance.toString());
+            textDistance.setText(challengeItem.distance.toString()+"км");
         }
         if (challengeItem.hour!=null){
-            name.setText(challengeItem.hour.toString());
+            textHour.setText("0"+challengeItem.hour.toString()+":"+challengeItem.minutes.toString());
         }
 
 
