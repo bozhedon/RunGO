@@ -32,30 +32,49 @@ public final class MainActivity
     @Nullable
     private CatView.Heads head;
 
+    private boolean first = true;
+    private int position = 1;
+    private User user;
+    public static final String USER_TAG = "USER_TAG";
     @NonNull
     private BottomNavigationViewEx.OnNavigationItemSelectedListener onNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
         @Override
         final public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
             @NonNull Fragment fragment;
 
             switch (item.getItemId()) {
                 case R.id.home:
-                    fragment = new HomeFragment();
-                    replaceFragment(fragment);
+                    if(position !=1)
+                    {
+                        fragment = new HomeFragment();
+                        replaceFragment(fragment);
+                        position=1;
+                    }
                     return true;
                 case R.id.custom:
-                    fragment = new CustomFragment();
-                    replaceFragment(fragment);
+                    if (position!=2)
+                    {
+                        fragment = new CustomFragment();
+                        replaceFragment(fragment);
+                        position=2;
+                    }
                     return true;
                 case R.id.challenge:
-                    fragment = new ChallengeFragment();
-                    replaceFragment(fragment);
+                    if (position!=4)
+                    {
+                        fragment = new ChallengeFragment();
+                        replaceFragment(fragment);
+                        position=4;
+                    }
                     return true;
                 case R.id.profile:
-                    fragment = new ProfileFragment();
-                    replaceFragment(fragment);
+                    if (position!=5)
+                    {
+                        fragment = new ProfileFragment();
+                        replaceFragment(fragment);
+                        position=5;
+                    }
                     return true;
             }
 
@@ -109,11 +128,12 @@ public final class MainActivity
         setContentView(R.layout.activity_main);
 
         fab = findViewById(R.id.fab_start);
-
+        user = new User(CatView.Skins.BUSINESS, CatView.Heads.ANGRY);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, StartActivity.class);
+                intent.putExtra(User.class.getSimpleName(), user);
                 startActivity(intent);
             }
         });
@@ -121,8 +141,11 @@ public final class MainActivity
         @NonNull final Fragment fragment = new HomeFragment();
         @NonNull final FragmentManager manager = getSupportFragmentManager();
 
+        Bundle user_bundle = new Bundle();
+        user_bundle.putSerializable(USER_TAG,user);
+        fragment.setArguments(user_bundle);
         @NonNull final FragmentTransaction transaction = manager.beginTransaction();
-        transaction.add(R.id.fragment_container, fragment);
+        transaction.add(R.id.fragment_container,fragment);
         transaction.commit();
 
         setupBottomNavigationView();
@@ -131,11 +154,19 @@ public final class MainActivity
     }
 
     final public void replaceFragment(@NonNull final Fragment someFragment) {
+        Bundle user_bundle = new Bundle();
+        user_bundle.putSerializable(USER_TAG,user);
+        someFragment.setArguments(user_bundle);
         @NonNull final FragmentManager fragmentManager = getSupportFragmentManager();
         @NonNull final FragmentTransaction transaction = fragmentManager.beginTransaction();
 
         transaction.replace(R.id.fragment_container, someFragment);
-        transaction.addToBackStack(null);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        if(first)
+        {
+            transaction.addToBackStack(null);
+            first=false;
+        }
         transaction.commit();
     }
 
