@@ -74,16 +74,18 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         fab = findViewById(R.id.fab_start);
+        user = new User(CatView.Skins.BUSINESS, CatView.Heads.ANGRY);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, StartActivity.class);
+                intent.putExtra(User.class.getSimpleName(), user);
                 startActivity(intent);
             }
         });
 
         Fragment fragment = new HomeFragment();
-        user = new User(CatView.Skins.BUSINESS, CatView.Heads.ANGRY);
+
         Bundle user_bundle = new Bundle();
         user_bundle.putSerializable(USER_TAG,user);
         fragment.setArguments(user_bundle);
