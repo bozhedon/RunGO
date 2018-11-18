@@ -1,20 +1,17 @@
 package com.myrungo.rungo.login;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-interface LoginContract {
+import com.myrungo.rungo.base.BaseContract;
 
-    interface View {
+interface LoginContract extends BaseContract {
 
-        void showProgressIndicator();
+    interface View extends BaseContract.View {
 
         void createSignInIntent();
 
         void hideRefreshIndicator();
-
-        void hideProgressDialog();
 
         void hideErrorTextView();
 
@@ -22,19 +19,15 @@ interface LoginContract {
 
         void goToMainScreen();
 
-        void showMessage(@Nullable final String message);
-
         void setErrorText(@Nullable final String message);
+
+        void showProgressIndicator();
+
+        void hideProgressIndicator();
 
     }
 
-    interface Presenter<V extends View> {
-
-        void onBindView(@NonNull final V view);
-
-        void onUnbindView();
-
-        void onViewCreate();
+    interface Presenter<V extends View> extends BaseContract.Presenter<V> {
 
         void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data);
 

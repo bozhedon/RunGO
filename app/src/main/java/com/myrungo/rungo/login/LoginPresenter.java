@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUserMetadata;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.myrungo.rungo.R;
+import com.myrungo.rungo.base.BasePresenter;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,20 +34,32 @@ import static com.firebase.ui.auth.ErrorCodes.PLAY_SERVICES_UPDATE_CANCELLED;
 import static com.firebase.ui.auth.ErrorCodes.PROVIDER_ERROR;
 import static com.firebase.ui.auth.ErrorCodes.UNKNOWN_ERROR;
 import static com.myrungo.rungo.login.LoginActivity.RC_SIGN_IN;
+import static com.myrungo.rungo.utils.DBConstants.emailKey;
+import static com.myrungo.rungo.utils.DBConstants.phoneNumberKey;
+import static com.myrungo.rungo.utils.DBConstants.usersCollection;
 
-public final class LoginPresenter<V extends LoginContract.View> implements LoginContract.Presenter<V> {
+public final class LoginPresenter
+        extends BasePresenter<LoginContract.View>
+        implements LoginContract.Presenter<LoginContract.View> {
 
-    @NonNull
-    public static final String usersCollection = "users";
-    @NonNull
-    public static final String emailKey = "email";
-    @NonNull
-    public static final String phoneNumberKey = "phoneNumber";
     private final String TAG = this.getClass().getName();
+
     @Nullable
     private FirebaseFirestore firestoreDB;
-    @Nullable
-    private V view = null;
+
+    @NonNull
+    private FirebaseFirestore getFirebaseFirestore() {
+        if (firestoreDB == null) {
+            firestoreDB = FirebaseFirestore.getInstance();
+        }
+
+        return firestoreDB;
+    }
+
+    @Override
+    public void onViewStart() {
+        //do work in onStart method
+    }
 
     @Override
     public void onViewCreate() {
@@ -69,7 +82,7 @@ public final class LoginPresenter<V extends LoginContract.View> implements Login
                 onNotOkResult(response);
             }
         } else {
-            getView().hideProgressDialog();
+            getView().hideProgressIndicator();
         }
     }
 
@@ -79,7 +92,7 @@ public final class LoginPresenter<V extends LoginContract.View> implements Login
         @Nullable final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (user == null) {
-            getView().hideProgressDialog();
+            getView().hideProgressIndicator();
         } else {
             saveToDB(user);
         }
@@ -131,7 +144,7 @@ public final class LoginPresenter<V extends LoginContract.View> implements Login
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     final public void onFailure(@NonNull final Exception exception) {
-                        getView().hideProgressDialog();
+                        getView().hideProgressIndicator();
 
                         getView().showMessage(exception.getMessage());
                     }
@@ -142,14 +155,14 @@ public final class LoginPresenter<V extends LoginContract.View> implements Login
     private void onNotOkResult(@Nullable final IdpResponse response) {
         if (response == null) {
             //the user canceled the sign-in flow using the back button
-            getView().hideProgressDialog();
+            getView().hideProgressIndicator();
             return;
         }
 
         @Nullable final FirebaseUiException error = response.getError();
 
         if (error == null) {
-            getView().hideProgressDialog();
+            getView().hideProgressIndicator();
             return;
         }
 
@@ -203,35 +216,8 @@ public final class LoginPresenter<V extends LoginContract.View> implements Login
 
         getView().showMessage(part1);
 
-        getView().hideProgressDialog();
+        getView().hideProgressIndicator();
     }
 
-    @NonNull
-    private FirebaseFirestore getFirebaseFirestore() {
-        if (firestoreDB == null) {
-            firestoreDB = FirebaseFirestore.getInstance();
-        }
-
-        return firestoreDB;
-    }
-
-    @NonNull
-    private V getView() {
-        if (view == null) {
-            throw new RuntimeException("view == null");
-        }
-
-        return view;
-    }
-
-    @Override
-    public void onBindView(@NonNull V view) {
-        this.view = view;
-    }
-
-    @Override
-    public void onUnbindView() {
-        view = null;
-    }
 
 }

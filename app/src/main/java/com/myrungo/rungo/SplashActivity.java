@@ -14,10 +14,13 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.myrungo.rungo.login.LoginActivity;
-import com.myrungo.rungo.login.LoginPresenter;
 
 import java.util.List;
 import java.util.Map;
+
+import static com.myrungo.rungo.utils.DBConstants.emailKey;
+import static com.myrungo.rungo.utils.DBConstants.phoneNumberKey;
+import static com.myrungo.rungo.utils.DBConstants.usersCollection;
 
 public final class SplashActivity extends AppCompatActivity {
 
@@ -85,7 +88,7 @@ public final class SplashActivity extends AppCompatActivity {
 
     private void checkWithEmail(@NonNull final String email) {
         getFirebaseFirestore()
-                .collection(LoginPresenter.usersCollection)
+                .collection(usersCollection)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -116,7 +119,7 @@ public final class SplashActivity extends AppCompatActivity {
             @Nullable final Map<String, Object> data = document.getData();
 
             if (data != null) {
-                @Nullable final Object emailFromDB = data.get(LoginPresenter.emailKey);
+                @Nullable final Object emailFromDB = data.get(emailKey);
 
                 if (emailFromDB != null) {
                     final boolean canGoToMainScreen = emailFromDB.equals(email);
@@ -135,7 +138,7 @@ public final class SplashActivity extends AppCompatActivity {
 
     private void checkWithPhoneNumber(@NonNull final String phoneNumber) {
         getFirebaseFirestore()
-                .collection(LoginPresenter.usersCollection)
+                .collection(usersCollection)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -166,7 +169,7 @@ public final class SplashActivity extends AppCompatActivity {
             @Nullable final Map<String, Object> data = document.getData();
 
             if (data != null) {
-                @Nullable final Object phoneNumberFromDB = data.get(LoginPresenter.phoneNumberKey);
+                @Nullable final Object phoneNumberFromDB = data.get(phoneNumberKey);
 
                 if (phoneNumberFromDB != null) {
                     final boolean canGoToMainScreen = phoneNumberFromDB.equals(phoneNumber);

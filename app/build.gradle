@@ -49,5 +49,8 @@ dependencies {
 
     // Google Sign In SDK
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
+
+    //for converting pojo to map and reverse one
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.7'
 }
 apply plugin: 'com.google.gms.google-services'

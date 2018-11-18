@@ -23,6 +23,22 @@
           }
         },
         {
+          "client_id": "16007015268-15s4ssep24n99c2cgdillvldlck110e7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.myrungo.rungo",
+            "certificate_hash": "b315785c67c5f994eef2a01f0a65751d6c291823"
+          }
+        },
+        {
+          "client_id": "16007015268-d9tk7btfrmce5aa9th0l7jq8crdieppb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.myrungo.rungo",
+            "certificate_hash": "931d72106a461d593531b8e222a2cacf82a06a8a"
+          }
+        },
+        {
           "client_id": "16007015268-hnf1l1cc38bm20furo261g8if5tm3h2s.apps.googleusercontent.com",
           "client_type": 3
         }

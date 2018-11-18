@@ -7,20 +7,20 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.firebase.ui.auth.AuthUI;
-import com.myrungo.rungo.MainActivity;
 import com.myrungo.rungo.R;
+import com.myrungo.rungo.base.BaseActivity;
+import com.myrungo.rungo.MainActivity;
 
 import java.util.Arrays;
 import java.util.List;
 
 public final class LoginActivity
-        extends AppCompatActivity
+        extends BaseActivity<LoginContract.View, LoginContract.Presenter<LoginContract.View>>
         implements SwipeRefreshLayout.OnRefreshListener, LoginContract.View {
 
     static final int RC_SIGN_IN = 123;
@@ -35,14 +35,16 @@ public final class LoginActivity
     @Nullable
     private LoginContract.Presenter<LoginContract.View> presenter;
 
-    private void setupPresenter() {
-        presenter = new LoginPresenter<>();
+    @Override
+    final protected void setupPresenter() {
+        presenter = new LoginPresenter();
 
         presenter.onBindView(this);
     }
 
     @NonNull
-    private LoginContract.Presenter<LoginContract.View> getPresenter() {
+    @Override
+    final protected LoginContract.Presenter<LoginContract.View> getPresenter() {
         if (presenter == null) {
             throw new RuntimeException("presenter == null");
         }
@@ -57,15 +59,7 @@ public final class LoginActivity
 
         getSwipeRefreshLayout().setOnRefreshListener(this);
 
-        setupPresenter();
-
         getPresenter().onViewCreate();
-    }
-
-    @Override
-    final protected void onDestroy() {
-        getPresenter().onUnbindView();
-        super.onDestroy();
     }
 
     //must be called ONLY from onCreate
@@ -111,7 +105,7 @@ public final class LoginActivity
     }
 
     @Override
-    public void hideProgressDialog() {
+    public void hideProgressIndicator() {
         getProgressBarLayout().setVisibility(View.GONE);
     }
 
