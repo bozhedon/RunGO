@@ -25,10 +25,18 @@ import android.widget.Toast;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,9 +49,11 @@ import static com.firebase.ui.auth.AuthUI.TAG;
 public class ChallengeFragment extends Fragment {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-
+    private FirebaseFirestore profilered = FirebaseFirestore.getInstance();
     private static final String TAG = ChallengeFragment.class.getSimpleName();
-    private Map data;
+
+    @Nullable final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private Map data, data2;
     private ListView listView;
     private List<ChallengeItem> challengeItems;
     private ChallengeListAdapter challengeListAdapter;
@@ -60,6 +70,8 @@ public class ChallengeFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_challenge, container, false);
         listView = view.findViewById(R.id.list);
+        Log.d(TAG, user.getUid().toString()+"<=>");
+
 
         challengeItems = new ArrayList<ChallengeItem>();
 
@@ -79,12 +91,14 @@ public class ChallengeFragment extends Fragment {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG,document.getId()+"="+document.getData()+"=>");
+                                //Log.d(TAG,document.getId()+"="+document.getData()+"=>");
                                 data = document.getData();
                                 ChallengeItem item = new ChallengeItem();
+
                                 item.setDistance((Long) data.get("distance"));
                                 item.setHour((Long) data.get("hour"));
                                 item.setMinutes((Long) data.get("minutes"));
+                                item.setId((String) data.get("id"));
                                 String imageURL = ((String) data.get("imgURL"));
                                 if (imageURL==null){
 
@@ -108,17 +122,37 @@ public class ChallengeFragment extends Fragment {
         return view;
     }
 
-    private void set_list(int position)
+    private void set_challenge(int position)
     {
-        ChallengeItem challengeItem;
+        final ChallengeItem challengeItem;
         challengeItem = (ChallengeItem) listView.getAdapter().getItem(position);
-        TextView text_distance = getActivity().findViewById(R.id.text_distance);
-        TextView textTime = getActivity().findViewById(R.id.textTime);
-        text_distance.setText(challengeItem.distance.toString());
-        textTime.setText("0"+challengeItem.hour.toString()+":"+challengeItem.minutes.toString());
+        String UID = user.getUid();
+        final DocumentReference sfDocRef = profilered.collection("users").document(UID);
+        profilered.runTransaction(new Transaction.Function<Void>() {
+            @Override
+            public Void apply(Transaction transaction) throws FirebaseFirestoreException {
+                DocumentSnapshot snapshot = transaction.get(sfDocRef);
+                String chal_id = challengeItem.getId();
+                transaction.update(sfDocRef, "active_challenge", chal_id);
+
+                // Success
+                return null;
+            }
+        }).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Log.d(TAG, "Transaction success!");
+            }
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Transaction failure.", e);
+                    }
+                });
     }
 
-    private void set_dialog(int position)
+    private void set_dialog(final int position)
     {
         ChallengeItem challengeItem;
         challengeItem = (ChallengeItem) listView.getAdapter().getItem(position);
@@ -149,6 +183,7 @@ public class ChallengeFragment extends Fragment {
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                set_challenge(position);
                 MyDialog.cancel();
             }
         });
