@@ -20,32 +20,12 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 public class MainActivity extends AppCompatActivity{
 
-    public CatView.Skins getSkin() {
-        return skin;
-    }
-
-    public void setSkin(CatView.Skins skin) {
-        this.skin = skin;
-    }
-
-    public CatView.Heads getHead() {
-        return head;
-    }
-
-    public void setHead(CatView.Heads head) {
-        this.head = head;
-    }
-
-    private CatView.Skins skin;
-    private CatView.Heads head;
     private boolean first = true;
     private int position = 1;
-
-
-
+    private User user;
+    public static final String USER_TAG = "USER_TAG";
     private BottomNavigationViewEx.OnNavigationItemSelectedListener onNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             Fragment fragment;
@@ -101,7 +81,13 @@ public class MainActivity extends AppCompatActivity{
                 startActivity(intent);
             }
         });
+
         Fragment fragment = new HomeFragment();
+        user = new User(CatView.Skins.BUSINESS, CatView.Heads.ANGRY);
+        Bundle user_bundle = new Bundle();
+        user_bundle.putSerializable(USER_TAG,user);
+        fragment.setArguments(user_bundle);
+
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
         transaction.add(R.id.fragment_container,fragment);
@@ -109,9 +95,15 @@ public class MainActivity extends AppCompatActivity{
         BottomNavigationViewEx bottomNavigationViewEx = findViewById(R.id.bnve);
         bottomNavigationViewEx.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
         setupBottomNavigationView(bottomNavigationViewEx);
+
+
+
     }
 
     public void replaceFragment(Fragment someFragment) {
+        Bundle user_bundle = new Bundle();
+        user_bundle.putSerializable(USER_TAG,user);
+        someFragment.setArguments(user_bundle);
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.fragment_container, someFragment);
