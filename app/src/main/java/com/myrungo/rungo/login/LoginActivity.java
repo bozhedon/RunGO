@@ -62,6 +62,12 @@ public final class LoginActivity
         getPresenter().onViewCreate();
     }
 
+    @Override
+    final protected void onDestroy() {
+        getPresenter().onUnbindView();
+        super.onDestroy();
+    }
+
     //must be called ONLY from onCreate
     @Override
     public void createSignInIntent() {
