@@ -2,7 +2,12 @@ package com.myrungo.rungo.models;
 
 import android.support.annotation.NonNull;
 
-@SuppressWarnings({"FieldCanBeLocal", "unused"})
+/**
+ * In firestore fields will be named like parameter's fields
+ * For example: if in DB field == "reg_date", but model's field == "regDate"
+ * it will be renamed to "regDate"
+ */
+@SuppressWarnings("unused")
 public final class DBUser {
 
     @NonNull
@@ -22,8 +27,7 @@ public final class DBUser {
     @NonNull
     private String provider = "";
 
-    @NonNull
-    private String regDate = "";
+    private long reg_date = 0L;
 
     /**
      * Primary key
@@ -37,6 +41,10 @@ public final class DBUser {
     private String costume = "";
 
     private int height;
+
+    public DBUser() {
+        this.uid = "";
+    }
 
     public DBUser(@NonNull final String uid) {
         this.uid = uid.trim();
@@ -92,12 +100,12 @@ public final class DBUser {
     }
 
     @NonNull
-    public String getRegDate() {
-        return regDate;
+    public Long getReg_date() {
+        return reg_date;
     }
 
-    public void setRegDate(@NonNull final String regDate) {
-        this.regDate = regDate;
+    public void setReg_date(@NonNull final Long reg_date) {
+        this.reg_date = reg_date;
     }
 
     @NonNull

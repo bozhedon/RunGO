@@ -11,7 +11,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 
+import com.google.android.gms.tasks.Task;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.myrungo.rungo.base.BaseActivity;
 import com.myrungo.rungo.main.MainContract;
@@ -21,7 +23,6 @@ import com.myrungo.rungo.models.DBUser;
 import com.myrungo.rungo.models.Training;
 
 import java.util.List;
-import java.util.Objects;
 
 public final class MainActivity
         extends BaseActivity<MainContract.View, MainContract.Presenter<MainContract.View>>
@@ -82,6 +83,23 @@ public final class MainActivity
     @Nullable
     private FloatingActionButton fab;
 
+    @NonNull
+    public FloatingActionButton getFab() {
+        if (fab == null) {
+            throw new NullPointerException("fab == null");
+        }
+
+        return fab;
+    }
+
+    public void setFab(@Nullable final View fab) {
+        if (fab == null) {
+            throw new NullPointerException("fab == null");
+        }
+
+        this.fab = (FloatingActionButton) fab;
+    }
+
     @Nullable
     private MainContract.Presenter<MainContract.View> presenter;
 
@@ -115,8 +133,6 @@ public final class MainActivity
     @Override
     final protected void setupPresenter() {
         presenter = new MainPresenter();
-
-        presenter.onBindView(this);
     }
 
     @Override
@@ -124,18 +140,24 @@ public final class MainActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        showProgressIndicator();
+
         user = new User(CatView.Skins.BUSINESS, CatView.Heads.ANGRY);
 
-        fab = findViewById(R.id.fab_start);
-        Objects.requireNonNull(fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, StartActivity.class);
-                //intent.putExtra(DBUser.class.getSimpleName(), user);
-                startActivity(intent);
-            }
-        });
+        setFab(findViewById(R.id.fab_start));
 
+        setFabOnClickListener();
+
+        goToHomeFragment();
+
+        setupBottomNavigationView();
+
+        hideProgressIndicator();
+
+        getPresenter().onViewCreate();
+    }
+
+    private void goToHomeFragment() {
         @NonNull final Fragment fragment = new HomeFragment();
         @NonNull final FragmentManager manager = getSupportFragmentManager();
 
@@ -145,10 +167,17 @@ public final class MainActivity
         @NonNull final FragmentTransaction transaction = manager.beginTransaction();
         transaction.add(R.id.fragment_container, fragment);
         transaction.commit();
+    }
 
-        setupBottomNavigationView();
-
-        getPresenter().onViewCreate();
+    private void setFabOnClickListener() {
+        getFab().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, StartActivity.class);
+                //intent.putExtra(DBUser.class.getSimpleName(), user);
+                startActivity(intent);
+            }
+        });
     }
 
     final public void replaceFragment(@NonNull final Fragment someFragment) {
@@ -178,6 +207,27 @@ public final class MainActivity
         bottomNavigationViewEx.setTextVisibility(false);
     }
 
+    @NonNull
+    private ViewGroup getProgressBarLayout() {
+        @Nullable final ViewGroup layoutWithProgressBar = findViewById(R.id.layoutWithProgressBar);
+
+        if (layoutWithProgressBar == null) {
+            throw new RuntimeException("layoutWithProgressBar == null");
+        }
+
+        return layoutWithProgressBar;
+    }
+
+    @Override
+    final public void hideProgressIndicator() {
+        getProgressBarLayout().setVisibility(View.GONE);
+    }
+
+    @Override
+    final public void showProgressIndicator() {
+        getProgressBarLayout().setVisibility(View.VISIBLE);
+    }
+
     @Override
     @NonNull
     final public List<Challenge> getAllChallenges() throws Exception {
@@ -190,7 +240,13 @@ public final class MainActivity
         return getPresenter().getUsers();
     }
 
-    @Nullable
+    @NonNull
+    @Override
+    final public Task<DBUser> asyncGetCurrentUserInfo() {
+        return getPresenter().asyncGetCurrentUserInfo();
+    }
+
+    @NonNull
     @Override
     final public DBUser getCurrentUserInfo() throws Exception {
         return getPresenter().getCurrentUserInfo();
@@ -199,6 +255,12 @@ public final class MainActivity
     @Override
     final public void updateUserInfo(@NonNull final DBUser newUserInfo) throws Exception {
         getPresenter().updateUserInfo(newUserInfo);
+    }
+
+    @Override
+    @NonNull
+    public Task<Void> asyncUpdateUserInfo(@NonNull final DBUser newUserInfo) throws Exception {
+        return getPresenter().asyncUpdateUserInfo(newUserInfo);
     }
 
     @Override

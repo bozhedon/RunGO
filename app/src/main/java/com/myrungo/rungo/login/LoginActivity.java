@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.firebase.ui.auth.AuthUI;
+import com.myrungo.rungo.MainActivity;
 import com.myrungo.rungo.R;
 import com.myrungo.rungo.base.BaseActivity;
-import com.myrungo.rungo.MainActivity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,8 +38,6 @@ public final class LoginActivity
     @Override
     final protected void setupPresenter() {
         presenter = new LoginPresenter();
-
-        presenter.onBindView(this);
     }
 
     @NonNull
@@ -55,7 +53,7 @@ public final class LoginActivity
     @Override
     final protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_firebase_ui);
+        setContentView(R.layout.activity_login);
 
         getSwipeRefreshLayout().setOnRefreshListener(this);
 

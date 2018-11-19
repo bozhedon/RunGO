@@ -1,8 +1,6 @@
 package com.myrungo.rungo.login;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -57,18 +55,13 @@ public final class LoginPresenter
     }
 
     @Override
-    public void onViewStart() {
-        //do work in onStart method
-    }
-
-    @Override
-    public void onViewCreate() {
+    final public void onViewCreate() {
         getView().showProgressIndicator();
         getView().createSignInIntent();
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    final public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         getView().hideRefreshIndicator();
 
         getView().showProgressIndicator();
@@ -170,45 +163,43 @@ public final class LoginPresenter
 
         final int errorCode = error.getErrorCode();
 
-        @NonNull String part1;
-
-        Context context = ((Activity) getView()).getApplicationContext();
+        @NonNull final String part1;
 
         if (errorCode == NO_NETWORK) {
 
-            part1 = context.getString(R.string.no_internet_connection);
+            part1 = getContext().getString(R.string.no_internet_connection);
 
         } else if (errorCode == PLAY_SERVICES_UPDATE_CANCELLED) {
 
-            part1 = context.getString(R.string.play_services_update_cancelled);
+            part1 = getContext().getString(R.string.play_services_update_cancelled);
 
         } else if (errorCode == DEVELOPER_ERROR) {
 
-            part1 = context.getString(R.string.developer_error);
+            part1 = getContext().getString(R.string.developer_error);
 
         } else if (errorCode == PROVIDER_ERROR) {
 
-            part1 = context.getString(R.string.provider_error);
+            part1 = getContext().getString(R.string.provider_error);
 
         } else if (errorCode == ANONYMOUS_UPGRADE_MERGE_CONFLICT) {
 
-            part1 = context.getString(R.string.user_account_merge_conflict);
+            part1 = getContext().getString(R.string.user_account_merge_conflict);
 
         } else if (errorCode == EMAIL_MISMATCH_ERROR) {
 
-            part1 = context.getString(R.string.you_are_attempting_to_sign_in_a_different_email_than_previously_provided);
+            part1 = getContext().getString(R.string.you_are_attempting_to_sign_in_a_different_email_than_previously_provided);
 
         } else if (errorCode == UNKNOWN_ERROR) {
 
-            part1 = context.getString(R.string.unknown_error_has_occured);
+            part1 = getContext().getString(R.string.unknown_error_has_occured);
 
         } else {
 
-            part1 = context.getString(R.string.unknown_error_has_occured);
+            part1 = getContext().getString(R.string.unknown_error_has_occured);
 
         }
 
-        @NonNull final String part2 = context.getString(R.string.swipe_from_up_to_down);
+        @NonNull final String part2 = getContext().getString(R.string.swipe_from_up_to_down);
 
         getView().setErrorText(part1 + ". " + part2);
 
@@ -218,6 +209,5 @@ public final class LoginPresenter
 
         getView().hideProgressIndicator();
     }
-
 
 }

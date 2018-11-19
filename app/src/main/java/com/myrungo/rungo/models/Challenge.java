@@ -2,6 +2,11 @@ package com.myrungo.rungo.models;
 
 import android.support.annotation.NonNull;
 
+/**
+ * In firestore fields will be named like parameter's fields
+ * For example: if in DB field == "img_URL", but model's field == "imgURL"
+ * it will be renamed to "imgURL"
+ */
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
 public final class Challenge {
 

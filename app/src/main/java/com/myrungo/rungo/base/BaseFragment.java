@@ -3,10 +3,11 @@ package com.myrungo.rungo.base;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 
-abstract public class BaseActivity<V extends BaseContract.View, P extends BaseContract.Presenter<V>>
-        extends AppCompatActivity
+public abstract class BaseFragment<V extends BaseContract.View, P extends BaseContract.Presenter<V>>
+        extends Fragment
         implements BaseContract.View {
 
     protected abstract P getPresenter();
@@ -14,7 +15,7 @@ abstract public class BaseActivity<V extends BaseContract.View, P extends BaseCo
     protected abstract void setupPresenter();
 
     @Override
-    protected void onCreate(@Nullable final Bundle savedInstanceState) {
+    public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupPresenter();
         //noinspection unchecked
@@ -22,7 +23,7 @@ abstract public class BaseActivity<V extends BaseContract.View, P extends BaseCo
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         getPresenter().onUnbindView();
         super.onDestroy();
     }
@@ -30,7 +31,11 @@ abstract public class BaseActivity<V extends BaseContract.View, P extends BaseCo
     @Override
     public void showMessage(@Nullable final String message) {
         if (message != null) {
-            Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
+            @Nullable final FragmentActivity activity = getActivity();
+
+            if (activity != null) {
+                Snackbar.make(activity.findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
+            }
         }
     }
 

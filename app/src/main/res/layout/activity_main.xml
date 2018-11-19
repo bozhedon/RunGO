@@ -17,17 +17,16 @@
         android:layout_marginTop="15dp"
         android:layout_marginBottom="-10dp"
         app:elevation="9dp"
-        android:src="@drawable/round_play_arrow_24px"
+        app:fabCustomSize="90dp"
         app:maxImageSize="90dp"
-        app:fabCustomSize="90dp" />
+        app:srcCompat="@drawable/round_play_arrow_24px" />
 
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_parent_rounded_corner"
-        android:layout_above="@+id/bnve">
-    </FrameLayout>
+        android:layout_above="@+id/bnve"
+        android:background="@drawable/bg_parent_rounded_corner" />
 
     <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
         android:id="@+id/bnve"
@@ -42,5 +41,7 @@
         app:menu="@menu/bottom_menu">
 
     </com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx>
+
+    <include layout="@layout/layout_progress_bar" />
 
 </RelativeLayout>

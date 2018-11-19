@@ -19,8 +19,6 @@ public interface BaseContract {
 
         void onViewCreate();
 
-        void onViewStart();
-
     }
 
 }

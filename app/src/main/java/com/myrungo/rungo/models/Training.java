@@ -1,5 +1,10 @@
 package com.myrungo.rungo.models;
 
+/**
+ * In firestore fields will be named like parameter's fields
+ * For example: if in DB field == "start_time", but model's field == "startTime"
+ * it will be renamed to "startTime"
+ */
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
 public final class Training {
 

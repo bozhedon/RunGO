@@ -1,8 +1,8 @@
 package com.myrungo.rungo.main;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
+import com.google.android.gms.tasks.Task;
 import com.myrungo.rungo.base.BaseContract;
 import com.myrungo.rungo.models.Challenge;
 import com.myrungo.rungo.models.DBUser;
@@ -14,6 +14,10 @@ public interface MainContract extends BaseContract {
 
     @SuppressWarnings("unused")
     interface View extends BaseContract.View {
+
+        void showProgressIndicator();
+
+        void hideProgressIndicator();
 
         /**
          * Fragments can call this method for their work
@@ -47,10 +51,16 @@ public interface MainContract extends BaseContract {
         @NonNull
         List<DBUser> getUsers() throws Exception;
 
-        @Nullable
+        @NonNull
         DBUser getCurrentUserInfo() throws Exception;
 
+        @NonNull
+        Task<DBUser> asyncGetCurrentUserInfo();
+
         void updateUserInfo(@NonNull final DBUser newUserInfo) throws Exception;
+
+        @NonNull
+        Task<Void> asyncUpdateUserInfo(@NonNull final DBUser newUserInfo) throws Exception;
 
         void createNewUser(@NonNull final DBUser newUser) throws Exception;
 
@@ -59,7 +69,6 @@ public interface MainContract extends BaseContract {
 
         @NonNull
         List<Training> getUserTrainingsByDocumentId(@NonNull final String documentId) throws Exception;
-
 
     }
 
@@ -71,10 +80,16 @@ public interface MainContract extends BaseContract {
         @NonNull
         List<DBUser> getUsers() throws Exception;
 
-        @Nullable
+        @NonNull
         DBUser getCurrentUserInfo() throws Exception;
 
+        @NonNull
+        Task<DBUser> asyncGetCurrentUserInfo();
+
         void updateUserInfo(@NonNull final DBUser newUserInfo) throws Exception;
+
+        @NonNull
+        Task<Void> asyncUpdateUserInfo(@NonNull final DBUser newUserInfo) throws Exception;
 
         void createNewUser(@NonNull final DBUser newUser) throws Exception;
 
