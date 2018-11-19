@@ -1,37 +1,37 @@
 package com.myrungo.rungo;
 
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.support.constraint.ConstraintLayout;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
-import android.widget.FrameLayout;
+import android.view.animation.RotateAnimation;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
-
 import com.bumptech.glide.Glide;
 
 public class CatView extends ConstraintLayout {
-    private static final int DURATION = 300;
+    private static final int DURATION = 250;
+    private float headWidth;
+    private float headHeight;
+    private float handWidth;
+    private float eyeWidth;
+    private float eyeHeight;
+
     private ImageView head;
     private ImageView body;
     private ImageView handLeft;
     private ImageView handRight;
     private ImageView legLeft;
     private ImageView legRight;
+    private ImageView tail;
     private ImageView eyeRight;
     private ImageView eyeLeft;
-    private ObjectAnimator handRightAnimation1;
-    private ObjectAnimator handRightAnimation2;
-    private ObjectAnimator handLeftAnimation1;
-    private ObjectAnimator handLeftAnimation2;
-    private ObjectAnimator legRightAnimation1;
-    private ObjectAnimator legRightAnimation2;
-    private ObjectAnimator legLeftAnimation1;
-    private ObjectAnimator legLeftAnimation2;
-    private ObjectAnimator eyeLeftAnimation;
-    private ObjectAnimator eyeRightAnimation;
+
+    private Heads currentHead;
+    private Animation.AnimationListener animationListener = null;
 
     public CatView(Context context) {
         super(context);
@@ -48,6 +48,10 @@ public class CatView extends ConstraintLayout {
         init();
     }
 
+    public void setAnimationListener(Animation.AnimationListener animationListener) {
+        this.animationListener = animationListener;
+    }
+
     private void init() {
         inflate(getContext(), R.layout.view_cat, this);
         head = findViewById(R.id.cat_head_image_view);
@@ -56,74 +60,42 @@ public class CatView extends ConstraintLayout {
         handRight = findViewById(R.id.cat_hand_right_image_view);
         legLeft = findViewById(R.id.cat_leg_left_image_view);
         legRight = findViewById(R.id.cat_leg_right_image_view);
-        eyeLeft = findViewById(R.id.cat_eye_left);
-        eyeRight = findViewById(R.id.cat_eye_right);
+        tail = findViewById(R.id.cat_tail_image_view);
+        eyeLeft = findViewById(R.id.cat_eye_left_image_view);
+        eyeRight = findViewById(R.id.cat_eye_right_image_view);
 
+        Glide.with(this).load(R.drawable.tall_common).into(tail);
         Glide.with(this).load(R.drawable.eye_sad).into(eyeLeft);
         Glide.with(this).load(R.drawable.eye_sad).into(eyeRight);
 
         setSkin(Skins.COMMON);
         setHead(Heads.COMMON);
 
-        handLeft.setPivotY(-5);
-        handLeft.setPivotX(65);
+        head.getViewTreeObserver()
+                .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        headWidth = head.getWidth();
+                        headHeight = head.getHeight();
+                    }
+                });
 
-        handRight.setPivotY(5);
-        handRight.setPivotX(5);
+        handLeft.getViewTreeObserver()
+                .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        handWidth = handLeft.getWidth();
+                    }
+                });
 
-        eyeLeftAnimation = ObjectAnimator.ofFloat(eyeLeft, "rotation", 10f, 0f);
-        eyeLeftAnimation.setDuration(100);
-        eyeLeftAnimation.setRepeatMode(ValueAnimator.REVERSE);
-        eyeLeftAnimation.setRepeatCount(Animation.INFINITE);
-
-        eyeRightAnimation = ObjectAnimator.ofFloat(eyeRight, "rotation", 10f, 0f);
-        eyeRightAnimation.setDuration(100);
-        eyeRightAnimation.setRepeatMode(ValueAnimator.REVERSE);
-        eyeRightAnimation.setRepeatCount(Animation.INFINITE);
-
-        eyeLeftAnimation.start();
-        eyeRightAnimation.start();
-
-        handRightAnimation1 = ObjectAnimator.ofFloat(handRight, "rotation", 10f, 30f);
-        handRightAnimation1.setDuration(DURATION);
-        handRightAnimation1.setRepeatMode(ValueAnimator.REVERSE);
-        handRightAnimation1.setRepeatCount(Animation.INFINITE);
-
-        handRightAnimation2 = ObjectAnimator.ofFloat(handRight, "rotation", -10f, -30f);
-        handRightAnimation2.setDuration(DURATION);
-        handRightAnimation2.setRepeatMode(ValueAnimator.REVERSE);
-        handRightAnimation2.setRepeatCount(Animation.INFINITE);
-
-        handLeftAnimation1 = ObjectAnimator.ofFloat(handLeft, "rotation", -30f, -10f);
-        handLeftAnimation1.setDuration(DURATION);
-        handLeftAnimation1.setRepeatMode(ValueAnimator.REVERSE);
-        handLeftAnimation1.setRepeatCount(Animation.INFINITE);
-
-        handLeftAnimation2 = ObjectAnimator.ofFloat(handLeft, "rotation", 30f, 10f);
-        handLeftAnimation2.setDuration(DURATION);
-        handLeftAnimation2.setRepeatMode(ValueAnimator.REVERSE);
-        handLeftAnimation2.setRepeatCount(Animation.INFINITE);
-
-        legRightAnimation1 = ObjectAnimator.ofFloat(legRight, "translationY", 20f);
-        legRightAnimation1.setDuration(DURATION);
-        legRightAnimation1.setRepeatMode(ValueAnimator.REVERSE);
-        legRightAnimation1.setRepeatCount(Animation.INFINITE);
-
-        legRightAnimation2 = ObjectAnimator.ofFloat(legLeft, "translationY", -20f);
-        legRightAnimation2.setStartDelay(DURATION);
-        legRightAnimation2.setDuration(DURATION);
-        legRightAnimation2.setRepeatMode(ValueAnimator.REVERSE);
-        legRightAnimation2.setRepeatCount(Animation.INFINITE);
-
-        legLeftAnimation1 = ObjectAnimator.ofFloat(legLeft, "translationY", -20f);
-        legLeftAnimation1.setDuration(DURATION);
-        legLeftAnimation1.setRepeatMode(ValueAnimator.REVERSE);
-        legLeftAnimation1.setRepeatCount(Animation.INFINITE);
-
-        legLeftAnimation2 = ObjectAnimator.ofFloat(legRight, "translationY", -20f);
-        legLeftAnimation2.setDuration(DURATION);
-        legLeftAnimation2.setRepeatMode(ValueAnimator.REVERSE);
-        legLeftAnimation2.setRepeatCount(Animation.INFINITE);
+        eyeLeft.getViewTreeObserver()
+                .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        eyeWidth = eyeLeft.getMeasuredWidth();
+                        eyeHeight = eyeLeft.getMeasuredHeight();
+                    }
+                });
     }
 
     public enum Skins {
@@ -139,7 +111,7 @@ public class CatView extends ConstraintLayout {
             case COMMON:
                 Glide.with(this).load(R.drawable.common_cat_body).into(body);
                 Glide.with(this).load(R.drawable.common_cat_hand).into(handRight);
-                Glide.with(this).load(R.drawable.common_cat_hand).into(handLeft);
+                Glide.with(this).load(R.drawable.common_cat_hand_left).into(handLeft);
                 Glide.with(this).load(R.drawable.common_cat_leg).into(legRight);
                 Glide.with(this).load(R.drawable.common_cat_leg).into(legLeft);
                 break;
@@ -147,7 +119,7 @@ public class CatView extends ConstraintLayout {
             case BAD:
                 Glide.with(this).load(R.drawable.bad_cat_body).into(body);
                 Glide.with(this).load(R.drawable.bad_cat_hand).into(handRight);
-                Glide.with(this).load(R.drawable.bad_cat_hand).into(handLeft);
+                Glide.with(this).load(R.drawable.bad_cat_hand_left).into(handLeft);
                 Glide.with(this).load(R.drawable.bad_cat_leg).into(legRight);
                 Glide.with(this).load(R.drawable.bad_cat_leg).into(legLeft);
                 break;
@@ -155,7 +127,7 @@ public class CatView extends ConstraintLayout {
             case BUSINESS:
                 Glide.with(this).load(R.drawable.bussiness_cat_body).into(body);
                 Glide.with(this).load(R.drawable.bussiness_cat_hand).into(handRight);
-                Glide.with(this).load(R.drawable.bussiness_cat_hand).into(handLeft);
+                Glide.with(this).load(R.drawable.bussiness_cat_hand_left).into(handLeft);
                 Glide.with(this).load(R.drawable.bussiness_cat_leg).into(legRight);
                 Glide.with(this).load(R.drawable.bussiness_cat_leg).into(legLeft);
                 break;
@@ -163,7 +135,7 @@ public class CatView extends ConstraintLayout {
             case KARATE:
                 Glide.with(this).load(R.drawable.karate_cat_body).into(body);
                 Glide.with(this).load(R.drawable.karate_cat_hand).into(handRight);
-                Glide.with(this).load(R.drawable.karate_cat_hand).into(handLeft);
+                Glide.with(this).load(R.drawable.karate_cat_hand_left).into(handLeft);
                 Glide.with(this).load(R.drawable.karate_cat_leg).into(legRight);
                 Glide.with(this).load(R.drawable.karate_cat_leg).into(legLeft);
                 break;
@@ -171,7 +143,7 @@ public class CatView extends ConstraintLayout {
             case NORMAL:
                 Glide.with(this).load(R.drawable.normal_cat_body).into(body);
                 Glide.with(this).load(R.drawable.normal_cat_hand).into(handRight);
-                Glide.with(this).load(R.drawable.normal_cat_hand).into(handLeft);
+                Glide.with(this).load(R.drawable.normal_cat_hand_left).into(handLeft);
                 Glide.with(this).load(R.drawable.normal_cat_leg).into(legRight);
                 Glide.with(this).load(R.drawable.normal_cat_leg).into(legLeft);
                 break;
@@ -187,9 +159,14 @@ public class CatView extends ConstraintLayout {
         ANGRY
     }
 
+    public Heads getCurrentHead() {
+        return currentHead;
+    }
+
     public void setHead(Heads head) {
         eyeLeft.setVisibility(View.GONE);
         eyeRight.setVisibility(View.GONE);
+        currentHead = head;
 
         switch (head) {
             case COMMON:
@@ -220,30 +197,184 @@ public class CatView extends ConstraintLayout {
         }
     }
 
+    public void stop() {
+        if (head.getAnimation() != null) head.clearAnimation();
+        if (legLeft.getAnimation() != null) legLeft.clearAnimation();
+        if (legRight.getAnimation() != null) legRight.clearAnimation();
+        if (handLeft.getAnimation() != null) handLeft.clearAnimation();
+        if (handRight.getAnimation() != null) handRight.clearAnimation();
+        if (eyeLeft.getAnimation() != null) eyeLeft.clearAnimation();
+        if (eyeRight.getAnimation() != null) eyeRight.clearAnimation();
+    }
+
+    public void pause() {
+        if (head.getAnimation() != null) head.getAnimation().cancel();
+        if (legLeft.getAnimation() != null) legLeft.getAnimation().cancel();
+        if (legRight.getAnimation() != null) legRight.getAnimation().cancel();
+        if (handLeft.getAnimation() != null) handLeft.getAnimation().cancel();
+        if (handRight.getAnimation() != null) handRight.getAnimation().cancel();
+        if (eyeLeft.getAnimation() != null) eyeLeft.getAnimation().cancel();
+        if (eyeRight.getAnimation() != null) eyeRight.getAnimation().cancel();
+    }
+
+    public void resume() {
+        if (head.getAnimation() != null) head.getAnimation().start();
+        if (legLeft.getAnimation() != null) legLeft.getAnimation().start();
+        if (legRight.getAnimation() != null) legRight.getAnimation().start();
+        if (handLeft.getAnimation() != null) handLeft.getAnimation().start();
+        if (handRight.getAnimation() != null) handRight.getAnimation().start();
+        if (eyeLeft.getAnimation() != null) eyeLeft.getAnimation().start();
+        if (eyeRight.getAnimation() != null) eyeRight.getAnimation().start();
+    }
+
+    public void greet() {
+        stop();
+
+        Animation rotateStart = new RotateAnimation(0, -90, 0, 10);
+        rotateStart.setDuration(500);
+
+        final Animation rotate = new RotateAnimation(-90, -45, 0, 10);
+        rotate.setDuration(500);
+        rotate.setRepeatMode(ValueAnimator.REVERSE);
+        rotate.setRepeatCount(3);
+
+        final Animation rotateEnd = new RotateAnimation(-90, 0, 0, 10);
+        rotateEnd.setDuration(500);
+
+        rotateStart.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                handRight.startAnimation(rotate);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+
+        rotate.setAnimationListener(new Animation.AnimationListener() {
+
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                handRight.startAnimation(rotateEnd);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+
+        handRight.startAnimation(rotateStart);
+    }
 
     public void run() {
         stop();
-        handRightAnimation1.start();
-        handRightAnimation2.start();
-        handLeftAnimation1.start();
-        handLeftAnimation2.start();
-        legRightAnimation2.start();
-        legLeftAnimation2.start();
+
+        Animation rotatingLeft = new RotateAnimation(0, 30, handWidth, 10);
+        rotatingLeft.setDuration(DURATION);
+        rotatingLeft.setRepeatMode(ValueAnimator.REVERSE);
+        rotatingLeft.setRepeatCount(Animation.INFINITE);
+        rotatingLeft.setFillAfter(true);
+
+        Animation rotatingRight = new RotateAnimation(-30, 0, 0, 10);
+        rotatingRight.setDuration(DURATION);
+        rotatingRight.setRepeatMode(ValueAnimator.REVERSE);
+        rotatingRight.setRepeatCount(Animation.INFINITE);
+        rotatingRight.setFillAfter(true);
+
+        Animation stepLeft = new TranslateAnimation(0, 0, -10, 20);
+        stepLeft.setDuration(DURATION);
+        stepLeft.setRepeatMode(ValueAnimator.REVERSE);
+        stepLeft.setRepeatCount(Animation.INFINITE);
+        stepLeft.setFillAfter(true);
+
+        Animation stepRight = new TranslateAnimation(0, 0, 20, -10);
+        stepRight.setDuration(DURATION);
+        stepRight.setRepeatMode(ValueAnimator.REVERSE);
+        stepRight.setRepeatCount(Animation.INFINITE);
+        stepRight.setFillAfter(true);
+
+        handLeft.startAnimation(rotatingLeft);
+        handRight.startAnimation(rotatingRight);
+        legLeft.startAnimation(stepLeft);
+        legRight.startAnimation(stepRight);
     }
 
-    public void stop() {
-        handRightAnimation1.cancel();
-        handRightAnimation2.cancel();
-        handLeftAnimation1.cancel();
-        handLeftAnimation2.cancel();
-        legRightAnimation1.cancel();
-        legRightAnimation2.cancel();
-        legLeftAnimation1.cancel();
-        legLeftAnimation2.cancel();
-    }
-
-    public void hello() {
+    public void cry() {
         stop();
+
+        Animation cryAnimation = new RotateAnimation(0, -30, eyeLeft.getWidth()/2, eyeLeft.getHeight()/2);
+        cryAnimation.setDuration(100);
+        cryAnimation.setRepeatMode(ValueAnimator.REVERSE);
+        cryAnimation.setRepeatCount(Animation.INFINITE);
+        cryAnimation.setFillAfter(true);
+
+        eyeLeft.startAnimation(cryAnimation);
+        eyeRight.startAnimation(cryAnimation);
+
+        Animation headAnimation = new TranslateAnimation(0, 0, 0, 10);
+        headAnimation.setDuration(600);
+        headAnimation.setRepeatMode(ValueAnimator.REVERSE);
+        headAnimation.setRepeatCount(Animation.INFINITE);
+        headAnimation.setFillAfter(true);
+
+        Animation handAnimation = new TranslateAnimation(0, 0, 0, -10);
+        handAnimation.setDuration(600);
+        handAnimation.setRepeatMode(ValueAnimator.REVERSE);
+        handAnimation.setRepeatCount(Animation.INFINITE);
+        handAnimation.setFillAfter(true);
+
+        head.startAnimation(headAnimation);
+        handRight.startAnimation(handAnimation);
+        handLeft.startAnimation(handAnimation);
+    }
+
+    public void slap() {
+        stop();
+
+        Animation headAnimation = new RotateAnimation(0, 10, headWidth/2, headHeight/2);
+        headAnimation.setDuration(100);
+        headAnimation.setRepeatMode(ValueAnimator.REVERSE);
+        headAnimation.setRepeatCount(1);
+        headAnimation.setFillAfter(true);
+        headAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                if (animationListener != null) animationListener.onAnimationStart(animation);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if (animationListener != null) animationListener.onAnimationEnd(animation);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+
+        Animation handLeftAnimation = new RotateAnimation(0, 60, handWidth, -10);
+        handLeftAnimation.setDuration(100);
+        handLeftAnimation.setRepeatMode(ValueAnimator.REVERSE);
+        handLeftAnimation.setRepeatCount(1);
+        handLeftAnimation.setFillAfter(true);
+
+        Animation handRightAnimation = new RotateAnimation(0, -60, 0, -10);
+        handRightAnimation.setDuration(100);
+        handRightAnimation.setRepeatMode(ValueAnimator.REVERSE);
+        handRightAnimation.setRepeatCount(1);
+        handRightAnimation.setFillAfter(true);
+
+        head.startAnimation(headAnimation);
+        handLeft.startAnimation(handLeftAnimation);
+        handRight.startAnimation(handRightAnimation);
     }
 }
-
