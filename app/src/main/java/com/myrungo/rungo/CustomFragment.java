@@ -32,14 +32,14 @@ public class CustomFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        Bundle user_bundle = getArguments();
-        User user = (User) user_bundle.getSerializable(USER_TAG);
+        //Bundle user_bundle = getArguments();
+        //User user = (User) user_bundle.getSerializable(USER_TAG);
 
         View view = inflater.inflate(R.layout.fragment_customization, container, false);
 
         catview = view.findViewById(R.id.cat);
-        catview.setSkin(user.getSkin());
-        catview.setHead(user.getHead());
+        //catview.setSkin(user.getSkin());
+        //catview.setHead(user.getHead());
 
         badcat = view.findViewById(R.id.bad_cat_cloth);
         karatecat = view.findViewById(R.id.karate_cloth);

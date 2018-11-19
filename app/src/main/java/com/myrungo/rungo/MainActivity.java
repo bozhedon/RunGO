@@ -131,7 +131,7 @@ public final class MainActivity
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, StartActivity.class);
-                intent.putExtra(DBUser.class.getSimpleName(), user);
+                //intent.putExtra(DBUser.class.getSimpleName(), user);
                 startActivity(intent);
             }
         });
@@ -139,9 +139,9 @@ public final class MainActivity
         @NonNull final Fragment fragment = new HomeFragment();
         @NonNull final FragmentManager manager = getSupportFragmentManager();
 
-        Bundle user_bundle = new Bundle();
-        user_bundle.putSerializable(USER_TAG, user);
-        fragment.setArguments(user_bundle);
+        //Bundle user_bundle = new Bundle();
+        //user_bundle.putSerializable(USER_TAG, user);
+        //fragment.setArguments(user_bundle);
         @NonNull final FragmentTransaction transaction = manager.beginTransaction();
         transaction.add(R.id.fragment_container, fragment);
         transaction.commit();
@@ -152,9 +152,9 @@ public final class MainActivity
     }
 
     final public void replaceFragment(@NonNull final Fragment someFragment) {
-        Bundle user_bundle = new Bundle();
-        user_bundle.putSerializable(USER_TAG, user);
-        someFragment.setArguments(user_bundle);
+        //Bundle user_bundle = new Bundle();
+        //user_bundle.putSerializable(USER_TAG, user);
+        //someFragment.setArguments(user_bundle);
         @NonNull final FragmentManager fragmentManager = getSupportFragmentManager();
         @NonNull final FragmentTransaction transaction = fragmentManager.beginTransaction();
 

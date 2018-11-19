@@ -20,13 +20,13 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Bundle user_bundle = getArguments();
-        User user = (User) user_bundle.getSerializable(USER_TAG);
+        //Bundle user_bundle = getArguments();
+        //User user = (User) user_bundle.getSerializable(USER_TAG);
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         love_heart = view.findViewById(R.id.love_heart);
         cat = view.findViewById(R.id.cat);
         cat.setClickable(true);
-        cat.setOnClickListener(new View.OnClickListener() {
+        /*cat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (love_heart.getVisibility()==View.INVISIBLE)
@@ -34,7 +34,7 @@ public class HomeFragment extends Fragment {
                 else
                     love_heart.setVisibility(View.INVISIBLE);
             }
-        });
+        });*/
 
         return view;
     }

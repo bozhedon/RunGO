@@ -67,11 +67,11 @@ public class StartActivity extends AppCompatActivity implements LocationListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        Bundle user_bundle = getIntent().getExtras();
-        final User user;
-        user = (User) user_bundle.getSerializable(User.class.getSimpleName());
-        catView.setSkin(user.getSkin());
-        catView.setHead(user.getHead());
+        //Bundle user_bundle = getIntent().getExtras();
+        //final User user;
+        //user = (User) user_bundle.getSerializable(User.class.getSimpleName());
+        //catView.setSkin(user.getSkin());
+        //catView.setHead(user.getHead());
         data = new Data(onGpsServiceUpdate);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         catView = findViewById(R.id.cat_view);
