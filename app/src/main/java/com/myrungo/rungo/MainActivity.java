@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.myrungo.rungo.base.BaseActivity;
 import com.myrungo.rungo.main.MainContract;
@@ -84,7 +85,7 @@ public final class MainActivity
     private FloatingActionButton fab;
 
     @NonNull
-    public FloatingActionButton getFab() {
+    public final FloatingActionButton getFab() {
         if (fab == null) {
             throw new NullPointerException("fab == null");
         }
@@ -92,7 +93,7 @@ public final class MainActivity
         return fab;
     }
 
-    public void setFab(@Nullable final View fab) {
+    public final void setFab(@Nullable final View fab) {
         if (fab == null) {
             throw new NullPointerException("fab == null");
         }
@@ -104,25 +105,25 @@ public final class MainActivity
     private MainContract.Presenter<MainContract.View> presenter;
 
     @Nullable
-    final public CatView.Skins getSkin() {
+    public final CatView.Skins getSkin() {
         return skin;
     }
 
-    final public void setSkin(@NonNull final CatView.Skins skin) {
+    public final void setSkin(@NonNull final CatView.Skins skin) {
         this.skin = skin;
     }
 
     @Nullable
-    final public CatView.Heads getHead() {
+    public final CatView.Heads getHead() {
         return head;
     }
 
-    final public void setHead(@NonNull final CatView.Heads head) {
+    public final void setHead(@NonNull final CatView.Heads head) {
         this.head = head;
     }
 
     @Override
-    final protected MainContract.Presenter<MainContract.View> getPresenter() {
+    protected final MainContract.Presenter<MainContract.View> getPresenter() {
         if (presenter == null) {
             throw new RuntimeException("presenter == null");
         }
@@ -131,12 +132,12 @@ public final class MainActivity
     }
 
     @Override
-    final protected void setupPresenter() {
+    protected final void setupPresenter() {
         presenter = new MainPresenter();
     }
 
     @Override
-    final protected void onCreate(@Nullable final Bundle savedInstanceState) {
+    protected final void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -180,7 +181,7 @@ public final class MainActivity
         });
     }
 
-    final public void replaceFragment(@NonNull final Fragment someFragment) {
+    public final void replaceFragment(@NonNull final Fragment someFragment) {
         //Bundle user_bundle = new Bundle();
         //user_bundle.putSerializable(USER_TAG, user);
         //someFragment.setArguments(user_bundle);
@@ -219,65 +220,71 @@ public final class MainActivity
     }
 
     @Override
-    final public void hideProgressIndicator() {
+    public final void hideProgressIndicator() {
         getProgressBarLayout().setVisibility(View.GONE);
     }
 
     @Override
-    final public void showProgressIndicator() {
+    public final void showProgressIndicator() {
         getProgressBarLayout().setVisibility(View.VISIBLE);
     }
 
     @Override
     @NonNull
-    final public List<Challenge> getAllChallenges() throws Exception {
+    public final List<Challenge> getAllChallenges() throws Exception {
         return getPresenter().getAllChallenges();
     }
 
     @NonNull
     @Override
-    final public List<DBUser> getUsers() throws Exception {
+    public final List<DBUser> getUsers() throws Exception {
         return getPresenter().getUsers();
     }
 
     @NonNull
     @Override
-    final public Task<DBUser> asyncGetCurrentUserInfo() {
+    public final Task<DBUser> asyncGetCurrentUserInfo() {
         return getPresenter().asyncGetCurrentUserInfo();
     }
 
     @NonNull
     @Override
-    final public DBUser getCurrentUserInfo() throws Exception {
+    public final DBUser getCurrentUserInfo() throws Exception {
         return getPresenter().getCurrentUserInfo();
     }
 
     @Override
-    final public void updateUserInfo(@NonNull final DBUser newUserInfo) throws Exception {
+    public final void updateUserInfo(@NonNull final DBUser newUserInfo) throws Exception {
         getPresenter().updateUserInfo(newUserInfo);
     }
 
     @Override
     @NonNull
-    public Task<Void> asyncUpdateUserInfo(@NonNull final DBUser newUserInfo) throws Exception {
+    public final Task<Void> asyncUpdateUserInfo(@NonNull final DBUser newUserInfo) throws Exception {
         return getPresenter().asyncUpdateUserInfo(newUserInfo);
     }
 
     @Override
-    final public void createNewUser(@NonNull final DBUser newUser) throws Exception {
+    public final void createNewUser(@NonNull final DBUser newUser) throws Exception {
         getPresenter().createNewUser(newUser);
     }
 
     @NonNull
     @Override
-    final public List<Training> getUserTrainingsByUid(@NonNull final String uid) throws Exception {
+    public final List<Training> getUserTrainingsByUid(@NonNull final String uid) throws Exception {
         return getPresenter().getUserTrainingsByUid(uid);
     }
 
     @NonNull
     @Override
-    final public List<Training> getUserTrainingsByDocumentId(@NonNull final String documentId) throws Exception {
+    public final List<Training> getUserTrainingsByDocumentId(@NonNull final String documentId) throws Exception {
         return getPresenter().getUserTrainingsByDocumentId(documentId);
+    }
+
+    @NonNull
+    @Override
+    public final CollectionReference getUsersCollection() {
+        return getPresenter().getUsersCollection();
     }
 
 }

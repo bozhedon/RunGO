@@ -9,12 +9,19 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.myrungo.rungo.base.BaseFragment;
 import com.myrungo.rungo.custom.CustomContract;
 import com.myrungo.rungo.custom.CustomPresenter;
 import com.myrungo.rungo.main.MainContract;
+
+import java.util.List;
+import java.util.Objects;
+
+import static com.myrungo.rungo.utils.DBConstants.badboyChallengeReward;
+import static com.myrungo.rungo.utils.DBConstants.karateChallengeReward;
+import static com.myrungo.rungo.utils.DBConstants.officeChallengeReward;
+import static com.myrungo.rungo.utils.DBConstants.ordinaryChallengeReward;
 
 
 @SuppressWarnings("unused")
@@ -28,13 +35,13 @@ public final class CustomFragment
     private CustomContract.Presenter<CustomContract.View> presenter;
 
     @Override
-    final protected void setupPresenter() {
+    protected final void setupPresenter() {
         presenter = new CustomPresenter();
     }
 
     @NonNull
     @Override
-    final protected CustomContract.Presenter<CustomContract.View> getPresenter() {
+    protected final CustomContract.Presenter<CustomContract.View> getPresenter() {
         if (presenter == null) {
             throw new RuntimeException("presenter == null");
         }
@@ -184,52 +191,95 @@ public final class CustomFragment
     }
 
     @Override
-    public void dressUp() {
+    public final void showAvailableCostumes(@NonNull final Task<List<String>> getUserChallengesTask) {
         @Nullable final MainContract.View activity = (MainContract.View) getActivity();
 
         if (activity == null) {
             return;
         }
 
-        @NonNull final Task<String> asyncGetPreferredSkinTask = getPresenter().asyncGetPreferredSkin();
-
         activity.showProgressIndicator();
 
-        asyncGetPreferredSkinTask
-                .addOnSuccessListener(new OnSuccessListener<String>() {
+        getUserChallengesTask
+                .addOnCompleteListener(new OnCompleteListener<List<String>>() {
                     @Override
-                    public void onSuccess(@Nullable final String preferredSkin) {
-                        if (preferredSkin == null) {
-                            getCatview().setSkin(CatView.Skins.COMMON);
-                            return;
-                        }
+                    public void onComplete(@NonNull final Task<List<String>> task) {
+                        if (task.isSuccessful()) {
+                            @Nullable final List<String> userRewards = task.getResult();
 
-                        switch (preferredSkin) {
-                            case "bad":
-                                getCatview().setSkin(CatView.Skins.BAD);
-                                break;
+                            if (userRewards == null || userRewards.isEmpty()) {
+                                activity.hideProgressIndicator();
+                                return;
+                            }
 
-                            case "karate":
-                                getCatview().setSkin(CatView.Skins.KARATE);
-                                break;
+                            for (@Nullable final String userReward : userRewards) {
+                                if (userReward == null) {
+                                    continue;
+                                }
 
-                            case "business":
-                                getCatview().setSkin(CatView.Skins.BUSINESS);
-                                break;
+                                if (Objects.equals(userReward, ordinaryChallengeReward)) {
+                                    Objects.requireNonNull(getActivity())
+                                            .findViewById(R.id.casual_sport_cloth)
+                                            .setVisibility(View.VISIBLE);
+                                } else if (Objects.equals(userReward, officeChallengeReward)) {
+                                    Objects.requireNonNull(getActivity())
+                                            .findViewById(R.id.office_cloth)
+                                            .setVisibility(View.VISIBLE);
+                                } else if (Objects.equals(userReward, karateChallengeReward)) {
+                                    Objects.requireNonNull(getActivity())
+                                            .findViewById(R.id.karate_cloth)
+                                            .setVisibility(View.VISIBLE);
+                                } else if (Objects.equals(userReward, badboyChallengeReward)) {
+                                    Objects.requireNonNull(getActivity())
+                                            .findViewById(R.id.bad_cat_cloth)
+                                            .setVisibility(View.VISIBLE);
+                                }
+                            }
 
-                            case "normal":
-                                getCatview().setSkin(CatView.Skins.NORMAL);
-                                break;
-
-                            default:
-                                getCatview().setSkin(CatView.Skins.COMMON);
+                            activity.hideProgressIndicator();
                         }
                     }
-                })
+                });
+    }
+
+    @Override
+    public final void dressUp() {
+        @NonNull final Task<String> asyncGetPreferredSkinTask = getPresenter().asyncGetPreferredCostume();
+
+        asyncGetPreferredSkinTask
                 .addOnCompleteListener(new OnCompleteListener<String>() {
                     @Override
                     public void onComplete(@NonNull Task<String> task) {
-                        activity.hideProgressIndicator();
+                        if (task.isSuccessful()) {
+                            @Nullable final String preferredSkin = task.getResult();
+
+                            if (preferredSkin == null) {
+                                getCatview().setSkin(CatView.Skins.COMMON);
+                                return;
+                            }
+
+                            switch (preferredSkin) {
+                                case "bad":
+                                    getCatview().setSkin(CatView.Skins.BAD);
+                                    break;
+
+                                case "karate":
+                                    getCatview().setSkin(CatView.Skins.KARATE);
+                                    break;
+
+                                case "business":
+                                    getCatview().setSkin(CatView.Skins.BUSINESS);
+                                    break;
+
+                                case "normal":
+                                    getCatview().setSkin(CatView.Skins.NORMAL);
+                                    break;
+
+                                default:
+                                    getCatview().setSkin(CatView.Skins.COMMON);
+                            }
+
+                        }
                     }
                 });
     }

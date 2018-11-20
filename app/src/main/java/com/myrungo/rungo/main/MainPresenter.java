@@ -10,6 +10,7 @@ import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -68,13 +69,18 @@ public final class MainPresenter
     }
 
     @Override
-    final public void onViewCreate() {
+    public final void onViewCreate() {
         //do work in onCreate method
+    }
+
+    @NonNull
+    public final CollectionReference getUsersCollection() {
+        return getDB().collection(usersCollection);
     }
 
     @Override
     @NonNull
-    final public List<Challenge> getAllChallenges() throws Exception {
+    public final List<Challenge> getAllChallenges() throws Exception {
         @NonNull final Task<QuerySnapshot> task = getDB()
                 .collection(challengesCollection)
                 .get();
@@ -100,7 +106,7 @@ public final class MainPresenter
 
     @NonNull
     @Override
-    final public List<DBUser> getUsers() throws Exception {
+    public final List<DBUser> getUsers() throws Exception {
         @NonNull final Task<QuerySnapshot> task = getDB()
                 .collection(usersCollection)
                 .get();
@@ -126,7 +132,7 @@ public final class MainPresenter
 
     @Override
     @NonNull
-    final public Task<DBUser> asyncGetCurrentUserInfo() {
+    public final Task<DBUser> asyncGetCurrentUserInfo() {
         @NonNull final Task<QuerySnapshot> getAllUsersTask = getDB().collection(usersCollection).get();
 
         return getAllUsersTask.continueWith(new Continuation<QuerySnapshot, DBUser>() {
@@ -171,7 +177,7 @@ public final class MainPresenter
 
     @NonNull
     @Override
-    final public DBUser getCurrentUserInfo() throws Exception {
+    public final DBUser getCurrentUserInfo() throws Exception {
         @NonNull final Task<QuerySnapshot> task = getDB()
                 .collection(usersCollection)
                 .get();
@@ -216,7 +222,7 @@ public final class MainPresenter
     @SuppressWarnings("RedundantThrows")
     @Override
     @NonNull
-    final public Task<Void> asyncUpdateUserInfo(@NonNull final DBUser newUserInfo) throws Exception {
+    public final Task<Void> asyncUpdateUserInfo(@NonNull final DBUser newUserInfo) throws Exception {
         @NonNull final ObjectMapper mapper = new ObjectMapper();
 
         //convert POJO to Map
@@ -257,7 +263,7 @@ public final class MainPresenter
      * it will be renamed to regDate
      */
     @Override
-    final public void updateUserInfo(@NonNull final DBUser newUserInfo) throws Exception {
+    public final void updateUserInfo(@NonNull final DBUser newUserInfo) throws Exception {
         @NonNull final ObjectMapper mapper = new ObjectMapper();
 
         //convert POJO to Map
@@ -302,7 +308,7 @@ public final class MainPresenter
 
     //I'm sure that user's creation must do by login screen
     @Override
-    final public void createNewUser(@NonNull final DBUser newUser) throws Exception {
+    public final void createNewUser(@NonNull final DBUser newUser) throws Exception {
         if (newUser.getUid().trim().isEmpty()) {
             throw new RuntimeException("Uid must not be empty");
         }
@@ -326,7 +332,7 @@ public final class MainPresenter
      */
     @NonNull
     @Override
-    final public List<Training> getUserTrainingsByUid(@NonNull final String uid) throws Exception {
+    public final List<Training> getUserTrainingsByUid(@NonNull final String uid) throws Exception {
         @Nullable final DocumentReference userDocument = getUserDocumentReferenceByUid(uid);
 
         if (userDocument == null) {
@@ -377,7 +383,7 @@ public final class MainPresenter
      */
     @NonNull
     @Override
-    final public List<Training> getUserTrainingsByDocumentId(@NonNull final String documentId) throws Exception {
+    public final List<Training> getUserTrainingsByDocumentId(@NonNull final String documentId) throws Exception {
         @NonNull final Task<QuerySnapshot> task = getDB()
                 .collection(usersCollection)
                 .document(documentId)

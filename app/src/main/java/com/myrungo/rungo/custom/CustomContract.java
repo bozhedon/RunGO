@@ -5,11 +5,15 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.tasks.Task;
 import com.myrungo.rungo.base.BaseFragmentContract;
 
+import java.util.List;
+
 public interface CustomContract extends BaseFragmentContract {
 
     interface View extends BaseFragmentContract.View {
 
         void dressUp();
+
+        void showAvailableCostumes(@NonNull final Task<List<String>> listTask);
 
     }
 
@@ -18,7 +22,10 @@ public interface CustomContract extends BaseFragmentContract {
         void saveNewCostume(@NonNull final String newCostume);
 
         @NonNull
-        Task<String> asyncGetPreferredSkin();
+        Task<String> asyncGetPreferredCostume();
+
+        @NonNull
+        Task<List<String>> asyncGetUserRewards();
 
     }
 

@@ -3,6 +3,7 @@ package com.myrungo.rungo.main;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.myrungo.rungo.base.BaseContract;
 import com.myrungo.rungo.models.Challenge;
 import com.myrungo.rungo.models.DBUser;
@@ -70,9 +71,15 @@ public interface MainContract extends BaseContract {
         @NonNull
         List<Training> getUserTrainingsByDocumentId(@NonNull final String documentId) throws Exception;
 
+        @NonNull
+        CollectionReference getUsersCollection();
+
     }
 
     interface Presenter<V extends View> extends BaseContract.Presenter<V> {
+
+        @NonNull
+        CollectionReference getUsersCollection();
 
         @NonNull
         List<Challenge> getAllChallenges() throws Exception;
