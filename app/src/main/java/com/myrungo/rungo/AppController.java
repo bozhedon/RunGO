@@ -7,6 +7,12 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
+import com.crashlytics.android.Crashlytics;
+import com.myrungo.rungo.utils.MyTrackerReceiver;
+import com.yandex.metrica.YandexMetrica;
+import com.yandex.metrica.YandexMetricaConfig;
+
+import io.fabric.sdk.android.Fabric;
 
 
 public class AppController extends Application {
@@ -22,7 +28,38 @@ public class AppController extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        initFabric();
+
+        initYandexMetrica();
+
         mInstance = this;
+    }
+
+    private void initFabric() {
+        Fabric.with(this, new Crashlytics());
+    }
+
+    private void initYandexMetrica() {
+        // Создание расширенной конфигурации библиотеки.
+        YandexMetricaConfig config = YandexMetricaConfig
+                .newConfigBuilder("bb71ae13-3e41-4920-9ac2-0258337217b0")
+                .withLocationTracking(false)
+                .withCrashReporting(true)
+                .withStatisticsSending(true)
+                .withNativeCrashReporting(true)
+                .withInstalledAppCollecting(true)
+                .build();
+
+        // Инициализация AppMetrica SDK.
+        YandexMetrica.activate(this, config);
+        // Отслеживание активности пользователей.
+        YandexMetrica.enableActivityAutoTracking(this);
+
+        //If AppMetrica has received referrer broadcast our own MyTrackerReceiver prints it to log
+        YandexMetrica.registerReferrerBroadcastReceivers(new MyTrackerReceiver());
+
+        YandexMetrica.setLocationTracking(false);
     }
 
     public static synchronized AppController getInstance() {

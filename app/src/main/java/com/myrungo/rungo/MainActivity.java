@@ -13,7 +13,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.firestore.CollectionReference;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.myrungo.rungo.base.BaseActivity;
@@ -22,6 +24,7 @@ import com.myrungo.rungo.main.MainPresenter;
 import com.myrungo.rungo.models.Challenge;
 import com.myrungo.rungo.models.DBUser;
 import com.myrungo.rungo.models.Training;
+import com.yandex.metrica.YandexMetrica;
 
 import java.util.List;
 
@@ -125,7 +128,10 @@ public final class MainActivity
     @Override
     protected final MainContract.Presenter<MainContract.View> getPresenter() {
         if (presenter == null) {
-            throw new RuntimeException("presenter == null");
+            @NonNull final RuntimeException exception = new RuntimeException("presenter == null");
+            reportException(exception);
+
+            throw exception;
         }
 
         return presenter;
@@ -134,6 +140,19 @@ public final class MainActivity
     @Override
     protected final void setupPresenter() {
         presenter = new MainPresenter();
+    }
+
+    @Nullable
+    private FirebaseAnalytics firebaseAnalytics;
+
+    @NonNull
+    @Override
+    public final FirebaseAnalytics getFirebaseAnalytics() {
+        if (firebaseAnalytics == null) {
+            firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        }
+
+        return firebaseAnalytics;
     }
 
     @Override
@@ -213,7 +232,10 @@ public final class MainActivity
         @Nullable final ViewGroup layoutWithProgressBar = findViewById(R.id.layoutWithProgressBar);
 
         if (layoutWithProgressBar == null) {
-            throw new RuntimeException("layoutWithProgressBar == null");
+            @NonNull final RuntimeException exception = new RuntimeException("layoutWithProgressBar == null");
+            reportException(exception);
+
+            throw exception;
         }
 
         return layoutWithProgressBar;
@@ -285,6 +307,11 @@ public final class MainActivity
     @Override
     public final CollectionReference getUsersCollection() {
         return getPresenter().getUsersCollection();
+    }
+
+    private void reportException(@NonNull final Throwable throwable) {
+        Crashlytics.logException(throwable);
+        YandexMetrica.reportUnhandledException(throwable);
     }
 
 }

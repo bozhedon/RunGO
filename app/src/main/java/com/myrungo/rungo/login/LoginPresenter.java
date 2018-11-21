@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.firebase.ui.auth.FirebaseUiException;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -17,6 +18,7 @@ import com.google.firebase.auth.FirebaseUserMetadata;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.myrungo.rungo.R;
 import com.myrungo.rungo.base.BasePresenter;
+import com.yandex.metrica.YandexMetrica;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -137,6 +139,8 @@ public final class LoginPresenter
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     final public void onFailure(@NonNull final Exception exception) {
+                        reportException(exception);
+
                         getView().hideProgressIndicator();
 
                         getView().showMessage(exception.getMessage());
@@ -175,25 +179,37 @@ public final class LoginPresenter
 
         } else if (errorCode == DEVELOPER_ERROR) {
 
+            reportException(error);
+
             part1 = getContext().getString(R.string.developer_error);
 
         } else if (errorCode == PROVIDER_ERROR) {
+
+            reportException(error);
 
             part1 = getContext().getString(R.string.provider_error);
 
         } else if (errorCode == ANONYMOUS_UPGRADE_MERGE_CONFLICT) {
 
+            reportException(error);
+
             part1 = getContext().getString(R.string.user_account_merge_conflict);
 
         } else if (errorCode == EMAIL_MISMATCH_ERROR) {
+
+            reportException(error);
 
             part1 = getContext().getString(R.string.you_are_attempting_to_sign_in_a_different_email_than_previously_provided);
 
         } else if (errorCode == UNKNOWN_ERROR) {
 
+            reportException(error);
+
             part1 = getContext().getString(R.string.unknown_error_has_occured);
 
         } else {
+
+            reportException(error);
 
             part1 = getContext().getString(R.string.unknown_error_has_occured);
 
@@ -208,6 +224,11 @@ public final class LoginPresenter
         getView().showMessage(part1);
 
         getView().hideProgressIndicator();
+    }
+
+    private void reportException(@NonNull final Throwable throwable) {
+        Crashlytics.logException(throwable);
+        YandexMetrica.reportUnhandledException(throwable);
     }
 
 }

@@ -2,14 +2,10 @@ package com.myrungo.rungo;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,13 +13,12 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -37,13 +32,11 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
+import com.yandex.metrica.YandexMetrica;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.firebase.ui.auth.AuthUI.TAG;
 
 
 public class ChallengeFragment extends Fragment {
@@ -108,7 +101,13 @@ public class ChallengeFragment extends Fragment {
                             }
                             challengeListAdapter.notifyDataSetChanged();
                         } else {
-                            Log.w(TAG, "Error getting documents.", task.getException());
+                            @Nullable final Exception exception = task.getException();
+
+                            if (exception != null) {
+                                reportException(exception);
+
+                                Log.w(TAG, "Error getting documents.", exception);
+                            }
                         }
 
                     }
@@ -146,8 +145,10 @@ public class ChallengeFragment extends Fragment {
         })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Transaction failure.", e);
+                    public void onFailure(@NonNull final Exception exception) {
+                        reportException(exception);
+
+                        Log.w(TAG, "Transaction failure.", exception);
                     }
                 });
     }
@@ -199,6 +200,11 @@ public class ChallengeFragment extends Fragment {
     }
     private void accept_challenge(int position){
 
+    }
+
+    private void reportException(@NonNull final Throwable throwable) {
+        Crashlytics.logException(throwable);
+        YandexMetrica.reportUnhandledException(throwable);
     }
 
 }

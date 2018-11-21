@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -19,6 +20,7 @@ import com.myrungo.rungo.CatView;
 import com.myrungo.rungo.base.BaseFragmentPresenter;
 import com.myrungo.rungo.main.MainContract;
 import com.myrungo.rungo.models.DBUser;
+import com.yandex.metrica.YandexMetrica;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,6 +67,8 @@ public final class CustomPresenter
                 @Nullable final Exception exception = task.getException();
 
                 if (exception != null) {
+                    reportError(exception);
+
                     throw exception;
                 }
 
@@ -83,6 +87,8 @@ public final class CustomPresenter
                 @Nullable final Exception getUserChallengesTaskException = getUserChallengesTask.getException();
 
                 if (getUserChallengesTaskException != null) {
+                    reportError(getUserChallengesTaskException);
+
                     throw getUserChallengesTaskException;
                 }
 
@@ -211,20 +217,26 @@ public final class CustomPresenter
                                                 @Nullable final Exception exception = task.getException();
 
                                                 if (exception != null) {
+                                                    reportError(exception);
+
                                                     Log.d(TAG, "User info in DB update failed", exception);
                                                 }
                                             }
                                         }
                                     });
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        } catch (@NonNull final Exception exception) {
+                            reportError(exception);
+
+                            exception.printStackTrace();
                         }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
-                    public void onFailure(@NonNull final Exception e) {
-                        Log.d(TAG, "Getting current user info from DB failed", e);
+                    public void onFailure(@NonNull final Exception exception) {
+                        reportError(exception);
+
+                        Log.d(TAG, "Getting current user info from DB failed", exception);
                     }
                 })
                 .addOnCanceledListener(new OnCanceledListener() {
@@ -258,8 +270,10 @@ public final class CustomPresenter
             @NonNull final DBUser currentUserInfo = mainView.getCurrentUserInfo();
 
             return currentUserInfo.getCostume();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (@NonNull final Exception exception) {
+            reportError(exception);
+
+            exception.printStackTrace();
             return "";
         }
     }
@@ -294,6 +308,8 @@ public final class CustomPresenter
                 @Nullable final Exception exception = task.getException();
 
                 if (exception != null) {
+                    reportError(exception);
+
                     throw exception;
                 }
 
@@ -312,6 +328,11 @@ public final class CustomPresenter
                 return preferredSkinFromDB;
             }
         });
+    }
+
+    private void reportError(@NonNull final Throwable throwable) {
+        Crashlytics.logException(throwable);
+        YandexMetrica.reportUnhandledException(throwable);
     }
 
     private void waitForAnyResult(@NonNull final Task<?> task) {

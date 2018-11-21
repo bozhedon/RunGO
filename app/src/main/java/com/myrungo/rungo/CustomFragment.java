@@ -8,12 +8,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.myrungo.rungo.base.BaseFragment;
 import com.myrungo.rungo.custom.CustomContract;
 import com.myrungo.rungo.custom.CustomPresenter;
 import com.myrungo.rungo.main.MainContract;
+import com.yandex.metrica.YandexMetrica;
 
 import java.util.List;
 import java.util.Objects;
@@ -43,7 +46,10 @@ public final class CustomFragment
     @Override
     protected final CustomContract.Presenter<CustomContract.View> getPresenter() {
         if (presenter == null) {
-            throw new RuntimeException("presenter == null");
+            @NonNull final RuntimeException exception = new RuntimeException("presenter == null");
+            reportException(exception);
+
+            throw exception;
         }
 
         return presenter;
@@ -55,7 +61,10 @@ public final class CustomFragment
     @NonNull
     private CatView getCatview() {
         if (catview == null) {
-            throw new NullPointerException("catview == null");
+            @NonNull final NullPointerException exception = new NullPointerException("catview == null");
+            reportException(exception);
+
+            throw exception;
         }
 
         return catview;
@@ -63,7 +72,10 @@ public final class CustomFragment
 
     private void setCatview(@Nullable final View catview) {
         if (catview == null) {
-            throw new NullPointerException("catview == null");
+            @NonNull final NullPointerException exception = new NullPointerException("catview == null");
+            reportException(exception);
+
+            throw exception;
         }
 
         this.catview = (CatView) catview;
@@ -75,7 +87,10 @@ public final class CustomFragment
     @NonNull
     private ImageView getBadcat() {
         if (badcat == null) {
-            throw new NullPointerException("badcat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("badcat == null");
+            reportException(exception);
+
+            throw exception;
         }
 
         return badcat;
@@ -83,7 +98,10 @@ public final class CustomFragment
 
     private void setBadcat(@Nullable final View badcat) {
         if (badcat == null) {
-            throw new NullPointerException("badcat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("badcat == null");
+            reportException(exception);
+
+            throw exception;
         }
 
         this.badcat = (ImageView) badcat;
@@ -95,7 +113,10 @@ public final class CustomFragment
     @NonNull
     private ImageView getKaratecat() {
         if (karatecat == null) {
-            throw new NullPointerException("karatecat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("karatecat == null");
+            reportException(exception);
+
+            throw exception;
         }
 
         return karatecat;
@@ -103,7 +124,10 @@ public final class CustomFragment
 
     private void setKaratecat(@Nullable final View karatecat) {
         if (karatecat == null) {
-            throw new NullPointerException("karatecat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("karatecat == null");
+            reportException(exception);
+
+            throw exception;
         }
 
         this.karatecat = (ImageView) karatecat;
@@ -115,7 +139,10 @@ public final class CustomFragment
     @NonNull
     private ImageView getOfficecat() {
         if (officecat == null) {
-            throw new NullPointerException("officecat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("officecat == null");
+            reportException(exception);
+
+            throw exception;
         }
 
         return officecat;
@@ -123,7 +150,10 @@ public final class CustomFragment
 
     private void setOfficecat(@Nullable final View officecat) {
         if (officecat == null) {
-            throw new NullPointerException("officecat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("officecat == null");
+            reportException(exception);
+
+            throw exception;
         }
 
         this.officecat = (ImageView) officecat;
@@ -135,7 +165,10 @@ public final class CustomFragment
     @NonNull
     private ImageView getSportcat() {
         if (sportcat == null) {
-            throw new NullPointerException("sportcat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("sportcat == null");
+            reportException(exception);
+
+            throw exception;
         }
 
         return sportcat;
@@ -143,7 +176,10 @@ public final class CustomFragment
 
     private void setSportcat(@Nullable final View sportcat) {
         if (sportcat == null) {
-            throw new NullPointerException("officecat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("officecat == null");
+            reportException(exception);
+
+            throw exception;
         }
 
         this.sportcat = (ImageView) sportcat;
@@ -195,6 +231,9 @@ public final class CustomFragment
         @Nullable final MainContract.View activity = (MainContract.View) getActivity();
 
         if (activity == null) {
+            @NonNull final NullPointerException exception = new NullPointerException("activity == null");
+            reportException(exception);
+
             return;
         }
 
@@ -291,6 +330,19 @@ public final class CustomFragment
                 getCatview().setSkin(CatView.Skins.BAD);
                 @NonNull final String newCostume = CatView.Skins.BAD.toString().toLowerCase();
 
+                @Nullable final MainContract.View mainView = ((MainContract.View) getActivity());
+
+                if (mainView == null) {
+                    @NonNull final NullPointerException exception = new NullPointerException("mainView == null");
+
+                    reportException(exception);
+                } else {
+                    @NonNull final Bundle bundle = new Bundle();
+                    bundle.putString("newCostume", newCostume);
+                    mainView.getFirebaseAnalytics().setUserProperty("selected_costume", newCostume);
+                    mainView.getFirebaseAnalytics().logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+                }
+
                 getPresenter().saveNewCostume(newCostume);
             }
         });
@@ -300,6 +352,19 @@ public final class CustomFragment
             public void onClick(View view) {
                 getCatview().setSkin(CatView.Skins.KARATE);
                 @NonNull final String newCostume = CatView.Skins.KARATE.toString().toLowerCase();
+
+                @Nullable final MainContract.View mainView = ((MainContract.View) getActivity());
+
+                if (mainView == null) {
+                    @NonNull final NullPointerException exception = new NullPointerException("mainView == null");
+
+                    reportException(exception);
+                } else {
+                    @NonNull final Bundle bundle = new Bundle();
+                    bundle.putString("newCostume", newCostume);
+                    mainView.getFirebaseAnalytics().setUserProperty("selected_costume", newCostume);
+                    mainView.getFirebaseAnalytics().logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+                }
 
                 getPresenter().saveNewCostume(newCostume);
             }
@@ -311,6 +376,19 @@ public final class CustomFragment
                 getCatview().setSkin(CatView.Skins.BUSINESS);
                 @NonNull final String newCostume = CatView.Skins.BUSINESS.toString().toLowerCase();
 
+                @Nullable final MainContract.View mainView = ((MainContract.View) getActivity());
+
+                if (mainView == null) {
+                    @NonNull final NullPointerException exception = new NullPointerException("mainView == null");
+
+                    reportException(exception);
+                } else {
+                    @NonNull final Bundle bundle = new Bundle();
+                    bundle.putString("newCostume", newCostume);
+                    mainView.getFirebaseAnalytics().setUserProperty("selected_costume", newCostume);
+                    mainView.getFirebaseAnalytics().logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+                }
+
                 getPresenter().saveNewCostume(newCostume);
             }
         });
@@ -320,6 +398,19 @@ public final class CustomFragment
             public void onClick(View view) {
                 getCatview().setSkin(CatView.Skins.NORMAL);
                 @NonNull final String newCostume = CatView.Skins.NORMAL.toString().toLowerCase();
+
+                @Nullable final MainContract.View mainView = ((MainContract.View) getActivity());
+
+                if (mainView == null) {
+                    @NonNull final NullPointerException exception = new NullPointerException("mainView == null");
+
+                    reportException(exception);
+                } else {
+                    @NonNull final Bundle bundle = new Bundle();
+                    bundle.putString("newCostume", newCostume);
+                    mainView.getFirebaseAnalytics().setUserProperty("selected_costume", newCostume);
+                    mainView.getFirebaseAnalytics().logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+                }
 
                 getPresenter().saveNewCostume(newCostume);
             }
@@ -336,6 +427,11 @@ public final class CustomFragment
     public final void onResume() {
         super.onResume();
         getCatview().resume();
+    }
+
+    private void reportException(@NonNull final Throwable throwable) {
+        Crashlytics.logException(throwable);
+        YandexMetrica.reportUnhandledException(throwable);
     }
 
 }

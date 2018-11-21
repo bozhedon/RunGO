@@ -3,6 +3,7 @@ package com.myrungo.rungo.main;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.firestore.CollectionReference;
 import com.myrungo.rungo.base.BaseContract;
 import com.myrungo.rungo.models.Challenge;
@@ -15,6 +16,9 @@ public interface MainContract extends BaseContract {
 
     @SuppressWarnings("unused")
     interface View extends BaseContract.View {
+
+        @NonNull
+        FirebaseAnalytics getFirebaseAnalytics();
 
         void showProgressIndicator();
 
