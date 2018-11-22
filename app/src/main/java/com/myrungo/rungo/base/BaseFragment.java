@@ -1,10 +1,14 @@
 package com.myrungo.rungo.base;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+
+import com.crashlytics.android.Crashlytics;
+import com.yandex.metrica.YandexMetrica;
 
 public abstract class BaseFragment<V extends BaseContract.View, P extends BaseContract.Presenter<V>>
         extends Fragment
@@ -37,6 +41,11 @@ public abstract class BaseFragment<V extends BaseContract.View, P extends BaseCo
                 Snackbar.make(activity.findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
             }
         }
+    }
+
+    protected void reportError(@NonNull final Throwable throwable) {
+        Crashlytics.logException(throwable);
+        YandexMetrica.reportUnhandledException(throwable);
     }
 
 }

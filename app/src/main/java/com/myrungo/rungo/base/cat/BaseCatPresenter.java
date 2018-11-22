@@ -44,7 +44,8 @@ public abstract class BaseCatPresenter<V extends BaseCatContract.View>
                         @Nullable final Exception exception = task.getException();
 
                         if (exception != null) {
-                            //TODO
+                            reportError(exception);
+                            return "";
                         }
 
                         @Nullable final String preferredSkinFromDB = task.getResult();
@@ -82,8 +83,8 @@ public abstract class BaseCatPresenter<V extends BaseCatContract.View>
                         @Nullable final Exception exception = task.getException();
 
                         if (exception != null) {
-                            int c = 1;
-                            //TODO
+                            reportError(exception);
+                            return "";
                         }
 
                         @Nullable final String preferredSkinFromDB = task.getResult();
@@ -230,7 +231,6 @@ public abstract class BaseCatPresenter<V extends BaseCatContract.View>
                 break;
             }
         }
-
     }
 
 }

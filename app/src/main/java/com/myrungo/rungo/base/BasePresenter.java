@@ -7,6 +7,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
+import com.crashlytics.android.Crashlytics;
+import com.yandex.metrica.YandexMetrica;
+
 public abstract class BasePresenter<V extends BaseContract.View> implements BaseContract.Presenter<V> {
 
     @Nullable
@@ -51,6 +54,11 @@ public abstract class BasePresenter<V extends BaseContract.View> implements Base
         } catch (Exception e) {
             return (Activity) getView();
         }
+    }
+
+    protected void reportError(@NonNull final Throwable throwable) {
+        Crashlytics.logException(throwable);
+        YandexMetrica.reportUnhandledException(throwable);
     }
 
 }

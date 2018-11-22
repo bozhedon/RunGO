@@ -44,7 +44,10 @@ public final class LoginActivity
     @Override
     final protected LoginContract.Presenter<LoginContract.View> getPresenter() {
         if (presenter == null) {
-            throw new RuntimeException("presenter == null");
+            @NonNull final NullPointerException exception = new NullPointerException("presenter == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         return presenter;
@@ -139,7 +142,10 @@ public final class LoginActivity
         @Nullable final ViewGroup layoutWithProgressBar = findViewById(R.id.layoutWithProgressBar);
 
         if (layoutWithProgressBar == null) {
-            throw new RuntimeException("layoutWithProgressBar == null");
+            @NonNull final NullPointerException exception = new NullPointerException("layoutWithProgressBar == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         return layoutWithProgressBar;
@@ -150,7 +156,10 @@ public final class LoginActivity
         @Nullable final CoordinatorLayout activityFirebaseUICL = findViewById(R.id.activityFirebaseUICL);
 
         if (activityFirebaseUICL == null) {
-            throw new RuntimeException("activityFirebaseUICL == null");
+            @NonNull final RuntimeException exception = new NullPointerException("activityFirebaseUICL == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         return activityFirebaseUICL;
@@ -161,7 +170,10 @@ public final class LoginActivity
         @Nullable final SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
 
         if (swipeRefreshLayout == null) {
-            throw new RuntimeException("swipeRefreshLayout == null");
+            @NonNull final NullPointerException exception = new NullPointerException("swipeRefreshLayout == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         return swipeRefreshLayout;
@@ -172,7 +184,10 @@ public final class LoginActivity
         @Nullable final TextView errorTextView = findViewById(R.id.errorText);
 
         if (errorTextView == null) {
-            throw new RuntimeException("errorTextView == null");
+            @NonNull final NullPointerException exception = new NullPointerException("errorTextView == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         return errorTextView;

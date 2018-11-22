@@ -24,10 +24,22 @@ public final class ProfileFragment
     @Nullable
     private ViewPagerAdapter adapter;
 
+    @Nullable
+    private ViewPager pager;
+
+    @Nullable
+    private CatView catView;
+
+    @Nullable
+    private ProfileContract.Presenter<ProfileContract.View> presenter;
+
     @NonNull
     private ViewPagerAdapter getAdapter() {
         if (adapter == null) {
-            throw new NullPointerException("Adapter must be initialized before getting");
+            @NonNull final NullPointerException exception = new NullPointerException("Adapter must be initialized before getting");
+            reportError(exception);
+
+            throw exception;
         }
 
         return adapter;
@@ -35,40 +47,44 @@ public final class ProfileFragment
 
     private void setAdapter(@Nullable final ViewPagerAdapter adapter) {
         if (adapter == null) {
-            throw new NullPointerException("Parameter must be non-null");
+            @NonNull final NullPointerException exception = new NullPointerException("Parameter must be non-null");
+            reportError(exception);
+
+            throw exception;
         }
 
         this.adapter = adapter;
     }
 
-    @Nullable
-    private ViewPager pager;
-
     @NonNull
-    public ViewPager getPager() {
+    private ViewPager getPager() {
         if (pager == null) {
-            throw new NullPointerException("Pager must be initialized before getting");
+            @NonNull final NullPointerException exception = new NullPointerException("Pager must be initialized before getting");
+            reportError(exception);
+
+            throw exception;
         }
 
         return pager;
     }
 
-    public void setPager(@Nullable final View pager) {
+    private void setPager(@Nullable final View pager) {
         if (pager == null) {
-            throw new NullPointerException("Parameter must be non-null");
+            @NonNull final NullPointerException exception = new NullPointerException("Parameter must be non-null");
+            reportError(exception);
+
+            throw exception;
         }
 
         this.pager = (ViewPager) pager;
     }
 
-    @Nullable
-    private CatView catView;
-
     @NonNull
     private CatView getCatView() {
         if (catView == null) {
             @NonNull final NullPointerException exception = new NullPointerException("catView == null");
-//todo
+            reportError(exception);
+
             throw exception;
         }
 
@@ -78,16 +94,13 @@ public final class ProfileFragment
     private void setCatView(@Nullable final View view) {
         if (view == null) {
             @NonNull final NullPointerException exception = new NullPointerException("view == null");
+            reportError(exception);
 
-            //todo
             throw exception;
         }
 
         this.catView = (CatView) view;
     }
-
-    @Nullable
-    private ProfileContract.Presenter<ProfileContract.View> presenter;
 
     @Override
     protected final void setupPresenter() {
@@ -98,7 +111,10 @@ public final class ProfileFragment
     @Override
     protected final ProfileContract.Presenter<ProfileContract.View> getPresenter() {
         if (presenter == null) {
-            throw new RuntimeException("presenter == null");
+            @NonNull final RuntimeException exception = new RuntimeException("presenter == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         return presenter;

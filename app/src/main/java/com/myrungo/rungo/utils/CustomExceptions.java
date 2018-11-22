@@ -7,7 +7,7 @@ public final class CustomExceptions {
     public static final class UnauthorizedUserException extends Exception {
 
         @NonNull
-        String message;
+        final String message;
 
         public UnauthorizedUserException(@NonNull final String message) {
             super(message);
@@ -25,7 +25,7 @@ public final class CustomExceptions {
     public static final class NullUserInfoException extends Exception {
 
         @NonNull
-        String message;
+        final String message;
 
         public NullUserInfoException(@NonNull final String message) {
             super(message);
@@ -44,7 +44,7 @@ public final class CustomExceptions {
     public static final class DBFieldsHasDifferentSctructureException extends Exception {
 
         @NonNull
-        String message;
+        final String message;
 
         public DBFieldsHasDifferentSctructureException(@NonNull final String message) {
             super(message);

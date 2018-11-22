@@ -24,9 +24,11 @@ import static com.myrungo.rungo.utils.DBConstants.usersCollection;
 
 public final class SplashActivity extends AppCompatActivity {
 
-    @SuppressWarnings("unused")
-    @NonNull
-    private final String TAG = getClass().getName();
+    @Nullable
+    private FirebaseFirestore firestoreDB;
+
+    @Nullable
+    private FirebaseAuth firebaseAuth;
 
     @Override
     final protected void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -34,9 +36,6 @@ public final class SplashActivity extends AppCompatActivity {
 
         routeToAppropriateScreen();
     }
-
-    @Nullable
-    private FirebaseFirestore firestoreDB;
 
     @NonNull
     private FirebaseFirestore getFirebaseFirestore() {
@@ -46,9 +45,6 @@ public final class SplashActivity extends AppCompatActivity {
 
         return firestoreDB;
     }
-
-    @Nullable
-    private FirebaseAuth firebaseAuth;
 
     @NonNull
     private FirebaseAuth getFirebaseAuth() {

@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.tasks.Continuation;
@@ -90,6 +91,8 @@ public final class MainPresenter
         @Nullable final Exception exception = task.getException();
 
         if (exception != null) {
+            reportError(exception);
+
             throw exception;
         }
 
@@ -116,6 +119,8 @@ public final class MainPresenter
         @Nullable final Exception exception = task.getException();
 
         if (exception != null) {
+            reportError(exception);
+
             throw exception;
         }
 
@@ -138,13 +143,17 @@ public final class MainPresenter
         return getAllUsersTask.continueWith(new Continuation<QuerySnapshot, DBUser>() {
             @Override
             public DBUser then(@NonNull Task<QuerySnapshot> task) throws Exception {
-                @NonNull final NullUserInfoException nullUserInfoException =
-                        new NullUserInfoException("DB has no info about current user");
-
                 @Nullable final QuerySnapshot result = task.getResult();
 
-                if (result == null) {
-                    throw nullUserInfoException;
+                {
+                    if (result == null) {
+                        @NonNull final NullUserInfoException exception =
+                                new NullUserInfoException("DB has no info about current user");
+
+                        reportError(exception);
+
+                        throw exception;
+                    }
                 }
 
                 @NonNull final List<DBUser> users = getDbUsers(result);
@@ -153,10 +162,12 @@ public final class MainPresenter
                     @Nullable final FirebaseUser currentUser = getCurrentUser();
 
                     if (currentUser == null) {
-                        @NonNull final UnauthorizedUserException unauthorizedUserException =
+                        @NonNull final UnauthorizedUserException exception =
                                 new UnauthorizedUserException("CurrentUser == null. DBUser must sign in");
 
-                        throw unauthorizedUserException;
+                        reportError(exception);
+
+                        throw exception;
                     }
 
                     if (user == null) {
@@ -170,7 +181,14 @@ public final class MainPresenter
                     }
                 }
 
-                throw nullUserInfoException;
+                {
+                    @NonNull final NullUserInfoException exception =
+                            new NullUserInfoException("DB has no info about current user");
+
+                    reportError(exception);
+
+                    throw exception;
+                }
             }
         });
     }
@@ -184,16 +202,25 @@ public final class MainPresenter
 
         waitForAnyResult(task);
 
-        @Nullable final Exception exception = task.getException();
+        {
+            @Nullable final Exception exception = task.getException();
 
-        if (exception != null) {
-            throw exception;
+            if (exception != null) {
+                reportError(exception);
+
+                throw exception;
+            }
         }
 
         @Nullable final QuerySnapshot result = task.getResult();
 
-        if (result == null) {
-            throw new NullUserInfoException("DB has no info about current user");
+        {
+            @NonNull final NullUserInfoException exception = new NullUserInfoException("DB has no info about current user");
+            if (result == null) {
+                reportError(exception);
+
+                throw exception;
+            }
         }
 
         @NonNull final List<DBUser> users = getDbUsers(result);
@@ -201,8 +228,13 @@ public final class MainPresenter
         for (@Nullable final DBUser user : users) {
             @Nullable final FirebaseUser currentUser = getCurrentUser();
 
-            if (currentUser == null) {
-                throw new UnauthorizedUserException("CurrentUser == null. DBUser must sign in");
+            {
+                if (currentUser == null) {
+                    @NonNull final UnauthorizedUserException exception = new UnauthorizedUserException("CurrentUser == null. DBUser must sign in");
+                    reportError(exception);
+
+                    throw exception;
+                }
             }
 
             if (user == null) {
@@ -216,7 +248,12 @@ public final class MainPresenter
             }
         }
 
-        throw new NullUserInfoException("DB has no info about current user");
+        {
+            @NonNull final NullUserInfoException exception = new NullUserInfoException("DB has no info about current user");
+            reportError(exception);
+
+            throw exception;
+        }
     }
 
     @SuppressWarnings("RedundantThrows")
@@ -232,7 +269,10 @@ public final class MainPresenter
                 });
 
         if (newUserInfoMap == null) {
-            throw new RuntimeException("newUserInfoMap == null. Update not available");
+            @NonNull final RuntimeException runtimeException = new RuntimeException("newUserInfoMap == null. Update not available");
+            Crashlytics.logException(runtimeException);
+
+            throw runtimeException;
         }
 
         @NonNull final WriteBatch batch = getDB().batch();
@@ -243,7 +283,10 @@ public final class MainPresenter
             @NonNull final String message =
                     "newUserInfoMap does not contain uid key. Key is needed for update user info";
 
-            throw new RuntimeException(message);
+            @NonNull final RuntimeException exception = new RuntimeException(message);
+            reportError(exception);
+
+            throw exception;
         }
 
         @NonNull final String uid = (String) uidObject;
@@ -273,7 +316,10 @@ public final class MainPresenter
                 });
 
         if (newUserInfoMap == null) {
-            throw new RuntimeException("newUserInfoMap == null. Update not available");
+            @NonNull final RuntimeException exception = new RuntimeException("newUserInfoMap == null. Update not available");
+            reportError(exception);
+
+            throw exception;
         }
 
         @NonNull final WriteBatch batch = getDB().batch();
@@ -284,7 +330,11 @@ public final class MainPresenter
             @NonNull final String message =
                     "newUserInfoMap does not contain uid key. Key is needed for update user info";
 
-            throw new RuntimeException(message);
+            @NonNull final RuntimeException exception = new RuntimeException(message);
+            reportError(exception);
+
+
+            throw exception;
         }
 
         @NonNull final String uid = (String) uidObject;
@@ -302,6 +352,8 @@ public final class MainPresenter
         @Nullable final Exception exception = task.getException();
 
         if (exception != null) {
+            reportError(exception);
+
             throw exception;
         }
     }
@@ -310,7 +362,10 @@ public final class MainPresenter
     @Override
     public final void createNewUser(@NonNull final DBUser newUser) throws Exception {
         if (newUser.getUid().trim().isEmpty()) {
-            throw new RuntimeException("Uid must not be empty");
+            @NonNull final RuntimeException exception = new RuntimeException("Uid must not be empty");
+            reportError(exception);
+
+            throw exception;
         }
 
         @NonNull final Task<Void> task = getDB()
@@ -323,6 +378,8 @@ public final class MainPresenter
         @Nullable final Exception exception = task.getException();
 
         if (exception != null) {
+            reportError(exception);
+
             throw exception;
         }
     }
@@ -352,6 +409,8 @@ public final class MainPresenter
         @Nullable final Exception exception = task.getException();
 
         if (exception != null) {
+            reportError(exception);
+
             throw exception;
         }
 
@@ -395,6 +454,8 @@ public final class MainPresenter
         @Nullable final Exception exception = task.getException();
 
         if (exception != null) {
+            reportError(exception);
+
             throw exception;
         }
 
@@ -432,6 +493,8 @@ public final class MainPresenter
         @Nullable final Exception exception = task.getException();
 
         if (exception != null) {
+            reportError(exception);
+
             throw exception;
         }
 
@@ -461,7 +524,9 @@ public final class MainPresenter
                 if (neededUser) {
                     return document.getReference();
                 }
-            } catch (Exception e) {
+            } catch (@NonNull final Exception e) {
+                reportError(e);
+
                 e.printStackTrace();
                 @Nullable final Map<String, Object> data = document.getData();
 
@@ -491,6 +556,9 @@ public final class MainPresenter
         } catch (@Nullable final RuntimeException e) {
             @NonNull final List<DocumentSnapshot> documents = result.getDocuments();
 
+            @NonNull final DBFieldsHasDifferentSctructureException exception =
+                    new DBFieldsHasDifferentSctructureException("Some DB field has different sctructure unlike DBUser model");
+
             for (@Nullable final DocumentSnapshot document : documents) {
                 if (document != null) {
                     try {
@@ -503,23 +571,30 @@ public final class MainPresenter
                         @Nullable final Map<String, Object> data = document.getData();
 
                         if (data == null) {
-                            throw new DBFieldsHasDifferentSctructureException("Some DB field has different sctructure unlike DBUser model");
+                            reportError(exception);
+
+                            throw exception;
                         }
 
                         @Nullable final Object uidObject = data.get("uid");
 
                         if (uidObject == null) {
-                            throw new DBFieldsHasDifferentSctructureException("Some DB field has different sctructure unlike DBUser model");
+                            reportError(exception);
+
+                            throw exception;
                         }
 
                         @NonNull final String uid = (String) uidObject;
 
-                        throw new DBFieldsHasDifferentSctructureException(uid + " has different sctructure unlike DBUser model");
+                        @NonNull final DBFieldsHasDifferentSctructureException sctructureException = new DBFieldsHasDifferentSctructureException(uid + " has different sctructure unlike DBUser model");
+
+                        reportError(exception);
+                        throw sctructureException;
                     }
                 }
             }
 
-            throw new DBFieldsHasDifferentSctructureException("Some DB field has different sctructure unlike DBUser model");
+            throw exception;
         }
 
         return users;

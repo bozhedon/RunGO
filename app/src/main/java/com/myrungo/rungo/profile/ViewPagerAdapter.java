@@ -9,7 +9,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import static com.myrungo.rungo.profile.Constants.POSITION_KEY;
 
-public class ViewPagerAdapter extends FragmentStatePagerAdapter {
+class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
     ViewPagerAdapter(@Nullable final FragmentManager fm) {
         super(fm);

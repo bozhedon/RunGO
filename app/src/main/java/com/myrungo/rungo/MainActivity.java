@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.firestore.CollectionReference;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.myrungo.rungo.base.BaseActivity;
@@ -30,6 +31,8 @@ public final class MainActivity
         extends BaseActivity<MainContract.View, MainContract.Presenter<MainContract.View>>
         implements MainContract.View {
 
+    public static final String USER_TAG = "USER_TAG";
+
     @Nullable
     private CatView.Skins skin;
 
@@ -37,11 +40,14 @@ public final class MainActivity
     private CatView.Heads head;
 
     private boolean first = true;
+
     private int position = 1;
+
+    @Nullable
     private User user;
-    public static final String USER_TAG = "USER_TAG";
+
     @NonNull
-    private BottomNavigationViewEx.OnNavigationItemSelectedListener onNavigationItemSelectedListener
+    private final BottomNavigationViewEx.OnNavigationItemSelectedListener onNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
         final public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
@@ -85,8 +91,14 @@ public final class MainActivity
     @Nullable
     private FloatingActionButton fab;
 
+    @Nullable
+    private MainContract.Presenter<MainContract.View> presenter;
+
+    @Nullable
+    private FirebaseAnalytics firebaseAnalytics;
+
     @NonNull
-    public final FloatingActionButton getFab() {
+    private FloatingActionButton getFab() {
         if (fab == null) {
             throw new NullPointerException("fab == null");
         }
@@ -94,16 +106,13 @@ public final class MainActivity
         return fab;
     }
 
-    public final void setFab(@Nullable final View fab) {
+    private void setFab(@Nullable final View fab) {
         if (fab == null) {
             throw new NullPointerException("fab == null");
         }
 
         this.fab = (FloatingActionButton) fab;
     }
-
-    @Nullable
-    private MainContract.Presenter<MainContract.View> presenter;
 
     @Nullable
     public final CatView.Skins getSkin() {
@@ -126,7 +135,10 @@ public final class MainActivity
     @Override
     protected final MainContract.Presenter<MainContract.View> getPresenter() {
         if (presenter == null) {
-            throw new RuntimeException("presenter == null");
+            @NonNull final RuntimeException exception = new RuntimeException("presenter == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         return presenter;
@@ -135,6 +147,16 @@ public final class MainActivity
     @Override
     protected final void setupPresenter() {
         presenter = new MainPresenter();
+    }
+
+    @NonNull
+    @Override
+    public final FirebaseAnalytics getFirebaseAnalytics() {
+        if (firebaseAnalytics == null) {
+            firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        }
+
+        return firebaseAnalytics;
     }
 
     @Override
@@ -182,7 +204,7 @@ public final class MainActivity
         });
     }
 
-    public final void replaceFragment(@NonNull final Fragment someFragment) {
+    private void replaceFragment(@NonNull final Fragment someFragment) {
         //Bundle user_bundle = new Bundle();
         //user_bundle.putSerializable(USER_TAG, user);
         //someFragment.setArguments(user_bundle);
@@ -214,7 +236,10 @@ public final class MainActivity
         @Nullable final ViewGroup layoutWithProgressBar = findViewById(R.id.layoutWithProgressBar);
 
         if (layoutWithProgressBar == null) {
-            throw new RuntimeException("layoutWithProgressBar == null");
+            @NonNull final RuntimeException exception = new RuntimeException("layoutWithProgressBar == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         return layoutWithProgressBar;

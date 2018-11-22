@@ -16,7 +16,10 @@ public abstract class BaseFragmentPresenter<V extends BaseFragmentContract.View>
         @Nullable final FragmentActivity activity = fragment.getActivity();
 
         if (activity == null) {
-            throw new NullPointerException("activity == null");
+            @NonNull final NullPointerException exception = new NullPointerException("activity == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         return activity;

@@ -21,7 +21,6 @@ import com.myrungo.rungo.utils.DBConstants;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -30,12 +29,9 @@ import static com.myrungo.rungo.utils.DBConstants.userChallengeIsCompleteField;
 import static com.myrungo.rungo.utils.DBConstants.userChallengeRewardField;
 import static com.myrungo.rungo.utils.DBConstants.userChallengesCollection;
 
-@SuppressWarnings("unused")
 public final class CustomPresenter
         extends BaseCatPresenter<CustomContract.View>
         implements CustomContract.Presenter<CustomContract.View> {
-
-    private final String TAG = this.getClass().getName();
 
     @Override
     public final void onViewCreate() {
@@ -62,7 +58,7 @@ public final class CustomPresenter
                                 getUserChallengesCollection(dbUser);
 
                         @NonNull final List<DocumentSnapshot> userChallenges =
-                                getUserChallenges(dbUser, userChallengesCollection);
+                                getUserChallenges(userChallengesCollection);
 
                         updateApropriateChallenge(userChallenges, preferredCostume, userChallengesCollection);
                     }
@@ -70,18 +66,13 @@ public final class CustomPresenter
                 .addOnFailureListener(activity, new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull final Exception exception) {
-                        int c = 1;
-
-                        //todo
+                        reportError(exception);
                     }
                 });
     }
 
     @NonNull
-    private List<DocumentSnapshot> getUserChallenges(
-            @NonNull final DBUser dbUser,
-            @NonNull final CollectionReference userChallengesCollection
-    ) {
+    private List<DocumentSnapshot> getUserChallenges(@NonNull final CollectionReference userChallengesCollection) {
         @NonNull final Task<QuerySnapshot> getUserChallengesTask =
                 userChallengesCollection.get();
 
@@ -90,7 +81,7 @@ public final class CustomPresenter
         @Nullable final Exception getUserChallengesTaskException = getUserChallengesTask.getException();
 
         if (getUserChallengesTaskException != null) {
-            //todo
+            reportError(getUserChallengesTaskException);
             return Collections.emptyList();
         }
 
@@ -118,8 +109,6 @@ public final class CustomPresenter
             @NonNull final String preferredCostume,
             @NonNull final CollectionReference userChallengesCollection) {
         @NonNull final FragmentActivity activity = getActivity();
-
-        @NonNull Map<String, Object> updatedChallenge = new HashMap<>();
 
         for (@Nullable final DocumentSnapshot snapshot : snapshots) {
             if (snapshot == null) {
@@ -149,9 +138,8 @@ public final class CustomPresenter
                             thisChallengeDocument.set(data)
                                     .addOnFailureListener(activity, new OnFailureListener() {
                                         @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            int c = 1;
-                                            //todo
+                                        public void onFailure(@NonNull final Exception exception) {
+                                            reportError(exception);
                                         }
                                     });
                         }
@@ -166,12 +154,6 @@ public final class CustomPresenter
     @Override
     @NonNull
     public final Task<List<String>> asyncGetUserRewards() {
-        @NonNull final String preferredSkinFromSharedPreferences =
-                getPreferredSkinFromSharedPreferences();
-
-        @NonNull final Task<String> asyncGetPreferredSkinFromDBTask =
-                asyncGetPreferredSkinFromDB(preferredSkinFromSharedPreferences);
-
         @NonNull final MainContract.View view = (MainContract.View) getActivity();
 
         @NonNull final Task<DBUser> getCurrentUserInfoTask = view.asyncGetCurrentUserInfo();
@@ -184,6 +166,8 @@ public final class CustomPresenter
                 @Nullable final Exception exception = task.getException();
 
                 if (exception != null) {
+                    reportError(exception);
+
                     throw exception;
                 }
 
@@ -202,6 +186,8 @@ public final class CustomPresenter
                 @Nullable final Exception getUserChallengesTaskException = getUserChallengesTask.getException();
 
                 if (getUserChallengesTaskException != null) {
+                    reportError(getUserChallengesTaskException);
+
                     throw getUserChallengesTaskException;
                 }
 
@@ -271,6 +257,7 @@ public final class CustomPresenter
         prefs.edit().putString("SKIN", newCostume).apply();
     }
 
+    @SuppressWarnings("unused")
     @NonNull
     private String getPreferredSkin() {
         @NonNull final String preferredSkinFromSharedPreferences = getPreferredSkinFromSharedPreferences();
@@ -294,8 +281,10 @@ public final class CustomPresenter
             @NonNull final DBUser currentUserInfo = mainView.getCurrentUserInfo();
 
             return currentUserInfo.getCostume();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (@NonNull final Exception exception) {
+            reportError(exception);
+
+            exception.printStackTrace();
             return "";
         }
     }

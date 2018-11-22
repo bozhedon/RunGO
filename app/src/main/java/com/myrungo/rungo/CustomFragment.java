@@ -28,15 +28,29 @@ import static com.myrungo.rungo.utils.DBConstants.karateChallengeReward;
 import static com.myrungo.rungo.utils.DBConstants.ordinaryChallengeReward;
 
 
-@SuppressWarnings("unused")
 public final class CustomFragment
         extends BaseFragment<CustomContract.View, CustomContract.Presenter<CustomContract.View>>
         implements CustomContract.View {
 
-    private final String TAG = this.getClass().getName();
+    private static final String USER_TAG = "USER_TAG";
 
     @Nullable
     private CustomContract.Presenter<CustomContract.View> presenter;
+
+    @Nullable
+    private CatView catview;
+
+    @Nullable
+    private ImageView badcat;
+
+    @Nullable
+    private ImageView karatecat;
+
+    @Nullable
+    private ImageView officecat;
+
+    @Nullable
+    private ImageView sportcat;
 
     @Override
     protected final void setupPresenter() {
@@ -47,19 +61,22 @@ public final class CustomFragment
     @Override
     protected final CustomContract.Presenter<CustomContract.View> getPresenter() {
         if (presenter == null) {
-            throw new RuntimeException("presenter == null");
+            @NonNull final RuntimeException exception = new RuntimeException("presenter == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         return presenter;
     }
 
-    @Nullable
-    private CatView catview;
-
     @NonNull
     private CatView getCatview() {
         if (catview == null) {
-            throw new NullPointerException("catview == null");
+            @NonNull final NullPointerException exception = new NullPointerException("catview == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         return catview;
@@ -67,19 +84,22 @@ public final class CustomFragment
 
     private void setCatview(@Nullable final View catview) {
         if (catview == null) {
-            throw new NullPointerException("catview == null");
+            @NonNull final NullPointerException exception = new NullPointerException("catview == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         this.catview = (CatView) catview;
     }
 
-    @Nullable
-    private ImageView badcat;
-
     @NonNull
     private ImageView getBadcat() {
         if (badcat == null) {
-            throw new NullPointerException("badcat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("badcat == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         return badcat;
@@ -87,19 +107,22 @@ public final class CustomFragment
 
     private void setBadcat(@Nullable final View badcat) {
         if (badcat == null) {
-            throw new NullPointerException("badcat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("badcat == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         this.badcat = (ImageView) badcat;
     }
 
-    @Nullable
-    private ImageView karatecat;
-
     @NonNull
     private ImageView getKaratecat() {
         if (karatecat == null) {
-            throw new NullPointerException("karatecat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("karatecat == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         return karatecat;
@@ -107,19 +130,22 @@ public final class CustomFragment
 
     private void setKaratecat(@Nullable final View karatecat) {
         if (karatecat == null) {
-            throw new NullPointerException("karatecat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("karatecat == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         this.karatecat = (ImageView) karatecat;
     }
 
-    @Nullable
-    private ImageView officecat;
-
     @NonNull
     private ImageView getOfficecat() {
         if (officecat == null) {
-            throw new NullPointerException("officecat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("officecat == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         return officecat;
@@ -127,19 +153,22 @@ public final class CustomFragment
 
     private void setOfficecat(@Nullable final View officecat) {
         if (officecat == null) {
-            throw new NullPointerException("officecat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("officecat == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         this.officecat = (ImageView) officecat;
     }
 
-    @Nullable
-    private ImageView sportcat;
-
     @NonNull
     private ImageView getSportcat() {
         if (sportcat == null) {
-            throw new NullPointerException("sportcat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("sportcat == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         return sportcat;
@@ -147,13 +176,14 @@ public final class CustomFragment
 
     private void setSportcat(@Nullable final View sportcat) {
         if (sportcat == null) {
-            throw new NullPointerException("officecat == null");
+            @NonNull final NullPointerException exception = new NullPointerException("officecat == null");
+            reportError(exception);
+
+            throw exception;
         }
 
         this.sportcat = (ImageView) sportcat;
     }
-
-    private static final String USER_TAG = "USER_TAG";
 
     @NonNull
     @Override
@@ -199,6 +229,9 @@ public final class CustomFragment
         @Nullable final FragmentActivity activity = getActivity();
 
         if (activity == null) {
+            @NonNull final NullPointerException exception = new NullPointerException("activity == null");
+            reportError(exception);
+
             return;
         }
 

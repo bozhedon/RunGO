@@ -1,6 +1,5 @@
 package com.myrungo.rungo.login;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -137,6 +136,8 @@ public final class LoginPresenter
                 .addOnFailureListener(getActivity(), new OnFailureListener() {
                     @Override
                     final public void onFailure(@NonNull final Exception exception) {
+                        reportError(exception);
+
                         getView().hideProgressIndicator();
 
                         getView().showMessage(exception.getMessage());
@@ -144,7 +145,6 @@ public final class LoginPresenter
                 });
     }
 
-    @SuppressLint("SetTextI18n")
     private void onNotOkResult(@Nullable final IdpResponse response) {
         if (response == null) {
             //the user canceled the sign-in flow using the back button
@@ -175,25 +175,37 @@ public final class LoginPresenter
 
         } else if (errorCode == DEVELOPER_ERROR) {
 
+            reportError(error);
+
             part1 = getContext().getString(R.string.developer_error);
 
         } else if (errorCode == PROVIDER_ERROR) {
+
+            reportError(error);
 
             part1 = getContext().getString(R.string.provider_error);
 
         } else if (errorCode == ANONYMOUS_UPGRADE_MERGE_CONFLICT) {
 
+            reportError(error);
+
             part1 = getContext().getString(R.string.user_account_merge_conflict);
 
         } else if (errorCode == EMAIL_MISMATCH_ERROR) {
+
+            reportError(error);
 
             part1 = getContext().getString(R.string.you_are_attempting_to_sign_in_a_different_email_than_previously_provided);
 
         } else if (errorCode == UNKNOWN_ERROR) {
 
+            reportError(error);
+
             part1 = getContext().getString(R.string.unknown_error_has_occured);
 
         } else {
+
+            reportError(error);
 
             part1 = getContext().getString(R.string.unknown_error_has_occured);
 
