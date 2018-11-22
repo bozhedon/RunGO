@@ -127,14 +127,14 @@ public final class LoginPresenter
                 .collection(usersCollection)
                 .document(uid)
                 .set(newUserInfo)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                .addOnSuccessListener(getActivity(), new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(@Nullable final Void v) {
                         //user saved in DB
                         getView().goToMainScreen();
                     }
                 })
-                .addOnFailureListener(new OnFailureListener() {
+                .addOnFailureListener(getActivity(), new OnFailureListener() {
                     @Override
                     final public void onFailure(@NonNull final Exception exception) {
                         getView().hideProgressIndicator();

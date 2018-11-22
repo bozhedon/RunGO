@@ -22,6 +22,7 @@ import com.myrungo.rungo.main.MainPresenter;
 import com.myrungo.rungo.models.Challenge;
 import com.myrungo.rungo.models.DBUser;
 import com.myrungo.rungo.models.Training;
+import com.myrungo.rungo.profile.ProfileFragment;
 
 import java.util.List;
 

@@ -32,6 +32,11 @@ public abstract class BasePresenter<V extends BaseContract.View> implements Base
     }
 
     @NonNull
+    protected Activity getActivity() {
+        return (Activity) getView();
+    }
+
+    @NonNull
     final protected Context getContext() {
         try {
             @NonNull final Fragment fragment = (Fragment) getView();

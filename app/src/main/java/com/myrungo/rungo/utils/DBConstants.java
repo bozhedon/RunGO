@@ -20,7 +20,7 @@ public final class DBConstants {
     public static final String ordinaryChallengeReward = "ordinary";
 
     @NonNull
-    public static final String officeChallengeReward = "office";
+    public static final String businessChallengeReward = "business";
 
     @NonNull
     public static final String karateChallengeReward = "karate";

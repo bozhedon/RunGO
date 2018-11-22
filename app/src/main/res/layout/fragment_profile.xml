@@ -5,16 +5,74 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_challenge"
-    tools:context=".ProfileFragment">
+    tools:context=".profile.ProfileFragment">
+
+    <com.myrungo.rungo.CatView
+        android:id="@+id/cat"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="19dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="219dp"
+        android:layout_marginBottom="457dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.067"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.016" />
+
+    <!--TODO add ellipse-->
 
     <TextView
-        android:id="@+id/textView13"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="В разработке"
-        android:textSize="25dp"
+        android:id="@+id/userName"
+        android:layout_width="110dp"
+        android:layout_height="22dp"
+        android:layout_marginStart="121dp"
+        android:layout_marginTop="38dp"
+        android:layout_marginEnd="89dp"
+        android:fontFamily="@font/roboto_bold"
+        android:text="Иван Петров"
+        android:textColor="@color/colorPrimary"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/userDistance"
+        android:layout_width="160dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="121dp"
+        android:layout_marginTop="67dp"
+        android:layout_marginEnd="39dp"
+        android:fontFamily="@font/roboto_light"
+        android:text="20км"
+        android:textColor="@color/colorPrimary"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="159dp"
+        android:layout_marginBottom="250dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:context=".MainActivity">
+
+        <android.support.design.widget.TabLayout
+            style="@style/AppTabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            app:tabBackground="@drawable/tab_selector"
+            app:tabSelectedTextColor="@color/colorPrimary" />
+    </android.support.v4.view.ViewPager>
 </android.support.constraint.ConstraintLayout>

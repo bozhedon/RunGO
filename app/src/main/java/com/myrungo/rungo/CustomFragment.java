@@ -3,10 +3,13 @@ package com.myrungo.rungo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -15,12 +18,13 @@ import com.myrungo.rungo.custom.CustomContract;
 import com.myrungo.rungo.custom.CustomPresenter;
 import com.myrungo.rungo.main.MainContract;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import static com.myrungo.rungo.utils.DBConstants.badboyChallengeReward;
+import static com.myrungo.rungo.utils.DBConstants.businessChallengeReward;
 import static com.myrungo.rungo.utils.DBConstants.karateChallengeReward;
-import static com.myrungo.rungo.utils.DBConstants.officeChallengeReward;
 import static com.myrungo.rungo.utils.DBConstants.ordinaryChallengeReward;
 
 
@@ -191,63 +195,118 @@ public final class CustomFragment
     }
 
     @Override
-    public final void showAvailableCostumes(@NonNull final Task<List<String>> getUserChallengesTask) {
-        @Nullable final MainContract.View activity = (MainContract.View) getActivity();
+    public final void showAvailableCostumes(@NonNull final Task<List<String>> getUserRewardsTask) {
+        @Nullable final FragmentActivity activity = getActivity();
 
         if (activity == null) {
             return;
         }
 
-        activity.showProgressIndicator();
-
-        getUserChallengesTask
-                .addOnCompleteListener(new OnCompleteListener<List<String>>() {
+        getUserRewardsTask
+                .addOnCompleteListener(activity, new OnCompleteListener<List<String>>() {
                     @Override
                     public void onComplete(@NonNull final Task<List<String>> task) {
                         if (task.isSuccessful()) {
-                            @Nullable final List<String> userRewards = task.getResult();
+                            @Nullable final List<String> result = task.getResult();
 
-                            if (userRewards == null || userRewards.isEmpty()) {
-                                activity.hideProgressIndicator();
+                            if (result == null) {
                                 return;
                             }
 
-                            for (@Nullable final String userReward : userRewards) {
-                                if (userReward == null) {
-                                    continue;
-                                }
+                            @NonNull final List<String> userRewards = new ArrayList<>(result);
 
-                                if (Objects.equals(userReward, ordinaryChallengeReward)) {
-                                    Objects.requireNonNull(getActivity())
-                                            .findViewById(R.id.casual_sport_cloth)
-                                            .setVisibility(View.VISIBLE);
-                                } else if (Objects.equals(userReward, officeChallengeReward)) {
-                                    Objects.requireNonNull(getActivity())
-                                            .findViewById(R.id.office_cloth)
-                                            .setVisibility(View.VISIBLE);
-                                } else if (Objects.equals(userReward, karateChallengeReward)) {
-                                    Objects.requireNonNull(getActivity())
-                                            .findViewById(R.id.karate_cloth)
-                                            .setVisibility(View.VISIBLE);
-                                } else if (Objects.equals(userReward, badboyChallengeReward)) {
-                                    Objects.requireNonNull(getActivity())
-                                            .findViewById(R.id.bad_cat_cloth)
-                                            .setVisibility(View.VISIBLE);
-                                }
+                            @NonNull final TextView errorTextView =
+                                    activity.findViewById(R.id.errorTextView);
+
+                            @NonNull final ConstraintLayout mainLayout =
+                                    activity.findViewById(R.id.mainLayout);
+
+                            if (isUserRewardsEmpty(userRewards, errorTextView, mainLayout)) {
+                                return;
                             }
 
-                            activity.hideProgressIndicator();
+                            showAvailableCostumes(userRewards, activity);
+
+                            errorTextView.setVisibility(View.GONE);
+                            mainLayout.setVisibility(View.VISIBLE);
+                            dressUp();
                         }
                     }
                 });
     }
 
-    @Override
-    public final void dressUp() {
+    private void showAvailableCostumes(
+            @NonNull final List<String> userRewards,
+            @NonNull final FragmentActivity activity) {
+        for (@Nullable final String userReward : userRewards) {
+            if (userReward == null) {
+                continue;
+            }
+
+            if (Objects.equals(userReward, ordinaryChallengeReward)) {
+
+                activity
+                        .findViewById(R.id.casual_sport_cloth)
+                        .setVisibility(View.VISIBLE);
+
+            } else if (Objects.equals(userReward, businessChallengeReward)) {
+
+                activity
+                        .findViewById(R.id.office_cloth)
+                        .setVisibility(View.VISIBLE);
+
+            } else if (Objects.equals(userReward, karateChallengeReward)) {
+
+                activity
+                        .findViewById(R.id.karate_cloth)
+                        .setVisibility(View.VISIBLE);
+
+            } else if (Objects.equals(userReward, badboyChallengeReward)) {
+
+                activity
+                        .findViewById(R.id.bad_cat_cloth)
+                        .setVisibility(View.VISIBLE);
+
+            }
+        }
+    }
+
+    private boolean isUserRewardsEmpty(
+            @NonNull final List<String> userRewards,
+            @NonNull final TextView errorTextView,
+            @NonNull final ConstraintLayout mainLayout) {
+        @NonNull final String preferredCostume = getPresenter().getPrefferedCostume();
+
+        if (userRewards.isEmpty()) {
+            if (preferredCostume.equals(CatView.Skins.COMMON.toString().toLowerCase())) {
+                errorTextView.setText(getString(R.string.you_do_not_have_any_costume));
+                errorTextView.setVisibility(View.VISIBLE);
+                mainLayout.setVisibility(View.GONE);
+
+                hideProgressIndicator();
+                return true;
+            } else {
+                userRewards.add(preferredCostume);
+
+                getPresenter().asyncSaveNewCostume(preferredCostume);
+                getPresenter().asyncUpdateUserRewards(preferredCostume);
+            }
+        }
+
+        return false;
+    }
+
+    private void dressUp() {
+        @Nullable final FragmentActivity activity = getActivity();
+
+        if (activity == null) {
+            return;
+        }
+
         @NonNull final Task<String> asyncGetPreferredSkinTask = getPresenter().asyncGetPreferredCostume();
 
         asyncGetPreferredSkinTask
-                .addOnCompleteListener(new OnCompleteListener<String>() {
+                .addOnCompleteListener(activity, new OnCompleteListener<String>() {
                     @Override
                     public void onComplete(@NonNull Task<String> task) {
                         if (task.isSuccessful()) {
@@ -278,8 +337,9 @@ public final class CustomFragment
                                 default:
                                     getCatview().setSkin(CatView.Skins.COMMON);
                             }
-
                         }
+
+                        hideProgressIndicator();
                     }
                 });
     }
@@ -291,7 +351,7 @@ public final class CustomFragment
                 getCatview().setSkin(CatView.Skins.BAD);
                 @NonNull final String newCostume = CatView.Skins.BAD.toString().toLowerCase();
 
-                getPresenter().saveNewCostume(newCostume);
+                getPresenter().asyncSaveNewCostume(newCostume);
             }
         });
 
@@ -301,7 +361,7 @@ public final class CustomFragment
                 getCatview().setSkin(CatView.Skins.KARATE);
                 @NonNull final String newCostume = CatView.Skins.KARATE.toString().toLowerCase();
 
-                getPresenter().saveNewCostume(newCostume);
+                getPresenter().asyncSaveNewCostume(newCostume);
             }
         });
 
@@ -311,7 +371,7 @@ public final class CustomFragment
                 getCatview().setSkin(CatView.Skins.BUSINESS);
                 @NonNull final String newCostume = CatView.Skins.BUSINESS.toString().toLowerCase();
 
-                getPresenter().saveNewCostume(newCostume);
+                getPresenter().asyncSaveNewCostume(newCostume);
             }
         });
 
@@ -321,7 +381,7 @@ public final class CustomFragment
                 getCatview().setSkin(CatView.Skins.NORMAL);
                 @NonNull final String newCostume = CatView.Skins.NORMAL.toString().toLowerCase();
 
-                getPresenter().saveNewCostume(newCostume);
+                getPresenter().asyncSaveNewCostume(newCostume);
             }
         });
     }
@@ -336,6 +396,28 @@ public final class CustomFragment
     public final void onResume() {
         super.onResume();
         getCatview().resume();
+    }
+
+    @Override
+    public final void showProgressIndicator() {
+        @Nullable final MainContract.View mainView = (MainContract.View) getActivity();
+
+        if (mainView == null) {
+            return;
+        }
+
+        mainView.showProgressIndicator();
+    }
+
+    @Override
+    public final void hideProgressIndicator() {
+        @Nullable final MainContract.View mainView = (MainContract.View) getActivity();
+
+        if (mainView == null) {
+            return;
+        }
+
+        mainView.hideProgressIndicator();
     }
 
 }

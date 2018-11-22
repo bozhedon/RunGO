@@ -38,9 +38,7 @@
         android:layout_marginBottom="0dp"
         android:background="@color/bottomviewcolor"
         app:itemIconTint="@color/bottom_navigation_item_color"
-        app:menu="@menu/bottom_menu">
-
-    </com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx>
+        app:menu="@menu/bottom_menu" />
 
     <include layout="@layout/layout_progress_bar" />
 

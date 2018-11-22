@@ -8,95 +8,114 @@
     android:background="@drawable/gradient_challenge"
     tools:context=".CustomFragment">
 
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/mainLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/custom_fragment_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/custom_frag_title"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.myrungo.rungo.CatView
+            android:id="@+id/cat"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/custom_fragment_title" />
+
+        <ImageView
+            android:id="@+id/bad_cat_cloth"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_parent_rounded_corner"
+            android:padding="5dp"
+            android:src="@drawable/bad_cat_jacket"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/karate_cloth"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline7" />
+
+        <ImageView
+            android:id="@+id/karate_cloth"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_parent_rounded_corner"
+            android:padding="5dp"
+            android:src="@drawable/karate_cat_kimono"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/bad_cat_cloth"
+            app:layout_constraintTop_toBottomOf="@+id/guideline7" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <ImageView
+            android:id="@+id/office_cloth"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_parent_rounded_corner"
+            android:padding="5dp"
+            android:src="@drawable/bussiness_cat_cloth"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/casual_sport_cloth"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bad_cat_cloth" />
+
+        <ImageView
+            android:id="@+id/casual_sport_cloth"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_parent_rounded_corner"
+            android:padding="5dp"
+            android:src="@drawable/normal_cat_sportsuniform"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/office_cloth"
+            app:layout_constraintTop_toBottomOf="@+id/karate_cloth" />
+    </android.support.constraint.ConstraintLayout>
+
     <TextView
-        android:id="@+id/custom_fragment_title"
+        android:id="@+id/errorTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="@string/custom_frag_title"
-        android:textSize="18sp"
-        android:textStyle="bold"
+        android:layout_marginBottom="8dp"
+        android:text="@string/you_do_not_have_any_costume"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <com.myrungo.rungo.CatView
-        android:id="@+id/cat"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/custom_fragment_title">
-
-    </com.myrungo.rungo.CatView>
-
-    <ImageView
-        android:id="@+id/bad_cat_cloth"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:visibility="gone"
-        android:layout_marginTop="8dp"
-        android:padding="5dp"
-        android:background="@drawable/bg_parent_rounded_corner"
-        android:src="@drawable/bad_cat_jacket"
-        app:layout_constraintEnd_toStartOf="@+id/karate_cloth"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline7" />
-
-    <ImageView
-        android:id="@+id/karate_cloth"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:visibility="gone"
-        android:layout_marginTop="8dp"
-        android:padding="5dp"
-        android:background="@drawable/bg_parent_rounded_corner"
-        android:src="@drawable/karate_cat_kimono"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/bad_cat_cloth"
-        app:layout_constraintTop_toBottomOf="@+id/guideline7" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.5" />
-
-    <ImageView
-        android:id="@+id/office_cloth"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:visibility="gone"
-        android:layout_marginTop="16dp"
-        android:padding="5dp"
-        android:background="@drawable/bg_parent_rounded_corner"
-        android:src="@drawable/bussiness_cat_cloth"
-        app:layout_constraintEnd_toStartOf="@+id/casual_sport_cloth"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bad_cat_cloth" />
-
-    <ImageView
-        android:id="@+id/casual_sport_cloth"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:visibility="gone"
-        android:layout_marginTop="16dp"
-        android:padding="5dp"
-        android:background="@drawable/bg_parent_rounded_corner"
-        android:src="@drawable/normal_cat_sportsuniform"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/office_cloth"
-        app:layout_constraintTop_toBottomOf="@+id/karate_cloth" />
 
 </android.support.constraint.ConstraintLayout>
