@@ -231,15 +231,15 @@ public class CatView extends ConstraintLayout {
         stop();
 
         Animation rotateStart = new RotateAnimation(0, -90, 0, 10);
-        rotateStart.setDuration(500);
+        rotateStart.setDuration(700);
 
         final Animation rotate = new RotateAnimation(-90, -45, 0, 10);
-        rotate.setDuration(500);
+        rotate.setDuration(700);
         rotate.setRepeatMode(ValueAnimator.REVERSE);
         rotate.setRepeatCount(3);
 
         final Animation rotateEnd = new RotateAnimation(-90, 0, 0, 10);
-        rotateEnd.setDuration(500);
+        rotateEnd.setDuration(700);
 
         rotateStart.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -341,7 +341,7 @@ public class CatView extends ConstraintLayout {
         stop();
 
         Animation headAnimation = new RotateAnimation(0, 10, headWidth/2, headHeight/2);
-        headAnimation.setDuration(100);
+        headAnimation.setDuration(500);
         headAnimation.setRepeatMode(ValueAnimator.REVERSE);
         headAnimation.setRepeatCount(1);
         headAnimation.setFillAfter(true);
@@ -362,13 +362,13 @@ public class CatView extends ConstraintLayout {
         });
 
         Animation handLeftAnimation = new RotateAnimation(0, 60, handWidth, -10);
-        handLeftAnimation.setDuration(100);
+        handLeftAnimation.setDuration(400);
         handLeftAnimation.setRepeatMode(ValueAnimator.REVERSE);
         handLeftAnimation.setRepeatCount(1);
         handLeftAnimation.setFillAfter(true);
 
         Animation handRightAnimation = new RotateAnimation(0, -60, 0, -10);
-        handRightAnimation.setDuration(100);
+        handRightAnimation.setDuration(400);
         handRightAnimation.setRepeatMode(ValueAnimator.REVERSE);
         handRightAnimation.setRepeatCount(1);
         handRightAnimation.setFillAfter(true);
