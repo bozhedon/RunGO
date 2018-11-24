@@ -16,6 +16,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -34,10 +35,16 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 public class StartActivity extends AppCompatActivity implements LocationListener, GpsStatus.Listener, OnMapReadyCallback {
@@ -61,6 +68,10 @@ public class StartActivity extends AppCompatActivity implements LocationListener
     private String currentTime;
     private GoogleMap map;
     private CatView catView;
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    @Nullable
+    final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -254,6 +265,12 @@ public class StartActivity extends AppCompatActivity implements LocationListener
         //intent.putExtra("distance", data.getDistance());
         //intent.putExtra("average", data.getAverageSpeed());
         //intent.putExtra("time", currentTime);
+        Map<String,Object> training = new HashMap<>();
+        training.put("distance", data.getDistance());
+        training.put("averageSpeed", data.getAverageSpeed());
+        training.put("time", currentTime);
+        training.put("startTime", Calendar.getInstance().getTime());
+        db.collection("users").document(user.getUid()).collection("trainings").add(training);
         resetData();
         //startActivity(intent);
         finish();

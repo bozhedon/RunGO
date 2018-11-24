@@ -33,15 +33,11 @@ public final class MainActivity
 
     public static final String USER_TAG = "USER_TAG";
 
-    @Nullable
-    private CatView.Skins skin;
-
-    @Nullable
-    private CatView.Heads head;
-
     private boolean first = true;
 
     private int position = 1;
+
+    private ChallengeItem current_challenge;
 
     @Nullable
     private User user;
@@ -114,24 +110,6 @@ public final class MainActivity
         this.fab = (FloatingActionButton) fab;
     }
 
-    @Nullable
-    public final CatView.Skins getSkin() {
-        return skin;
-    }
-
-    public final void setSkin(@NonNull final CatView.Skins skin) {
-        this.skin = skin;
-    }
-
-    @Nullable
-    public final CatView.Heads getHead() {
-        return head;
-    }
-
-    public final void setHead(@NonNull final CatView.Heads head) {
-        this.head = head;
-    }
-
     @Override
     protected final MainContract.Presenter<MainContract.View> getPresenter() {
         if (presenter == null) {
@@ -166,8 +144,6 @@ public final class MainActivity
 
         showProgressIndicator();
 
-        user = new User(CatView.Skins.BUSINESS, CatView.Heads.ANGRY);
-
         setFab(findViewById(R.id.fab_start));
 
         setFabOnClickListener();
@@ -198,7 +174,7 @@ public final class MainActivity
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, StartActivity.class);
-                //intent.putExtra(DBUser.class.getSimpleName(), user);
+                intent.putExtra(DBUser.class.getSimpleName(), user);
                 startActivity(intent);
             }
         });
