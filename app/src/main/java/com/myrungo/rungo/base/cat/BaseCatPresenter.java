@@ -122,7 +122,7 @@ public abstract class BaseCatPresenter<V extends BaseCatContract.View>
     }
 
     @NonNull
-    protected Task<String> asyncGetPreferredSkinFromDB(@NonNull final String preferredSkinFromSharedPreferences) {
+    private Task<String> asyncGetPreferredSkinFromDB(@NonNull final String preferredSkinFromSharedPreferences) {
         @NonNull final MainContract.View mainView = (MainContract.View) getActivity();
 
         @NonNull final Task<DBUser> getCurrentUserInfoTask = mainView.asyncGetCurrentUserInfo();

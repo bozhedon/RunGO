@@ -8,6 +8,7 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -15,6 +16,7 @@ import com.myrungo.rungo.CatView;
 import com.myrungo.rungo.R;
 import com.myrungo.rungo.base.BaseFragment;
 import com.myrungo.rungo.main.MainContract;
+import com.myrungo.rungo.models.UserTimeIntervalsInfo;
 
 
 public final class ProfileFragment
@@ -23,15 +25,6 @@ public final class ProfileFragment
 
     @Nullable
     private ViewPagerAdapter adapter;
-
-    @Nullable
-    private ViewPager pager;
-
-    @Nullable
-    private CatView catView;
-
-    @Nullable
-    private ProfileContract.Presenter<ProfileContract.View> presenter;
 
     @NonNull
     private ViewPagerAdapter getAdapter() {
@@ -56,6 +49,9 @@ public final class ProfileFragment
         this.adapter = adapter;
     }
 
+    @Nullable
+    private ViewPager pager;
+
     @NonNull
     private ViewPager getPager() {
         if (pager == null) {
@@ -79,6 +75,9 @@ public final class ProfileFragment
         this.pager = (ViewPager) pager;
     }
 
+    @Nullable
+    private CatView catView;
+
     @NonNull
     private CatView getCatView() {
         if (catView == null) {
@@ -101,6 +100,9 @@ public final class ProfileFragment
 
         this.catView = (CatView) view;
     }
+
+    @Nullable
+    private ProfileContract.Presenter<ProfileContract.View> presenter;
 
     @Override
     protected final void setupPresenter() {
@@ -186,10 +188,62 @@ public final class ProfileFragment
                             }
                         }
 
-                        hideProgressIndicator();
+                        getPresenter().onDressUpComplete();
                     }
                 });
 
+    }
+
+    @NonNull
+    @Override
+    public UserTimeIntervalsInfo getWeekInfo() {
+        return getPresenter().getWeekInfo();
+    }
+
+    @NonNull
+    @Override
+    public UserTimeIntervalsInfo getMonthInfo() {
+        return getPresenter().getMonthInfo();
+    }
+
+    @NonNull
+    @Override
+    public UserTimeIntervalsInfo getYearInfo() {
+        return getPresenter().getYearInfo();
+    }
+
+    @Override
+    public void setUpName(@NonNull final String name) {
+        @Nullable final FragmentActivity activity = getActivity();
+
+        if (activity == null) {
+            @NonNull final NullPointerException exception = new NullPointerException("activity == null");
+
+            reportError(exception);
+
+            throw exception;
+        }
+
+        final TextView userNameView = activity.findViewById(R.id.userName);
+
+        userNameView.setText(name);
+    }
+
+    @Override
+    public void setUpTotalDistance(@NonNull final String totalDistance) {
+        @Nullable final FragmentActivity activity = getActivity();
+
+        if (activity == null) {
+            @NonNull final NullPointerException exception = new NullPointerException("activity == null");
+
+            reportError(exception);
+
+            throw exception;
+        }
+
+        @NonNull final TextView userTotalDistance = activity.findViewById(R.id.userTotalDistance);
+
+        userTotalDistance.setText(totalDistance);
     }
 
     @Override

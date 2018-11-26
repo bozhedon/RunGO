@@ -5,6 +5,9 @@ import android.support.annotation.NonNull;
 public final class DBConstants {
 
     @NonNull
+    public static final String trainingsCollection = "trainings";
+
+    @NonNull
     public static final String usersCollection = "users";
 
     @NonNull

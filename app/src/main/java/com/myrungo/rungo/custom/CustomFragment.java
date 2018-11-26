@@ -1,4 +1,4 @@
-package com.myrungo.rungo;
+package com.myrungo.rungo.custom;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,9 +13,9 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.myrungo.rungo.CatView;
+import com.myrungo.rungo.R;
 import com.myrungo.rungo.base.BaseFragment;
-import com.myrungo.rungo.custom.CustomContract;
-import com.myrungo.rungo.custom.CustomPresenter;
 import com.myrungo.rungo.main.MainContract;
 
 import java.util.ArrayList;

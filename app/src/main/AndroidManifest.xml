@@ -52,7 +52,7 @@
             android:permission="" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".main.MainActivity"
             android:screenOrientation="portrait">
 
         </activity>
@@ -60,7 +60,7 @@
             android:name=".StartActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".SplashActivity"
+            android:name=".splash.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>

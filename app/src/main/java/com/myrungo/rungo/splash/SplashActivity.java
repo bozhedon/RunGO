@@ -1,4 +1,4 @@
-package com.myrungo.rungo;
+package com.myrungo.rungo.splash;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +14,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.myrungo.rungo.login.LoginActivity;
+import com.myrungo.rungo.main.MainActivity;
 
 import java.util.List;
 import java.util.Map;

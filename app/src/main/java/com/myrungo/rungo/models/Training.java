@@ -12,9 +12,11 @@ public final class Training {
 
     private double distance = 0.0;
 
-    private int startTime = 0;
+    private long startTime = 0;
 
-    private double time = 0.0;
+    private long endTime = 0;
+
+//    private double time = 0.0;
 
     public double getAverageSpeed() {
         return averageSpeed;
@@ -24,12 +26,16 @@ public final class Training {
         return distance;
     }
 
-    public int getStartTime() {
+    public long getStartTime() {
         return startTime;
     }
 
-    public double getTime() {
-        return time;
+    public long getEndTime() {
+        return endTime;
     }
+
+    //    public double getTime() {
+//        return time;
+//    }
 
 }

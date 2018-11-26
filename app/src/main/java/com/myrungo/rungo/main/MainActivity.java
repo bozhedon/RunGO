@@ -1,4 +1,4 @@
-package com.myrungo.rungo;
+package com.myrungo.rungo.main;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,9 +17,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.firestore.CollectionReference;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.myrungo.rungo.CatView;
+import com.myrungo.rungo.ChallengeFragment;
+import com.myrungo.rungo.HomeFragment;
+import com.myrungo.rungo.R;
+import com.myrungo.rungo.StartActivity;
+import com.myrungo.rungo.User;
 import com.myrungo.rungo.base.BaseActivity;
-import com.myrungo.rungo.main.MainContract;
-import com.myrungo.rungo.main.MainPresenter;
+import com.myrungo.rungo.custom.CustomFragment;
+import com.myrungo.rungo.login.LoginActivity;
 import com.myrungo.rungo.models.Challenge;
 import com.myrungo.rungo.models.DBUser;
 import com.myrungo.rungo.models.Training;
@@ -181,6 +187,19 @@ public final class MainActivity
         getPresenter().onViewCreate();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getPresenter().onViewStart();
+    }
+
+    @Override
+    public void goToLoginScreen() {
+        @NonNull final Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     private void goToHomeFragment() {
         @NonNull final Fragment fragment = new HomeFragment();
         @NonNull final FragmentManager manager = getSupportFragmentManager();
@@ -313,4 +332,9 @@ public final class MainActivity
         return getPresenter().getUsersCollection();
     }
 
+    @NonNull
+    @Override
+    public List<Training> getCurrentUserTrainings() throws Exception {
+        return getPresenter().getCurrentUserTrainings();
+    }
 }

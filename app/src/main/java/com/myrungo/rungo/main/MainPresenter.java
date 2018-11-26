@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.tasks.Continuation;
@@ -31,6 +30,7 @@ import static com.myrungo.rungo.utils.CustomExceptions.DBFieldsHasDifferentSctru
 import static com.myrungo.rungo.utils.CustomExceptions.NullUserInfoException;
 import static com.myrungo.rungo.utils.CustomExceptions.UnauthorizedUserException;
 import static com.myrungo.rungo.utils.DBConstants.challengesCollection;
+import static com.myrungo.rungo.utils.DBConstants.trainingsCollection;
 import static com.myrungo.rungo.utils.DBConstants.usersCollection;
 
 public final class MainPresenter
@@ -41,8 +41,6 @@ public final class MainPresenter
 
     @Nullable
     private FirebaseFirestore db;
-    @Nullable
-    private FirebaseAuth firebaseAuth;
 
     @NonNull
     private FirebaseFirestore getDB() {
@@ -52,6 +50,9 @@ public final class MainPresenter
 
         return db;
     }
+
+    @Nullable
+    private FirebaseAuth firebaseAuth;
 
     @NonNull
     private FirebaseAuth getFirebaseAuth() {
@@ -71,7 +72,17 @@ public final class MainPresenter
 
     @Override
     public final void onViewCreate() {
-        //do work in onCreate method
+    }
+
+    @Override
+    public void onViewStart() {
+        checkIfUserSignedIn();
+    }
+
+    private void checkIfUserSignedIn() {
+        if (getCurrentUser() == null) {
+            getView().goToLoginScreen();
+        }
     }
 
     @NonNull
@@ -269,10 +280,10 @@ public final class MainPresenter
                 });
 
         if (newUserInfoMap == null) {
-            @NonNull final RuntimeException runtimeException = new RuntimeException("newUserInfoMap == null. Update not available");
-            Crashlytics.logException(runtimeException);
+            @NonNull final RuntimeException exception = new RuntimeException("newUserInfoMap == null. Update not available");
+            reportError(exception);
 
-            throw runtimeException;
+            throw exception;
         }
 
         @NonNull final WriteBatch batch = getDB().batch();
@@ -333,7 +344,6 @@ public final class MainPresenter
             @NonNull final RuntimeException exception = new RuntimeException(message);
             reportError(exception);
 
-
             throw exception;
         }
 
@@ -384,6 +394,56 @@ public final class MainPresenter
         }
     }
 
+    @NonNull
+    public final List<Training> getCurrentUserTrainings() throws Exception {
+        @Nullable final DocumentReference userDocument = getUserDocumentReferenceByUid(getCurrentUserInfo().getUid());
+
+        if (userDocument == null) {
+            return Collections.emptyList();
+        }
+
+        @NonNull final String userDocumentId = userDocument.getId();
+
+        @NonNull final Task<QuerySnapshot> task = getDB()
+                .collection(usersCollection)
+                .document(userDocumentId)
+                .collection(trainingsCollection)
+                .get();
+
+        waitForAnyResult(task);
+
+        @Nullable final Exception exception = task.getException();
+
+        if (exception != null) {
+            reportError(exception);
+
+            throw exception;
+        }
+
+        @Nullable final QuerySnapshot result = task.getResult();
+
+        if (result == null) {
+            return Collections.emptyList();
+        }
+
+        @NonNull final List<DocumentSnapshot> documents = result.getDocuments();
+
+        @NonNull final List<Training> userTrainings = new ArrayList<>();
+
+        for (@Nullable final DocumentSnapshot document : documents) {
+            if (document != null) {
+                @Nullable final Training training = document.toObject(Training.class);
+
+                if (training != null) {
+                    userTrainings.add(training);
+                }
+            }
+        }
+
+        return userTrainings;
+
+    }
+
     /**
      * @return user's trainings (can returns empty list)
      */
@@ -401,7 +461,7 @@ public final class MainPresenter
         @NonNull final Task<QuerySnapshot> task = getDB()
                 .collection(usersCollection)
                 .document(userDocumentId)
-                .collection("trainings")
+                .collection(trainingsCollection)
                 .get();
 
         waitForAnyResult(task);

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_challenge"
-    tools:context=".CustomFragment">
+    tools:context=".custom.CustomFragment">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/mainLayout"

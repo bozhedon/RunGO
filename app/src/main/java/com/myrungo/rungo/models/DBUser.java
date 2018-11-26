@@ -27,6 +27,7 @@ public final class DBUser {
     @NonNull
     private String provider = "";
 
+    //must be EXACTLY with underscore, because of firebase authentication
     private long reg_date = 0L;
 
     /**
@@ -41,6 +42,16 @@ public final class DBUser {
     private String costume = "";
 
     private int height;
+
+    private double totalDistance = 0.0;
+
+    public double getTotalDistance() {
+        return totalDistance;
+    }
+
+    public void setTotalDistance(double totalDistance) {
+        this.totalDistance = totalDistance;
+    }
 
     public DBUser() {
         this.uid = "";

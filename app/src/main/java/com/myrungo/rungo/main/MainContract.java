@@ -78,9 +78,16 @@ public interface MainContract extends BaseContract {
         @NonNull
         CollectionReference getUsersCollection();
 
+        void goToLoginScreen();
+
+        @NonNull
+        List<Training> getCurrentUserTrainings() throws Exception;
+
     }
 
     interface Presenter<V extends View> extends BaseContract.Presenter<V> {
+
+        void onViewStart();
 
         @NonNull
         CollectionReference getUsersCollection();
@@ -109,6 +116,9 @@ public interface MainContract extends BaseContract {
 
         @NonNull
         List<Training> getUserTrainingsByDocumentId(@NonNull final String documentId) throws Exception;
+
+        @NonNull
+        List<Training> getCurrentUserTrainings() throws Exception;
 
     }
 
