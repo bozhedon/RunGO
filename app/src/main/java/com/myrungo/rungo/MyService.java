@@ -1,5 +1,6 @@
 package com.myrungo.rungo;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -12,98 +13,114 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.myrungo.rungo.start.StartActivity;
 
-public class MyService extends Service implements LocationListener, GpsStatus.Listener {
-    private LocationManager mLocationManager;
+public final class MyService extends Service implements LocationListener, GpsStatus.Listener {
 
+    @Nullable
+    private LocationManager locationManager;
+
+    @Nullable
     private Location lastlocation;
+
+    @Nullable
     private Data data;
 
-    private double currentLon=0 ;
-    private double currentLat=0 ;
+    private double currentLon = 0;
+    private double currentLat = 0;
     private double lastLon = 0;
     private double lastLat = 0;
 
+    @Nullable
     private PendingIntent contentIntent;
 
-
+    @SuppressLint("MissingPermission")
     @Override
     public void onCreate() {
-
-        Intent notificationIntent = new Intent(this, StartActivity.class);
+        @NonNull final Intent notificationIntent = new Intent(this, StartActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        contentIntent = PendingIntent.getActivity(
-                this, 0, notificationIntent, 0);
+        contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
         updateNotification(false);
 
-        mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        mLocationManager.addGpsStatusListener(this);
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, this);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager.addGpsStatusListener(this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, this);
     }
 
-    public void onLocationChanged(Location location) {
+    @Override
+    public void onLocationChanged(@NonNull final Location location) {
         data = StartActivity.getData();
 
-        if (data.isRunning()){
-            /*lastlocation.setLatitude(lastLat);
-            lastlocation.setLongitude(lastLon);
-            double distance = lastlocation.distanceTo(location);
+        if (data != null && data.isRunning()) {
+                /*lastlocation.setLatitude(lastLat);
+                lastlocation.setLongitude(lastLon);
+                double distance = lastlocation.distanceTo(location);
 
-            if (location.getAccuracy() < distance){
-                data.addDistance(distance);
-                data.addPosition(new LatLng(currentLat, currentLon));
-                lastLat = currentLat;
-                lastLon = currentLon;
-            }*/
-            if(lastlocation==null){
-                lastlocation=location;
-            }
-            else{
-                if(location.getAccuracy()+lastlocation.getAccuracy()<location.distanceTo(lastlocation)) {
+                if (location.getAccuracy() < distance){
+                    data.addDistance(distance);
+                    data.addPosition(new LatLng(currentLat, currentLon));
+                    lastLat = currentLat;
+                    lastLon = currentLon;
+                }*/
+            if (lastlocation == null) {
+                lastlocation = location;
+            } else {
+                if (location.getAccuracy() + lastlocation.getAccuracy() < location.distanceTo(lastlocation)) {
                     data.addDistance(location.distanceTo(lastlocation));
-                    data.addPosition(new LatLng(location.getLatitude(),location.getLongitude()));
-                    lastlocation=location;
+                    data.addPosition(new LatLng(location.getLatitude(), location.getLongitude()));
+                    lastlocation = location;
                 }
             }
 
             if (location.hasSpeed()) {
                 data.setCurSpeed(location.getSpeed() * 3.6);
-                if(location.getSpeed() == 0){
-                    new isStillStopped().execute();
+                if (location.getSpeed() == 0) {
+                    new IsStillStopped().execute();
                 }
             }
+
             data.update();
             updateNotification(true);
         }
     }
 
-    private void updateNotification(boolean asData){
-        Notification.Builder builder = new Notification.Builder(getBaseContext())
+    private void updateNotification(final boolean asData) {
+        @NonNull final Notification.Builder builder = new Notification.Builder(getBaseContext())
                 .setContentTitle(getString(R.string.running))
                 .setSmallIcon(R.drawable.ic_cat)
                 .setContentIntent(contentIntent);
 
-        if(asData){
-            builder.setContentText(String.format(getString(R.string.notification), Math.round(data.getMaxSpeed()), Math.round(data.getDistance())));
-        }else{
+        if (asData) {
+            @NonNull final String text =
+                    String.format(
+                            getString(R.string.notification),
+                            Math.round(data.getMaxSpeed()),
+                            Math.round(data.getDistance())
+                    );
+            builder.setContentText(text);
+        } else {
             builder.setContentText(String.format(getString(R.string.notification), '-', '-'));
         }
-        Notification notification = builder.build();
+
+        @NonNull final Notification notification = builder.build();
+
         startForeground(R.string.noti_id, notification);
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(@Nullable final Intent intent, final int flags, final int startId) {
         // If we get killed, after returning from here, restart
         return START_STICKY;
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
+    @Nullable
+    public IBinder onBind(@NonNull final Intent intent) {
         // We don't provide binding, so return null
         return null;
     }
@@ -111,25 +128,33 @@ public class MyService extends Service implements LocationListener, GpsStatus.Li
     /* Remove the locationlistener updates when Services is stopped */
     @Override
     public void onDestroy() {
-        mLocationManager.removeUpdates(this);
-        mLocationManager.removeGpsStatusListener(this);
+        locationManager.removeUpdates(this);
+        locationManager.removeGpsStatusListener(this);
         stopForeground(true);
     }
 
     @Override
-    public void onGpsStatusChanged(int event) {}
+    public void onGpsStatusChanged(final int event) {
+    }
 
     @Override
-    public void onProviderDisabled(String provider) {}
+    public void onProviderDisabled(@NonNull final String provider) {
+    }
 
     @Override
-    public void onProviderEnabled(String provider) {}
+    public void onProviderEnabled(@NonNull final String provider) {
+    }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {}
+    public void onStatusChanged(
+            @NonNull final String provider,
+            final int status,
+            @Nullable final Bundle extras) {
+    }
 
-    class isStillStopped extends AsyncTask<Void, Integer, String> {
+    class IsStillStopped extends AsyncTask<Void, Integer, String> {
         int timer = 0;
+
         @Override
         protected String doInBackground(Void... unused) {
             try {
@@ -137,15 +162,18 @@ public class MyService extends Service implements LocationListener, GpsStatus.Li
                     Thread.sleep(1000);
                     timer++;
                 }
-            } catch (InterruptedException t) {
-                return ("The sleep operation failed");
+            } catch (@NonNull final InterruptedException t) {
+                return "The sleep operation failed";
             }
-            return ("return object when task is finished");
+
+            return "return object when task is finished";
         }
 
         @Override
-        protected void onPostExecute(String message) {
+        protected void onPostExecute(@Nullable final String message) {
             data.setTimeStopped(timer);
         }
+
     }
+
 }

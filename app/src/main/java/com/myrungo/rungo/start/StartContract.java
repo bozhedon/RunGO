@@ -1,5 +1,7 @@
 package com.myrungo.rungo.start;
 
+import android.support.annotation.NonNull;
+
 import com.myrungo.rungo.base.BaseContract;
 
 interface StartContract extends BaseContract {
@@ -10,17 +12,11 @@ interface StartContract extends BaseContract {
 
         void setMyLocationEnabled();
 
-        void showRequestPermissionRationaleForOnResume();
+        void showRequestPermissionRationaleForOnStart();
 
-        void requestLocationPermissionForOnMapReady();
+        void requestLocationPermissionForOnStart();
 
-        void showRequestPermissionRationaleForOnMapReady();
-
-        void requestLocationPermissionForOnResume();
-
-        void showGoSettingsForOnMapReadyDialog();
-
-        void showGoSettingsForOnResumeDialog();
+        void showGoSettingsForOnStartDialog();
 
     }
 
@@ -28,29 +24,15 @@ interface StartContract extends BaseContract {
 
         void onStart();
 
-        void onMapReady();
+        void onRequestPermissionForOnStartResult(@NonNull final int[] grantResults);
 
-        void onRequestPermissionForOnMapReadyResult(int[] grantResults);
+        void onShowRequestPermissionRationaleForOnStartPositiveButtonClick();
 
-        void onRequestPermissionForOnResumeResult(int[] grantResults);
+        void onShowRequestPermissionRationaleForOnStartNegativeButtonClick();
 
-        void onApplicationSettingsRequestResult();
+        void onShowGoSettingsForOnStartDialogPositiveButtonClick();
 
-        void onShowGoSettingsForOnMapReadyDialogPositiveButtonClick();
-
-        void onShowGoSettingsForOnMapReadyDialogNegativeButtonClick();
-
-        void onShowRequestPermissionRationaleForOnResumePositiveButtonClick();
-
-        void onShowRequestPermissionRationaleForOnResumeNegativeButtonClick();
-
-        void onShowRequestPermissionRationaleForOnMapReadyPositiveButtonClick();
-
-        void onShowRequestPermissionRationaleForOnMapReadyNegativeButtonClick();
-
-        void onShowGoSettingsForOnResumeDialogPositiveButtonClick();
-
-        void onShowGoSettingsForResumeDialogNegativeButtonClick();
+        void onShowGoSettingsForStartDialogNegativeButtonClick();
 
     }
 
