@@ -19,6 +19,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.myrungo.rungo.CatView;
 import com.myrungo.rungo.ChallengeFragment;
+import com.myrungo.rungo.ChallengeItem;
 import com.myrungo.rungo.HomeFragment;
 import com.myrungo.rungo.R;
 import com.myrungo.rungo.StartActivity;

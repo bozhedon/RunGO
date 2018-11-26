@@ -57,6 +57,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
     private Button map_btn;
     private TextView currentSpeed;
     private TextView distance;
+    private TextView avSpeed;
     private TextView result;
     private Chronometer time;
     private Data.onGpsServiceUpdate onGpsServiceUpdate;
@@ -106,6 +107,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
             public void update() {
                 double maxSpeedTemp = data.getMaxSpeed();
                 double distanceTemp = data.getDistance();
+                double averageSpeed = data.getAverageSpeed();
                 double averageTemp;
                 if (sharedPreferences.getBoolean("auto_average", false)) {
                     averageTemp = data.getAverageSpeedMotion();
@@ -124,16 +126,11 @@ public class StartActivity extends AppCompatActivity implements LocationListener
                     distanceUnits = " км";
                 }
 
-                SpannableString s = new SpannableString(String.format("%.0f", maxSpeedTemp) + speedUnits);
-                s.setSpan(new RelativeSizeSpan(0.5f), s.length() - 4, s.length(), 0);
-
-                s = new SpannableString(String.format("%.0f", averageTemp) + speedUnits);
-                s.setSpan(new RelativeSizeSpan(0.5f), s.length() - 4, s.length(), 0);
-
-                senddata=(int) Math.round(distanceTemp);
-                s = new SpannableString(String.format("%.3f", distanceTemp) + distanceUnits);
-                s.setSpan(new RelativeSizeSpan(0.5f), s.length() - 2, s.length(), 0);
+                String s = String.valueOf(Math.round(distanceTemp))+ distanceUnits;
                 distance.setText(s);
+                s = String.valueOf(Math.round(averageSpeed)) + speedUnits;
+                avSpeed.setText(s);
+
                 if(data.getPositions().size()>0){
                     List<LatLng> locationPoints = data.getPositions();
                     refreshMap(map);
@@ -147,6 +144,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
         distance = findViewById(R.id.distance);
         time = findViewById(R.id.time);
         currentSpeed = findViewById(R.id.speed);
+        avSpeed = findViewById(R.id.average_speed);
 
         time.setText("00:00:00");
         time.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
@@ -352,10 +350,10 @@ public class StartActivity extends AppCompatActivity implements LocationListener
         }
 
         if (location.hasSpeed()) {
-            String speed = String.format(Locale.ENGLISH, "%.0f", location.getSpeed() * 3.6) + "км/ч";
+            String speed = String.format(Locale.ENGLISH, "%.0f", location.getSpeed() * 3.6) + " км/ч";
 
             SpannableString s = new SpannableString(speed);
-            s.setSpan(new RelativeSizeSpan(0.25f), s.length() - 4, s.length(), 0);
+            s.setSpan(new RelativeSizeSpan(1f), s.length() - 4, s.length(), 0);
             currentSpeed.setText(s);
         }
     }
