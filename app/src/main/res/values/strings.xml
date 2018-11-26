@@ -18,4 +18,5 @@
     <string name="you_are_attempting_to_sign_in_a_different_email_than_previously_provided">Вы пытаетесь войти в другое электронное письмо, чем ранее</string>
     <string name="swipe_from_up_to_down">Свайпните сверху вниз</string>
     <string name="you_do_not_have_any_costume">Вы ещё не получили ни одного костюма :(</string>
+    <string name="zero_time">00:00:00</string>
 </resources>

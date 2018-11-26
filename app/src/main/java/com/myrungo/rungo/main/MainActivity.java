@@ -17,12 +17,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.firestore.CollectionReference;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
-import com.myrungo.rungo.CatView;
 import com.myrungo.rungo.ChallengeFragment;
 import com.myrungo.rungo.ChallengeItem;
 import com.myrungo.rungo.HomeFragment;
 import com.myrungo.rungo.R;
-import com.myrungo.rungo.StartActivity;
 import com.myrungo.rungo.User;
 import com.myrungo.rungo.base.BaseActivity;
 import com.myrungo.rungo.custom.CustomFragment;
@@ -31,6 +29,7 @@ import com.myrungo.rungo.models.Challenge;
 import com.myrungo.rungo.models.DBUser;
 import com.myrungo.rungo.models.Training;
 import com.myrungo.rungo.profile.ProfileFragment;
+import com.myrungo.rungo.start.StartActivity;
 
 import java.util.List;
 
@@ -92,13 +91,27 @@ public final class MainActivity
     };
 
     @Nullable
-    private FloatingActionButton fab;
-
-    @Nullable
     private MainContract.Presenter<MainContract.View> presenter;
 
+    @Override
+    protected final MainContract.Presenter<MainContract.View> getPresenter() {
+        if (presenter == null) {
+            @NonNull final RuntimeException exception = new RuntimeException("presenter == null");
+            reportError(exception);
+
+            throw exception;
+        }
+
+        return presenter;
+    }
+
+    @Override
+    protected final void setupPresenter() {
+        presenter = new MainPresenter();
+    }
+
     @Nullable
-    private FirebaseAnalytics firebaseAnalytics;
+    private FloatingActionButton fab;
 
     @NonNull
     private FloatingActionButton getFab() {
@@ -117,22 +130,8 @@ public final class MainActivity
         this.fab = (FloatingActionButton) fab;
     }
 
-    @Override
-    protected final MainContract.Presenter<MainContract.View> getPresenter() {
-        if (presenter == null) {
-            @NonNull final RuntimeException exception = new RuntimeException("presenter == null");
-            reportError(exception);
-
-            throw exception;
-        }
-
-        return presenter;
-    }
-
-    @Override
-    protected final void setupPresenter() {
-        presenter = new MainPresenter();
-    }
+    @Nullable
+    private FirebaseAnalytics firebaseAnalytics;
 
     @NonNull
     @Override

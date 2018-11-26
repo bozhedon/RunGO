@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.myrungo.rungo.start.StartActivity;
 
 public class MyService extends Service implements LocationListener, GpsStatus.Listener {
     private LocationManager mLocationManager;
@@ -40,12 +41,13 @@ public class MyService extends Service implements LocationListener, GpsStatus.Li
         updateNotification(false);
 
         mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        mLocationManager.addGpsStatusListener( this);
+        mLocationManager.addGpsStatusListener(this);
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, this);
     }
 
     public void onLocationChanged(Location location) {
         data = StartActivity.getData();
+
         if (data.isRunning()){
             currentLat = location.getLatitude();
             currentLon = location.getLongitude();

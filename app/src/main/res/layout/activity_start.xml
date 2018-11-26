@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#f2994a"
-    tools:context=".StartActivity"
+    tools:context=".start.StartActivity"
     tools:layout_editor_absoluteY="25dp">
 
     <TextView
@@ -39,13 +39,13 @@
         app:layout_constraintTop_toBottomOf="@+id/title_time" />
 
     <Chronometer
-        android:id="@+id/time"
+        android:id="@+id/chronometr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="8dp"
-        android:text="TextView"
+        android:text=""
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="45sp"
@@ -94,9 +94,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintVertical_bias="1.0"
         app:layout_constraintHeight_percent="0.5"
-        app:layout_constraintWidth_percent="0.7">
-
-    </com.myrungo.rungo.CatView>
+        app:layout_constraintWidth_percent="0.7" />
 
     <fragment
         android:id="@+id/map"
@@ -107,7 +105,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="50dp"
-        app:layout_constraintBottom_toBottomOf="@+id/Start"
+        app:layout_constraintBottom_toBottomOf="@+id/startButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/distanceTitle"/>
@@ -124,43 +122,38 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title_time" />
 
-
-
     <Button
-        android:id="@+id/map_btn"
+        android:id="@+id/mapButton"
         android:layout_width="42dp"
         android:layout_height="53dp"
         android:layout_marginStart="28dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/map"
-        android:onClick="onMapClick"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/Start"
+        android:id="@+id/startButton"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:background="@drawable/button_start"
-        android:onClick="onStartClick"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/Stop"
+        android:id="@+id/stopButton"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/stop"
-        android:onClick="onStopClick"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/start" />
+        app:layout_constraintStart_toEndOf="@+id/startButton" />
 
     <TextView
         android:id="@+id/speed_title"
@@ -198,6 +191,6 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/time" />
+        app:layout_constraintTop_toBottomOf="@+id/chronometr" />
 
 </android.support.constraint.ConstraintLayout>
