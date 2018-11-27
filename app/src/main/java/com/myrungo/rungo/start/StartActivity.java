@@ -54,7 +54,9 @@ public final class StartActivity
         extends BaseActivity<StartContract.View, StartContract.Presenter<StartContract.View>>
         implements LocationListener, GpsStatus.Listener, OnMapReadyCallback, StartContract.View {
 
+    final static int REQUEST_LOCATION_PERMISSION_CODE_FOR_ON_MAP_READY = 1000;
     final static int REQUEST_LOCATION_PERMISSION_CODE_FOR_ON_RESUME = 1001;
+    final static int REQUEST_APPLICATION_SETTINGS_FOR_ON_MAP_READY = 1002;
     final static int REQUEST_APPLICATION_SETTINGS_FOR_ON_RESUME = 1003;
 
     @Nullable
@@ -394,26 +396,46 @@ public final class StartActivity
             @NonNull final int[] grantResults
     ) {
         switch (requestCode) {
+            case REQUEST_LOCATION_PERMISSION_CODE_FOR_ON_MAP_READY: {
+                getPresenter().onRequestPermissionForOnMapReadyResult(grantResults);
+                break;
+            }
             case REQUEST_LOCATION_PERMISSION_CODE_FOR_ON_RESUME: {
-                getPresenter().onRequestPermissionForOnStartResult(grantResults);
+                getPresenter().onRequestPermissionForOnResumeResult(grantResults);
+                break;
+            }
+            case 0: {
+                getPresenter().onApplicationSettingsRequestResult();
+                break;
+            }
+            default: {
+                getPresenter().onApplicationSettingsRequestResult();
                 break;
             }
         }
     }
 
     @Override
-    public void showGoSettingsForOnStartDialog() {
+    public void showGoSettingsForOnMapReadyDialog() {
+        if (alertDialogIsShowing) {
+            return;
+        }
+
         @NonNull final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(@NonNull final DialogInterface dialogInterface, final int i) {
-                getPresenter().onShowGoSettingsForOnStartDialogPositiveButtonClick();
+                alertDialogIsShowing = false;
+
+                getPresenter().onShowGoSettingsForOnMapReadyDialogPositiveButtonClick();
             }
         });
         builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(@NonNull final DialogInterface dialog, final int which) {
-                getPresenter().onShowGoSettingsForStartDialogNegativeButtonClick();
+                alertDialogIsShowing = false;
+
+                getPresenter().onShowGoSettingsForOnMapReadyDialogNegativeButtonClick();
             }
         });
 
@@ -429,22 +451,82 @@ public final class StartActivity
                 .setMessage(message)
                 .setCancelable(false);
 
-        builder.create().show();
+        if (!alertDialogIsShowing) {
+            @NonNull final AlertDialog alertDialog = builder.create();
+
+            alertDialog.show();
+        }
+
+        alertDialogIsShowing = true;
     }
 
     @Override
-    public void showRequestPermissionRationaleForOnStart() {
+    public void showGoSettingsForOnResumeDialog() {
+        if (alertDialogIsShowing) {
+            return;
+        }
+
         @NonNull final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(@NonNull final DialogInterface dialogInterface, final int i) {
-                getPresenter().onShowRequestPermissionRationaleForOnStartPositiveButtonClick();
+                alertDialogIsShowing = false;
+
+                getPresenter().onShowGoSettingsForOnResumeDialogPositiveButtonClick();
             }
         });
         builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(@NonNull final DialogInterface dialog, final int which) {
-                getPresenter().onShowRequestPermissionRationaleForOnStartNegativeButtonClick();
+                alertDialogIsShowing = false;
+
+                getPresenter().onShowGoSettingsForResumeDialogNegativeButtonClick();
+            }
+        });
+
+
+        @NonNull final String part1 =
+                "Для дальнейшей работы приложения необходимо перейти в настройки приложения и " +
+                        "включить разрешение доступа к местоположению.";
+        @NonNull final String part2 = " Перейти?";
+
+        @NonNull final String message = part1 + part2;
+
+        builder.setTitle("Продолжение работы невозможно")
+                .setMessage(message)
+                .setCancelable(false);
+
+
+        if (!alertDialogIsShowing) {
+            @NonNull final AlertDialog alertDialog = builder.create();
+
+            alertDialog.show();
+        }
+
+        alertDialogIsShowing = true;
+    }
+
+    @Override
+    public void showRequestPermissionRationaleForOnResume() {
+        if (alertDialogIsShowing) {
+            return;
+        }
+
+        @NonNull final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(@NonNull final DialogInterface dialogInterface, final int i) {
+                alertDialogIsShowing = false;
+
+                getPresenter().onShowRequestPermissionRationaleForOnResumePositiveButtonClick();
+            }
+        });
+        builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(@NonNull final DialogInterface dialog, final int which) {
+                alertDialogIsShowing = false;
+
+                getPresenter().onShowRequestPermissionRationaleForOnResumeNegativeButtonClick();
             }
         });
 
@@ -459,11 +541,76 @@ public final class StartActivity
                 .setMessage(message)
                 .setCancelable(false);
 
-        builder.create().show();
+        if (!alertDialogIsShowing) {
+            @NonNull final AlertDialog alertDialog = builder.create();
+
+            alertDialog.show();
+        }
+
+        alertDialogIsShowing = true;
+    }
+
+    boolean alertDialogIsShowing = false;
+
+    @Override
+    public void showRequestPermissionRationaleForOnMapReady() {
+        if (alertDialogIsShowing) {
+            return;
+        }
+
+        @NonNull final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(@NonNull final DialogInterface dialogInterface, final int i) {
+                alertDialogIsShowing = false;
+
+                getPresenter().onShowRequestPermissionRationaleForOnMapReadyPositiveButtonClick();
+            }
+        });
+        builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(@NonNull final DialogInterface dialog, final int which) {
+                alertDialogIsShowing = false;
+
+                getPresenter().onShowRequestPermissionRationaleForOnMapReadyNegativeButtonClick();
+            }
+        });
+
+
+        @NonNull final String part1 =
+                "Для работы карты приложению необходимы права доступа к местоположению.";
+        @NonNull final String part2 = " Предоставить?";
+
+        @NonNull final String message = part1 + part2;
+
+        builder.setTitle("Продолжение работы невозможно")
+                .setMessage(message)
+                .setCancelable(false);
+
+        if (!alertDialogIsShowing) {
+            @NonNull final AlertDialog alertDialog = builder.create();
+
+            alertDialog.show();
+        }
+
+        alertDialogIsShowing = true;
     }
 
     @Override
-    public void requestLocationPermissionForOnStart() {
+    public void requestLocationPermissionForOnMapReady() {
+        @NonNull final String[] permissions =
+                {
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                };
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(permissions, REQUEST_LOCATION_PERMISSION_CODE_FOR_ON_MAP_READY);
+        }
+    }
+
+    @Override
+    public void requestLocationPermissionForOnResume() {
         @NonNull final String[] permissions =
                 {
                         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -588,6 +735,8 @@ public final class StartActivity
     @Override
     public void onMapReady(@NonNull final GoogleMap googleMap) {
         setMap(googleMap);
+
+        getPresenter().onMapReady();
     }
 
     @SuppressLint("MissingPermission")

@@ -1,7 +1,5 @@
 package com.myrungo.rungo.start;
 
-import android.support.annotation.NonNull;
-
 import com.myrungo.rungo.base.BaseContract;
 
 interface StartContract extends BaseContract {
@@ -12,11 +10,17 @@ interface StartContract extends BaseContract {
 
         void setMyLocationEnabled();
 
-        void showRequestPermissionRationaleForOnStart();
+        void showRequestPermissionRationaleForOnResume();
 
-        void requestLocationPermissionForOnStart();
+        void requestLocationPermissionForOnMapReady();
 
-        void showGoSettingsForOnStartDialog();
+        void showRequestPermissionRationaleForOnMapReady();
+
+        void requestLocationPermissionForOnResume();
+
+        void showGoSettingsForOnMapReadyDialog();
+
+        void showGoSettingsForOnResumeDialog();
 
     }
 
@@ -24,15 +28,29 @@ interface StartContract extends BaseContract {
 
         void onStart();
 
-        void onRequestPermissionForOnStartResult(@NonNull final int[] grantResults);
+        void onMapReady();
 
-        void onShowRequestPermissionRationaleForOnStartPositiveButtonClick();
+        void onRequestPermissionForOnMapReadyResult(int[] grantResults);
 
-        void onShowRequestPermissionRationaleForOnStartNegativeButtonClick();
+        void onRequestPermissionForOnResumeResult(int[] grantResults);
 
-        void onShowGoSettingsForOnStartDialogPositiveButtonClick();
+        void onApplicationSettingsRequestResult();
 
-        void onShowGoSettingsForStartDialogNegativeButtonClick();
+        void onShowGoSettingsForOnMapReadyDialogPositiveButtonClick();
+
+        void onShowGoSettingsForOnMapReadyDialogNegativeButtonClick();
+
+        void onShowRequestPermissionRationaleForOnResumePositiveButtonClick();
+
+        void onShowRequestPermissionRationaleForOnResumeNegativeButtonClick();
+
+        void onShowRequestPermissionRationaleForOnMapReadyPositiveButtonClick();
+
+        void onShowRequestPermissionRationaleForOnMapReadyNegativeButtonClick();
+
+        void onShowGoSettingsForOnResumeDialogPositiveButtonClick();
+
+        void onShowGoSettingsForResumeDialogNegativeButtonClick();
 
     }
 
