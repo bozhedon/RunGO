@@ -1,8 +1,5 @@
 package com.myrungo.rungo;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -19,17 +16,15 @@ public class Data {
     private double curSpeed;
     private double maxSpeed;
 
-    @Nullable
-    private OnGpsServiceUpdate onGpsServiceUpdate;
+    private onGpsServiceUpdate onGpsServiceUpdate;
 
-    @NonNull
-    private final List<LatLng> positions = new ArrayList<>();
+    private List<LatLng> positions = new ArrayList<>();
 
-    public interface OnGpsServiceUpdate {
+    public interface onGpsServiceUpdate{
         void update();
     }
 
-    public void setOnGpsServiceUpdate(@NonNull final OnGpsServiceUpdate onGpsServiceUpdate) {
+    public void setOnGpsServiceUpdate(onGpsServiceUpdate onGpsServiceUpdate){
         this.onGpsServiceUpdate = onGpsServiceUpdate;
     }
 
@@ -46,12 +41,12 @@ public class Data {
         positions.clear();
     }
 
-    public Data(@NonNull final OnGpsServiceUpdate onGpsServiceUpdate) {
+    public Data(onGpsServiceUpdate onGpsServiceUpdate){
         this();
         setOnGpsServiceUpdate(onGpsServiceUpdate);
     }
 
-    public void addDistance(final double distance) {
+    public void addDistance(double distance){
         distanceM = distanceM + distance;
     }
 
@@ -64,7 +59,7 @@ public class Data {
     }
 
     public double getAverageSpeed(){
-        final double average;
+        double average;
         String units;
         if (time <= 0) {
             average = 0.0;
@@ -75,40 +70,36 @@ public class Data {
     }
 
     public double getAverageSpeedMotion(){
-        final long motionTime = time - timeStopped;
-        final double average;
-
+        long motionTime = time - timeStopped;
+        double average;
         if (motionTime <= 0){
             average = 0.0;
         } else {
             average = (distanceM / (motionTime / 1000.0)) * 3.6;
         }
-
         return average;
     }
 
-    public void setCurSpeed(final double curSpeed) {
+    public void setCurSpeed(double curSpeed) {
         this.curSpeed = curSpeed;
         if (curSpeed > maxSpeed){
             maxSpeed = curSpeed;
         }
     }
-
-    public void addPosition(@NonNull final LatLng position) {
+    public void addPosition(LatLng position){
         positions.add(position);
     }
     public LatLng getLastPosition(){
         return positions.get(positions.size()-1);
     }
 
-    @NonNull
     public List<LatLng> getPositions() { return positions;}
 
     public boolean isFirstTime() {
         return isFirstTime;
     }
 
-    public void setFirstTime(final boolean isFirstTime) {
+    public void setFirstTime(boolean isFirstTime) {
         this.isFirstTime = isFirstTime;
     }
 
@@ -116,11 +107,11 @@ public class Data {
         return isRunning;
     }
 
-    public void setRunning(final boolean isRunning) {
+    public void setRunning(boolean isRunning) {
         this.isRunning = isRunning;
     }
 
-    public void setTimeStopped(final long timeStopped) {
+    public void setTimeStopped(long timeStopped) {
         this.timeStopped += timeStopped;
     }
 
@@ -132,13 +123,11 @@ public class Data {
         return time;
     }
 
-    public void setTime(final long time) {
+    public void setTime(long time) {
         this.time = time;
     }
 
     public boolean isSignal() {return signal;}
 
-    public void setSignal(final boolean x) {
-        signal = x;
-    }
+    public void setSignal(boolean x){signal = x;}
 }

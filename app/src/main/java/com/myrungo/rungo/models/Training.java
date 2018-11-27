@@ -34,7 +34,7 @@ public final class Training {
         return endTime;
     }
 
-    //    public double getChronometer() {
+    //    public double getTime() {
 //        return time;
 //    }
 
