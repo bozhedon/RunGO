@@ -19,7 +19,7 @@ import com.myrungo.rungo.start.StartActivity;
 public class MyService extends Service implements LocationListener, GpsStatus.Listener {
     private LocationManager mLocationManager;
 
-    private Location lastlocation;
+    private Location lastlocation = new Location("last");
     private Data data;
 
     private double currentLon=0 ;
@@ -49,7 +49,16 @@ public class MyService extends Service implements LocationListener, GpsStatus.Li
         data = StartActivity.getData();
 
         if (data.isRunning()){
-            /*lastlocation.setLatitude(lastLat);
+            currentLat = location.getLatitude();
+            currentLon = location.getLongitude();
+
+            if (data.isFirstTime()){
+                lastLat = currentLat;
+                lastLon = currentLon;
+                data.setFirstTime(false);
+            }
+
+            lastlocation.setLatitude(lastLat);
             lastlocation.setLongitude(lastLon);
             double distance = lastlocation.distanceTo(location);
 
@@ -58,16 +67,6 @@ public class MyService extends Service implements LocationListener, GpsStatus.Li
                 data.addPosition(new LatLng(currentLat, currentLon));
                 lastLat = currentLat;
                 lastLon = currentLon;
-            }*/
-            if(lastlocation==null){
-                lastlocation=location;
-            }
-            else{
-                if(location.getAccuracy()+lastlocation.getAccuracy()<location.distanceTo(lastlocation)) {
-                    data.addDistance(location.distanceTo(lastlocation));
-                    data.addPosition(new LatLng(location.getLatitude(),location.getLongitude()));
-                    lastlocation=location;
-                }
             }
 
             if (location.hasSpeed()) {
