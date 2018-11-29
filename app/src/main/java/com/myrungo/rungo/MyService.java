@@ -1,5 +1,6 @@
 package com.myrungo.rungo;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -15,23 +16,26 @@ import android.os.IBinder;
 
 import com.google.android.gms.maps.model.LatLng;
 
-public class MyService extends Service implements LocationListener, GpsStatus.Listener {
+public class MyService
+        extends Service
+        implements LocationListener, GpsStatus.Listener {
+
     private LocationManager mLocationManager;
 
     private Location lastlocation = new Location("last");
     private Data data;
 
-    private double currentLon=0 ;
-    private double currentLat=0 ;
+    private double currentLon = 0;
+    private double currentLat = 0;
     private double lastLon = 0;
     private double lastLat = 0;
 
     private PendingIntent contentIntent;
 
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onCreate() {
-
         Intent notificationIntent = new Intent(this, StartActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         contentIntent = PendingIntent.getActivity(
@@ -40,17 +44,17 @@ public class MyService extends Service implements LocationListener, GpsStatus.Li
         updateNotification(false);
 
         mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        mLocationManager.addGpsStatusListener( this);
+        mLocationManager.addGpsStatusListener(this);
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, this);
     }
 
     public void onLocationChanged(Location location) {
         data = StartActivity.getData();
-        if (data.isRunning()){
+        if (data.isRunning()) {
             currentLat = location.getLatitude();
             currentLon = location.getLongitude();
 
-            if (data.isFirstTime()){
+            if (data.isFirstTime()) {
                 lastLat = currentLat;
                 lastLon = currentLon;
                 data.setFirstTime(false);
@@ -60,7 +64,7 @@ public class MyService extends Service implements LocationListener, GpsStatus.Li
             lastlocation.setLongitude(lastLon);
             double distance = lastlocation.distanceTo(location);
 
-            if (location.getAccuracy() < distance){
+            if (location.getAccuracy() < distance) {
                 data.addDistance(distance);
                 data.addPosition(new LatLng(currentLat, currentLon));
                 lastLat = currentLat;
@@ -69,8 +73,8 @@ public class MyService extends Service implements LocationListener, GpsStatus.Li
 
             if (location.hasSpeed()) {
                 data.setCurSpeed(location.getSpeed() * 3.6);
-                if(location.getSpeed() == 0){
-                    new isStillStopped().execute();
+                if (location.getSpeed() == 0) {
+                    new IsStillStopped().execute();
                 }
             }
             data.update();
@@ -78,17 +82,27 @@ public class MyService extends Service implements LocationListener, GpsStatus.Li
         }
     }
 
-    private void updateNotification(boolean asData){
+    @SuppressLint("StringFormatMatches")
+    private void updateNotification(boolean asData) {
         Notification.Builder builder = new Notification.Builder(getBaseContext())
                 .setContentTitle(getString(R.string.running))
                 .setSmallIcon(R.drawable.ic_cat)
                 .setContentIntent(contentIntent);
 
-        if(asData){
-            builder.setContentText(String.format(getString(R.string.notification), Math.round(data.getMaxSpeed()), Math.round(data.getDistance())));
-        }else{
-            builder.setContentText(String.format(getString(R.string.notification), '-', '-'));
+        final String text;
+
+        if (asData) {
+            text = String.format(
+                    getString(R.string.notification),
+                    Math.round(data.getMaxSpeed()),
+                    Math.round(data.getDistance())
+            );
+        } else {
+            text = String.format(getString(R.string.notification), '-', '-');
         }
+
+        builder.setContentText(text);
+
         Notification notification = builder.build();
         startForeground(R.string.noti_id, notification);
     }
@@ -114,19 +128,24 @@ public class MyService extends Service implements LocationListener, GpsStatus.Li
     }
 
     @Override
-    public void onGpsStatusChanged(int event) {}
+    public void onGpsStatusChanged(int event) {
+    }
 
     @Override
-    public void onProviderDisabled(String provider) {}
+    public void onProviderDisabled(String provider) {
+    }
 
     @Override
-    public void onProviderEnabled(String provider) {}
+    public void onProviderEnabled(String provider) {
+    }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {}
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
 
-    class isStillStopped extends AsyncTask<Void, Integer, String> {
+    class IsStillStopped extends AsyncTask<Void, Integer, String> {
         int timer = 0;
+
         @Override
         protected String doInBackground(Void... unused) {
             try {
@@ -135,14 +154,17 @@ public class MyService extends Service implements LocationListener, GpsStatus.Li
                     timer++;
                 }
             } catch (InterruptedException t) {
-                return ("The sleep operation failed");
+                return "The sleep operation failed";
             }
-            return ("return object when task is finished");
+
+            return "return object when task is finished";
         }
 
         @Override
         protected void onPostExecute(String message) {
             data.setTimeStopped(timer);
         }
+
     }
+
 }

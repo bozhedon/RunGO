@@ -17,7 +17,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.firestore.CollectionReference;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
-import com.myrungo.rungo.CatView;
 import com.myrungo.rungo.ChallengeFragment;
 import com.myrungo.rungo.ChallengeItem;
 import com.myrungo.rungo.HomeFragment;
@@ -43,11 +42,6 @@ public final class MainActivity
     private boolean first = true;
 
     private int position = 1;
-
-    private ChallengeItem current_challenge;
-
-    @Nullable
-    private User user;
 
     @NonNull
     private final BottomNavigationViewEx.OnNavigationItemSelectedListener onNavigationItemSelectedListener
@@ -90,6 +84,11 @@ public final class MainActivity
             return false;
         }
     };
+
+    private ChallengeItem current_challenge;
+
+    @Nullable
+    private User user;
 
     @Nullable
     private FloatingActionButton fab;

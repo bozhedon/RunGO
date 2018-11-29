@@ -20,15 +20,15 @@ public class Data {
 
     private List<LatLng> positions = new ArrayList<>();
 
-    public interface onGpsServiceUpdate{
+    public interface onGpsServiceUpdate {
         void update();
     }
 
-    public void setOnGpsServiceUpdate(onGpsServiceUpdate onGpsServiceUpdate){
+    public void setOnGpsServiceUpdate(onGpsServiceUpdate onGpsServiceUpdate) {
         this.onGpsServiceUpdate = onGpsServiceUpdate;
     }
 
-    public void update(){
+    public void update() {
         onGpsServiceUpdate.update();
     }
 
@@ -41,16 +41,16 @@ public class Data {
         positions.clear();
     }
 
-    public Data(onGpsServiceUpdate onGpsServiceUpdate){
+    public Data(onGpsServiceUpdate onGpsServiceUpdate) {
         this();
         setOnGpsServiceUpdate(onGpsServiceUpdate);
     }
 
-    public void addDistance(double distance){
+    public void addDistance(double distance) {
         distanceM = distanceM + distance;
     }
 
-    public double getDistance(){
+    public double getDistance() {
         return distanceM;
     }
 
@@ -58,7 +58,7 @@ public class Data {
         return maxSpeed;
     }
 
-    public double getAverageSpeed(){
+    public double getAverageSpeed() {
         double average;
         String units;
         if (time <= 0) {
@@ -69,10 +69,10 @@ public class Data {
         return average;
     }
 
-    public double getAverageSpeedMotion(){
+    public double getAverageSpeedMotion() {
         long motionTime = time - timeStopped;
         double average;
-        if (motionTime <= 0){
+        if (motionTime <= 0) {
             average = 0.0;
         } else {
             average = (distanceM / (motionTime / 1000.0)) * 3.6;
@@ -82,18 +82,22 @@ public class Data {
 
     public void setCurSpeed(double curSpeed) {
         this.curSpeed = curSpeed;
-        if (curSpeed > maxSpeed){
+        if (curSpeed > maxSpeed) {
             maxSpeed = curSpeed;
         }
     }
-    public void addPosition(LatLng position){
+
+    public void addPosition(LatLng position) {
         positions.add(position);
     }
-    public LatLng getLastPosition(){
-        return positions.get(positions.size()-1);
+
+    public LatLng getLastPosition() {
+        return positions.get(positions.size() - 1);
     }
 
-    public List<LatLng> getPositions() { return positions;}
+    public List<LatLng> getPositions() {
+        return positions;
+    }
 
     public boolean isFirstTime() {
         return isFirstTime;
@@ -127,7 +131,12 @@ public class Data {
         this.time = time;
     }
 
-    public boolean isSignal() {return signal;}
+    public boolean isSignal() {
+        return signal;
+    }
 
-    public void setSignal(boolean x){signal = x;}
+    public void setSignal(boolean x) {
+        signal = x;
+    }
+
 }

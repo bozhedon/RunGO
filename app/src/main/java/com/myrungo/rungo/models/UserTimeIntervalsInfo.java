@@ -8,6 +8,18 @@ import android.support.annotation.Nullable;
 
 public final class UserTimeIntervalsInfo implements Parcelable {
 
+    public static final Creator<UserTimeIntervalsInfo> CREATOR = new Creator<UserTimeIntervalsInfo>() {
+        @Override
+        public final UserTimeIntervalsInfo createFromParcel(@NonNull final Parcel in) {
+            return new UserTimeIntervalsInfo(in);
+        }
+
+        @Override
+        public final UserTimeIntervalsInfo[] newArray(final int size) {
+            return new UserTimeIntervalsInfo[size];
+        }
+    };
+
     @Nullable
     public final UserTimeIntervalInfo currentTime;
 
@@ -36,17 +48,5 @@ public final class UserTimeIntervalsInfo implements Parcelable {
     public final int describeContents() {
         return 0;
     }
-
-    public static final Creator<UserTimeIntervalsInfo> CREATOR = new Creator<UserTimeIntervalsInfo>() {
-        @Override
-        public final UserTimeIntervalsInfo createFromParcel(@NonNull final Parcel in) {
-            return new UserTimeIntervalsInfo(in);
-        }
-
-        @Override
-        public final UserTimeIntervalsInfo[] newArray(final int size) {
-            return new UserTimeIntervalsInfo[size];
-        }
-    };
 
 }

@@ -26,6 +26,15 @@ public final class ProfileFragment
     @Nullable
     private ViewPagerAdapter adapter;
 
+    @Nullable
+    private ViewPager pager;
+
+    @Nullable
+    private CatView catView;
+
+    @Nullable
+    private ProfileContract.Presenter<ProfileContract.View> presenter;
+
     @NonNull
     private ViewPagerAdapter getAdapter() {
         if (adapter == null) {
@@ -48,9 +57,6 @@ public final class ProfileFragment
 
         this.adapter = adapter;
     }
-
-    @Nullable
-    private ViewPager pager;
 
     @NonNull
     private ViewPager getPager() {
@@ -75,9 +81,6 @@ public final class ProfileFragment
         this.pager = (ViewPager) pager;
     }
 
-    @Nullable
-    private CatView catView;
-
     @NonNull
     private CatView getCatView() {
         if (catView == null) {
@@ -100,9 +103,6 @@ public final class ProfileFragment
 
         this.catView = (CatView) view;
     }
-
-    @Nullable
-    private ProfileContract.Presenter<ProfileContract.View> presenter;
 
     @Override
     protected final void setupPresenter() {

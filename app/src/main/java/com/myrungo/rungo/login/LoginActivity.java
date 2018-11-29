@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.firebase.ui.auth.AuthUI;
-import com.myrungo.rungo.main.MainActivity;
 import com.myrungo.rungo.R;
 import com.myrungo.rungo.base.BaseActivity;
+import com.myrungo.rungo.main.MainActivity;
 
 import java.util.Arrays;
 import java.util.List;

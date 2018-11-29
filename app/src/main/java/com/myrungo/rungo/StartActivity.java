@@ -1,6 +1,7 @@
 package com.myrungo.rungo;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,11 +15,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.view.View;
@@ -47,7 +48,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
-public class StartActivity extends AppCompatActivity implements LocationListener, GpsStatus.Listener, OnMapReadyCallback {
+public class StartActivity
+        extends AppCompatActivity
+        implements LocationListener, GpsStatus.Listener, OnMapReadyCallback {
+
     private SharedPreferences sharedPreferences;
     private LocationManager mLocationManager;
     private Location startLocation;
@@ -64,7 +68,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
     private boolean firstfix;
     private boolean first = true;
     private boolean map_active = false;
-    private int senddata=0;
+    private int senddata = 0;
     private SupportMapFragment mapFragment;
     private String currentTime;
     private GoogleMap map;
@@ -126,12 +130,12 @@ public class StartActivity extends AppCompatActivity implements LocationListener
                     distanceUnits = " км";
                 }
 
-                String s = String.valueOf(Math.round(distanceTemp))+ distanceUnits;
+                String s = String.valueOf(Math.round(distanceTemp)) + distanceUnits;
                 distance.setText(s);
                 s = String.valueOf(Math.round(averageSpeed)) + speedUnits;
                 avSpeed.setText(s);
 
-                if(data.getPositions().size()>0){
+                if (data.getPositions().size() > 0) {
                     List<LatLng> locationPoints = data.getPositions();
                     refreshMap(map);
                     drawRouteOnMap(map, locationPoints);
@@ -236,41 +240,36 @@ public class StartActivity extends AppCompatActivity implements LocationListener
         }
     }
 
+    @SuppressLint("MissingPermission")
     public void onMapClick(View v) {
-        if(!map_active){
-            map_active=true;
+        if (!map_active) {
+            map_active = true;
             mapFragment.getView().setVisibility(View.VISIBLE);
             startLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (startLocation!=null){
+            if (startLocation != null) {
                 double lat = startLocation.getLatitude();
                 double lon = startLocation.getLongitude();
-                LatLng startPoint = new LatLng(lat,lon);
+                LatLng startPoint = new LatLng(lat, lon);
                 CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(startPoint)
                         .zoom(15)
                         .build();
                 map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
-        }
-        else if(map_active) {
-            map_active=false;
+        } else if (map_active) {
+            map_active = false;
             mapFragment.getView().setVisibility(View.INVISIBLE);
         }
     }
 
     public void onStopClick(View v) {
-        //Intent intent = new Intent(this, MainActivity.class);
-        //intent.putExtra("distance", data.getDistance());
-        //intent.putExtra("average", data.getAverageSpeed());
-        //intent.putExtra("time", currentTime);
-        Map<String,Object> training = new HashMap<>();
+        Map<String, Object> training = new HashMap<>();
         training.put("distance", data.getDistance());
         training.put("averageSpeed", data.getAverageSpeed());
         training.put("time", currentTime);
-        training.put("startTime", Calendar.getInstance().getTime());
+        training.put("startTime", Calendar.getInstance().getTimeInMillis());
         db.collection("users").document(user.getUid()).collection("trainings").add(training);
         resetData();
-        //startActivity(intent);
         finish();
     }
 
@@ -290,14 +289,13 @@ public class StartActivity extends AppCompatActivity implements LocationListener
             data.setOnGpsServiceUpdate(onGpsServiceUpdate);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
-            }
-            else{
+            } else {
                 if (mLocationManager.getAllProviders().indexOf(LocationManager.GPS_PROVIDER) >= 0) {
                     mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, this);
                 } else {
-                    Toast.makeText(this,"Не удаётся подключиться к GPS",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Не удаётся подключиться к GPS", Toast.LENGTH_SHORT).show();
                 }
 
                 if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -305,17 +303,14 @@ public class StartActivity extends AppCompatActivity implements LocationListener
                 }
                 mLocationManager.addGpsStatusListener(this);
             }
-        }
-        else{
+        } else {
             if (mLocationManager.getAllProviders().indexOf(LocationManager.GPS_PROVIDER) >= 0) {
                 mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, this);
             } else {
-                Toast.makeText(this,"Не удаётся подключиться к GPS",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Не удаётся подключиться к GPS", Toast.LENGTH_SHORT).show();
             }
             mLocationManager.addGpsStatusListener(this);
         }
-
-
     }
 
     @Override
@@ -328,7 +323,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
         Gson gson = new Gson();
         String json = gson.toJson(data);
         prefsEditor.putString("data", json);
-        prefsEditor.commit();
+        prefsEditor.apply();
     }
 
     @Override
@@ -358,10 +353,12 @@ public class StartActivity extends AppCompatActivity implements LocationListener
         }
     }
 
+    @SuppressLint("MissingPermission")
     public void onGpsStatusChanged(int event) {
         switch (event) {
             case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
                 GpsStatus gpsStatus = mLocationManager.getGpsStatus(null);
+
                 int satsInView = 0;
                 int satsUsed = 0;
                 Iterable<GpsSatellite> sats = gpsStatus.getSatellites();
@@ -386,7 +383,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
         }
     }
 
-    public void showGpsDisabledDialog(){
+    public void showGpsDisabledDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setPositiveButton("Настройки местоположения", new DialogInterface.OnClickListener() {
             @Override
@@ -401,7 +398,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
         dialog.show();
     }
 
-    private void resetData(){
+    private void resetData() {
         time.stop();
         distance.setText("");
         time.setText("00:00:00");
@@ -414,18 +411,21 @@ public class StartActivity extends AppCompatActivity implements LocationListener
 
     @Override
     public void onBackPressed() {
-        if (data.isRunning()==false)
+        if (!data.isRunning())
             super.onBackPressed();
     }
 
     @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {}
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+    }
 
     @Override
-    public void onProviderEnabled(String s) {}
+    public void onProviderEnabled(String s) {
+    }
 
     @Override
-    public void onProviderDisabled(String s) {}
+    public void onProviderDisabled(String s) {
+    }
 
     public static class ChangeProgressEvent {
 
@@ -435,29 +435,33 @@ public class StartActivity extends AppCompatActivity implements LocationListener
             this.progressmessage = progressmessage;
         }
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+            } else {
+                map.setMyLocationEnabled(true);
             }
-            else{ map.setMyLocationEnabled(true);}
         }
 
     }
-    private void drawRouteOnMap(GoogleMap map, List<LatLng> positions){
+
+    private void drawRouteOnMap(GoogleMap map, List<LatLng> positions) {
         PolylineOptions options = new PolylineOptions().width(10).color(Color.BLUE).geodesic(true);
         options.addAll(positions);
         Polyline polyline = map.addPolyline(options);
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(positions.get(positions.size()-1).latitude, positions.get(positions.size()-1).longitude))
+                .target(new LatLng(positions.get(positions.size() - 1).latitude, positions.get(positions.size() - 1).longitude))
                 .zoom(15)
                 .bearing(90)
                 .build();
         map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
-    private void refreshMap(GoogleMap mapInstance){
+
+    private void refreshMap(GoogleMap mapInstance) {
         mapInstance.clear();
     }
 }

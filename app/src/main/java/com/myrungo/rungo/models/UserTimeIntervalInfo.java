@@ -6,10 +6,20 @@ import android.support.annotation.NonNull;
 
 public final class UserTimeIntervalInfo implements Parcelable {
 
+    public static final Creator<UserTimeIntervalInfo> CREATOR = new Creator<UserTimeIntervalInfo>() {
+        @Override
+        public final UserTimeIntervalInfo createFromParcel(@NonNull final Parcel in) {
+            return new UserTimeIntervalInfo(in);
+        }
+
+        @Override
+        public final UserTimeIntervalInfo[] newArray(final int size) {
+            return new UserTimeIntervalInfo[size];
+        }
+    };
+
     public final double totalDistance;
-
     public final long totalNumberTrainings;
-
     public final double totalAverageSpeed;
 
     public UserTimeIntervalInfo(double totalDistance, long totalNumberTrainings, double totalAverageSpeed) {
@@ -35,17 +45,5 @@ public final class UserTimeIntervalInfo implements Parcelable {
     public final int describeContents() {
         return 0;
     }
-
-    public static final Creator<UserTimeIntervalInfo> CREATOR = new Creator<UserTimeIntervalInfo>() {
-        @Override
-        public final UserTimeIntervalInfo createFromParcel(@NonNull final Parcel in) {
-            return new UserTimeIntervalInfo(in);
-        }
-
-        @Override
-        public final UserTimeIntervalInfo[] newArray(final int size) {
-            return new UserTimeIntervalInfo[size];
-        }
-    };
 
 }

@@ -45,7 +45,8 @@ public class ChallengeFragment extends Fragment {
     private FirebaseFirestore profilered = FirebaseFirestore.getInstance();
     private static final String TAG = ChallengeFragment.class.getSimpleName();
 
-    @Nullable final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    @Nullable
+    final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private Map data, data2;
     private ListView listView;
     private List<ChallengeItem> challengeItems;
@@ -53,20 +54,19 @@ public class ChallengeFragment extends Fragment {
     ImageLoader imageLoader = AppController.getInstance().getImageLoader();
 
     Dialog MyDialog;
-    Button accept,close;
+    Button accept, close;
 
-    @SuppressLint("NewApi")
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_challenge, container, false);
         listView = view.findViewById(R.id.list);
-        Log.d(TAG, user.getUid().toString()+"<=>");
+        Log.d(TAG, user.getUid() + "<=>");
 
 
-        challengeItems = new ArrayList<ChallengeItem>();
+        challengeItems = new ArrayList<>();
 
         challengeListAdapter = new ChallengeListAdapter(getActivity(), challengeItems);
         listView.setAdapter(challengeListAdapter);
@@ -93,10 +93,9 @@ public class ChallengeFragment extends Fragment {
                                 item.setMinutes((Long) data.get("minutes"));
                                 item.setId((String) data.get("id"));
                                 String imageURL = ((String) data.get("imgURL"));
-                                if (imageURL==null){
-
+                                if (imageURL != null) {
+                                    item.setImge(imageURL);
                                 }
-                                else item.setImge(imageURL);
                                 challengeItems.add(item);
                             }
                             challengeListAdapter.notifyDataSetChanged();
@@ -114,22 +113,17 @@ public class ChallengeFragment extends Fragment {
                 });
 
 
-
-
-
-
         return view;
     }
 
-    private void set_challenge(int position)
-    {
+    private void set_challenge(int position) {
         final ChallengeItem challengeItem;
         challengeItem = (ChallengeItem) listView.getAdapter().getItem(position);
         String UID = user.getUid();
         final DocumentReference sfDocRef = profilered.collection("users").document(UID);
         profilered.runTransaction(new Transaction.Function<Void>() {
             @Override
-            public Void apply(Transaction transaction) throws FirebaseFirestoreException {
+            public Void apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
                 DocumentSnapshot snapshot = transaction.get(sfDocRef);
                 String chal_id = challengeItem.getId();
                 transaction.update(sfDocRef, "active_challenge", chal_id);
@@ -153,8 +147,8 @@ public class ChallengeFragment extends Fragment {
                 });
     }
 
-    private void set_dialog(final int position)
-    {
+    @SuppressLint("SetTextI18n")
+    private void set_dialog(final int position) {
         ChallengeItem challengeItem;
         challengeItem = (ChallengeItem) listView.getAdapter().getItem(position);
 
@@ -167,11 +161,11 @@ public class ChallengeFragment extends Fragment {
         TextView textDistance = MyDialog.findViewById(R.id.textDistance);
         TextView textHour = MyDialog.findViewById(R.id.textHour);
 
-        if (challengeItem.distance!=null){
-            textDistance.setText(challengeItem.distance.toString()+"км");
+        if (challengeItem.distance != null) {
+            textDistance.setText(challengeItem.distance.toString() + "км");
         }
-        if (challengeItem.hour!=null){
-            textHour.setText("0"+challengeItem.hour.toString()+":"+challengeItem.minutes.toString());
+        if (challengeItem.hour != null) {
+            textHour.setText("0" + challengeItem.hour.toString() + ":" + challengeItem.minutes.toString());
         }
 
 
@@ -198,7 +192,8 @@ public class ChallengeFragment extends Fragment {
 
         MyDialog.show();
     }
-    private void accept_challenge(int position){
+
+    private void accept_challenge(int position) {
 
     }
 

@@ -33,6 +33,18 @@ public final class TimeIntervalFragment extends Fragment {
     private final String yearInfoTag = "yearInfo";
 
     @Nullable
+    private ProfileContract.View profileFragment;
+
+    @Nullable
+    private UserTimeIntervalsInfo weekInfo;
+
+    @Nullable
+    private UserTimeIntervalsInfo monthInfo;
+
+    @Nullable
+    private UserTimeIntervalsInfo yearInfo;
+
+    @Nullable
     @Override
     public final View onCreateView(
             @NonNull final LayoutInflater inflater,
@@ -81,9 +93,6 @@ public final class TimeIntervalFragment extends Fragment {
         return view;
     }
 
-    @Nullable
-    private ProfileContract.View profileFragment;
-
     @NonNull
     private ProfileContract.View getProfileFragment() {
         if (profileFragment == null) {
@@ -116,9 +125,6 @@ public final class TimeIntervalFragment extends Fragment {
         return profileFragment;
     }
 
-    @Nullable
-    private UserTimeIntervalsInfo weekInfo;
-
     @NonNull
     private UserTimeIntervalsInfo getWeekInfo() {
         if (weekInfo == null) {
@@ -128,9 +134,6 @@ public final class TimeIntervalFragment extends Fragment {
         return weekInfo;
     }
 
-    @Nullable
-    private UserTimeIntervalsInfo monthInfo;
-
     @NonNull
     private UserTimeIntervalsInfo getMonthInfo() {
         if (monthInfo == null) {
@@ -139,9 +142,6 @@ public final class TimeIntervalFragment extends Fragment {
 
         return monthInfo;
     }
-
-    @Nullable
-    private UserTimeIntervalsInfo yearInfo;
 
     @NonNull
     private UserTimeIntervalsInfo getYearInfo() {

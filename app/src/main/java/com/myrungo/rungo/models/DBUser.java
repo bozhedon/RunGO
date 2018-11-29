@@ -45,20 +45,20 @@ public final class DBUser {
 
     private double totalDistance = 0.0;
 
-    public double getTotalDistance() {
-        return totalDistance;
-    }
-
-    public void setTotalDistance(double totalDistance) {
-        this.totalDistance = totalDistance;
-    }
-
     public DBUser() {
         this.uid = "";
     }
 
     public DBUser(@NonNull final String uid) {
         this.uid = uid.trim();
+    }
+
+    public double getTotalDistance() {
+        return totalDistance;
+    }
+
+    public void setTotalDistance(double totalDistance) {
+        this.totalDistance = totalDistance;
     }
 
     @NonNull

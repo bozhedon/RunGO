@@ -20,14 +20,14 @@ public final class ProfilePresenter
         extends BaseCatPresenter<ProfileContract.View>
         implements ProfileContract.Presenter<ProfileContract.View> {
 
+    @Nullable
+    private List<Training> currentUserTrainings;
+
     @Override
     public void onViewCreate() {
         getView().showProgressIndicator();
         getView().dressUp();
     }
-
-    @Nullable
-    private List<Training> currentUserTrainings;
 
     @NonNull
     private List<Training> getCurrentUserTrainings() {
@@ -69,12 +69,6 @@ public final class ProfilePresenter
         }
 
         getView().hideProgressIndicator();
-    }
-
-    enum TimeInterval {
-        WEEK,
-        MONTH,
-        YEAR
     }
 
     @NonNull
@@ -209,6 +203,12 @@ public final class ProfilePresenter
     @NonNull
     private MainContract.View getMainView() {
         return (MainContract.View) getActivity();
+    }
+
+    enum TimeInterval {
+        WEEK,
+        MONTH,
+        YEAR
     }
 
 }

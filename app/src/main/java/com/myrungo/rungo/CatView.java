@@ -10,6 +10,7 @@ import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
+
 import com.bumptech.glide.Glide;
 
 public class CatView extends ConstraintLayout {
@@ -311,7 +312,7 @@ public class CatView extends ConstraintLayout {
     public void cry() {
         stop();
 
-        Animation cryAnimation = new RotateAnimation(0, -30, eyeLeft.getWidth()/2, eyeLeft.getHeight()/2);
+        Animation cryAnimation = new RotateAnimation(0, -30, eyeLeft.getWidth() / 2, eyeLeft.getHeight() / 2);
         cryAnimation.setDuration(100);
         cryAnimation.setRepeatMode(ValueAnimator.REVERSE);
         cryAnimation.setRepeatCount(Animation.INFINITE);
@@ -340,7 +341,7 @@ public class CatView extends ConstraintLayout {
     public void slap() {
         stop();
 
-        Animation headAnimation = new RotateAnimation(0, 10, headWidth/2, headHeight/2);
+        Animation headAnimation = new RotateAnimation(0, 10, headWidth / 2, headHeight / 2);
         headAnimation.setDuration(500);
         headAnimation.setRepeatMode(ValueAnimator.REVERSE);
         headAnimation.setRepeatCount(1);

@@ -42,6 +42,9 @@ public final class MainPresenter
     @Nullable
     private FirebaseFirestore db;
 
+    @Nullable
+    private FirebaseAuth firebaseAuth;
+
     @NonNull
     private FirebaseFirestore getDB() {
         if (db == null) {
@@ -50,9 +53,6 @@ public final class MainPresenter
 
         return db;
     }
-
-    @Nullable
-    private FirebaseAuth firebaseAuth;
 
     @NonNull
     private FirebaseAuth getFirebaseAuth() {

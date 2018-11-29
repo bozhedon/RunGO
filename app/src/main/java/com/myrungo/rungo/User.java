@@ -22,4 +22,5 @@ public class User implements Serializable {
         this.skin = skin;
         this.head = head;
     }
+
 }

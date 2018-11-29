@@ -73,6 +73,7 @@ public class AppController extends Application {
 
         return mRequestQueue;
     }
+
     public ImageLoader getImageLoader() {
         getRequestQueue();
         if (mImageLoader == null) {
@@ -81,6 +82,7 @@ public class AppController extends Application {
         }
         return this.mImageLoader;
     }
+
     public LruBitmapCache getLruBitmapCache() {
         if (mLruBitmapCache == null)
             mLruBitmapCache = new LruBitmapCache();

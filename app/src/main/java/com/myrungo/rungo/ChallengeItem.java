@@ -1,6 +1,7 @@
 package com.myrungo.rungo;
 
 public class ChallengeItem {
+
     public String id;
     public String url;
     public String image;
@@ -10,7 +11,7 @@ public class ChallengeItem {
     public ChallengeItem() {
     }
 
-    public ChallengeItem(String customPic,String id, Long distance, Long hour, Long minutes, String url, String image) {
+    public ChallengeItem(String customPic, String id, Long distance, Long hour, Long minutes, String url, String image) {
         super();
         this.customPic = customPic;
         this.id = id;
@@ -45,24 +46,30 @@ public class ChallengeItem {
         this.url = url;
     }
 
-    public Long getDistance(){
+    public Long getDistance() {
         return distance;
     }
-    public void setDistance(Long distance){
+
+    public void setDistance(Long distance) {
         this.distance = distance;
     }
-    public Long getHour(){
+
+    public Long getHour() {
         return hour;
     }
-    public void setHour(Long hour){
+
+    public void setHour(Long hour) {
         this.hour = hour;
     }
-    public Long getMinutes(){
+
+    public Long getMinutes() {
         return minutes;
     }
-    public void setMinutes(Long minutes){
+
+    public void setMinutes(Long minutes) {
         this.minutes = minutes;
     }
+
     public static String getCustomPic() {
         return customPic;
     }
